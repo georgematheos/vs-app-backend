@@ -1,7 +1,8 @@
 ## Note:
-This is a copy of the api written in a [google drive document](https://docs.google.com/document/d/1AZlMTdyBrJAG-9qV4d5XjEoWY8OIUEbOgibg2oFzDnI/edit?usp=sharing).  The document is, at the moment, the official API and may be more up to date than this document.
+This is a copy of the api written in a [google drive document](https://docs.google.com/document/d/1AZlMTdyBrJAG-9qV4d5XjEoWY8OIUEbOgibg2oFzDnI/edit?usp=sharing).  The google drive document is, at the moment, the official API and may be more up to date than this document.
 
 –––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+
 Application Functions:
 * Authentication
 * Getting/Ending V’s
@@ -28,7 +29,7 @@ const feathersRestClient = feathers()
 
 ### Authentication
 
-POST /api/authenticate
+    POST /api/authenticate
 Authenticates a user and returns a valid JWT if successful.
 
 Request Body:
@@ -79,7 +80,7 @@ feathersRestClient.authenticate({
 
 ### Getting Vs
 
-POST /api/visitations/
+    POST /api/visitations/
 This initiates a Vs session.  If the visitor who sends the request is an approved visitor of the host, this will begin Vs.  If the visitor is not an approved visitor, this will send a request to the host asking for approval of the Vs.
 
 This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for the person specified in the request body as by `visitorUsername`.
@@ -130,7 +131,7 @@ feathersRestClient.service(‘remove-from-visitations’).update(‘username’,
 
 
 
-GET /api/visitations-requests/
+    GET /api/visitations-requests/
 Returns information about any Vs requests that have been sent to the user specified by `hostUsername` in the URL parameters.
 
 ##### Request body (use URL parameters):
@@ -163,7 +164,7 @@ feathersRestClient.service(‘visitations-requests’).find({ query: {
 
 
 
-PUT /api/visitations-request-response/:hostUsername
+    PUT /api/visitations-request-response/:hostUsername
 This command allows a host (specified in the URL by `:hostUsername`) to respond to a visitor’s request for visitations.
 
 This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for the user specified by `:hostUsername` in the URL.
