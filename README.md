@@ -10,3 +10,6 @@ The server source code is in `src`.
 `src/index.js` is the base file that starts the server.
 
 The feathers app started by `src/index.js` is created in `src/root-app.js`.  This root app puts an instance of the feathers app created in `src/api-app.js` at the URL route `/api`.  The feathers api app is where most of the server's brains are.  The root app mostly just serves the public files, and handles some middleware like CORS, compression, and security.
+
+## client-authentication
+This branch is for designing and testing code used to help make the client-side of authentication easy and somewhat automatic.
