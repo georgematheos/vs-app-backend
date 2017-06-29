@@ -1,7 +1,7 @@
-## Note:
+#### Note:
 This is a copy of the api written in a [google drive document](https://docs.google.com/document/d/1AZlMTdyBrJAG-9qV4d5XjEoWY8OIUEbOgibg2oFzDnI/edit?usp=sharing).  The google drive document is, at the moment, the official API and may be more up to date than this document.
 
-–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+---
 
 Application Functions:
 * Authentication
@@ -13,9 +13,11 @@ Application Functions:
 
 (Note: a draft of BOLD items have been completed or are in progress.)
 
-–––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––-
+---
 
 The server for the Vs application uses the feathers.js (feathersjs.com) framework.  This framework provides tools for the client to make it easier to communicate with the server. While these are not necessary, it is recommended that the client use these tools in order to maintain consistency with the server, and to help make the client code more succinct.
+
+---
 
 ## REST (classic HTTP request/response) API
 This webpage explains how to set up a feathers.js REST client: https://docs.feathersjs.com/guides/step-by-step/basic-feathers/rest-client.html. Pay particular attention to the section labeled “Writing the HTML Frontend” – the rest of the page is not important at this point, and may be confusing for one who has not read the prior documentation.
@@ -77,6 +79,7 @@ feathersRestClient.authenticate({
 – ‘isDayStudent’: a boolean, true if user is a day student, false if not
 – `profileImageURL`: a url linking to an image of the user
 
+---
 
 ### Getting Vs
 
@@ -102,11 +105,11 @@ feathersRestClient.service(‘visitations’).create({
 });
 ```
 
-
 ##### Successful response status code:
 `201` if the visitor is an approved visitor and Vs have begun
 `202` if the visitor is not an approved visitor, and a request has been sent to the host so they can approve the Vs
 
+---
 
 	PUT /api/remove-from-visitations/:username
 This ends a user’s involvement in a Vs session (the user is specified by `:username` in the URL).  If the user (again, specified in the URL by `:username`) who sends this request is a visitor, and Vs have started, this removes that visitor from the Vs session.  If the user is a visitor and Vs have not started (but a request has been sent to the host asking for permission to begin Vs), this command cancels the visitor’s request to the host for Vs.  If the user who sends this is a host of a session of visitations, this ends the entire Vs session (removing the host and all visitors from the Vs).
@@ -127,9 +130,7 @@ feathersRestClient.service(‘remove-from-visitations’).update(‘username’,
 ##### Successful response status code:
 `200`
 
-
-
-
+---
 
     GET /api/visitations-requests/
 Returns information about any Vs requests that have been sent to the user specified by `hostUsername` in the URL parameters.
@@ -162,7 +163,7 @@ feathersRestClient.service(‘visitations-requests’).find({ query: {
     – `gender`
     – `graduationYear`: The year the student is scheduled to graduate fromExeter.
 
-
+---
 
     PUT /api/visitations-request-response/:hostUsername
 This command allows a host (specified in the URL by `:hostUsername`) to respond to a visitor’s request for visitations.
@@ -186,6 +187,7 @@ feathersRestClient.service(‘visitations-request-response`).update(‘hostUsern
 });
 ```
 
+---
 
 ### Approved Visitors
 
@@ -210,6 +212,8 @@ feathersRestClient.service(‘approved-visitors’).update(‘username’, {
 });
 ```
 
+---
+
 	DELETE /api/approved-visitors/:listOwnerUsername
 Removes an approved visitor from the approved visitors list of a user specified by `:listOwnerUsername` in the URL.
 
@@ -232,6 +236,7 @@ feathersRestClient.service(‘approved-visitors’).remove(‘listOwnerUsername�
 });
 ```
 
+---
 
 	PUT /api/block-approved-visitor-addition/:username
 Prevents a user from attempting to add the user who issues this command (specified by `:username` in the url) to their approved visitor’s list.  This restriction can be removed by the user who creates it.
@@ -254,6 +259,8 @@ feathersRestClient.service(‘block-approved-visitor-addition’).update(‘user
 });
 ```
 
+---
+
 	DELETE /api/block-approved-visitor-addition/:username
 Removes a ban which the user specified by `:username` in the url had put on another user, preventing the second user from adding the first to their approved visitor’s list.
 
@@ -275,6 +282,8 @@ feathersRestClient.service(‘block-approved-visitor-addition’).remove(‘user
 });
 ```
 
+---
+
 ### Vs Restrictions
 
 	PUT /api/vs-restrictions/:username
@@ -293,6 +302,8 @@ feathersRestClient.service(‘vs-restrictions’).update(‘usernameOfStudent’
 });
 ```
 
+---
+
 	DELETE /api/vs-restrictions/:username
 Removes Vs restrictions from the student specified by `:username` in the URL.
 
@@ -308,6 +319,8 @@ feathersRestClient.service(‘vs-restrictions’).remove(‘usernameOfStudent’
     // do something with error if request is unsuccessful
 });
 ```
+
+---
 
 ### Display Vs info for Faculty
 
@@ -361,7 +374,7 @@ feathersRestClient.service(‘current-vs’).find({ query: {
 
 It is worth clarifying what the term “Vs session” refers to.  A Vs session is a continuous, uninterrupted period during which Vs are occurring in an individual’s room.  The same visitor does not have to be getting Vs for the whole time, as long as (an)other visitor(s) joins the Vs before the first visitor leaves.  The Vs session ends once all visitors have left the room, and at that point, a new Vs session begins the next time a visitor begins to get Vs in the room.
 
-
+---
 
 ## Websockets API
 Websockets is another technique for having the server and client communicate.  While REST only allows the client to initiate communication, making requests for the server to respond to, Websockets allows either the client or server to initiate communication.  Thus, it is useful for notifications, so the server can send information to the client when a notification occurs, without the client first making a request.
@@ -381,10 +394,7 @@ Note that this `feathersSocketClient` can be used instead of the `feathersRestCl
 
 The use of the websockets client is for receiving information from the server, so the API that will be described is the format of information the server will send the client, and how to set up the client to receive this information.  Use the REST API to send information to the server.
 
-
-
-
-### Notification: Vs Request
+---
 
 #### Event: `vs-request`
 
@@ -407,6 +417,8 @@ feathersNotificationReciever.on(‘vs-request’, body => {
     // do something with the information received (called ‘body’)
 });
 ```
+
+---
 
 #### Event: `vs-began-in-dorm`
 
@@ -439,6 +451,7 @@ feathersNotificationReciever.on(‘vs-began-in-dorm’, body => {
 });
 ```
 
+---
 
 #### Event: `vs-in-dorm-changed`
 Sent to a dorm faculty when there is a change in a Vs session currently occurring in the dorm.  This includes someone joining or leaving the Vs, or the Vs session ending.
