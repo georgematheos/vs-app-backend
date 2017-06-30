@@ -3,7 +3,33 @@ A [google drive document](https://docs.google.com/document/d/1AZlMTdyBrJAG-9qV4d
 
 ---
 
-#### Application Functions
+## Table of Contents
+
+* [Application Functions](#appFunctions)
+* [Feathers](#feathers)
+* [REST API](#restApi)
+  * [Authentication](#authentication)
+    * [Authenticate user](#authenticateUser)
+  * [Visitations](#visitations)
+    * [Get visitations](#getVisitations)
+    * [View visitations data](#viewVisitationsData)
+    * [Remove visitor from visitations](#removeVisitorFromVisitations)
+    * [End Vs session](#endVsSession)
+  * [Visitations requests](#visitationsRequests)
+    * [View visitations requests](#viewVisitationsRequests)
+    * [Respond to visitations request](#respondToVisitationsRequest)
+  * [Approved Visitors](#approvedVisitors)
+    * [Add an approved visitor](#addAnApprovedVisitor)
+    * [Remove an approved visitor](#removeAnApprovedVisitor)
+    * [Block approved visitor addition](#blockApprovedVisitorAddition)
+    * [Remove a block on approved visitor addition](#removeABlockOnApprovedVisitorAddition)
+  * [Vs Restrictions](#vsRestrictions)
+    * [Put a user on Vs restrictions](#putAUserOnVsRestrictions)
+    * [Remove a user from Vs restrictions](#removeAUserFromVsRestrictions)
+  * [Websockets API](#websocketsApi)
+
+---
+#### <a name="appFunctions"></a>Application Functions
 * Authentication
 * Getting/Ending V’s
 * Add/remove approved visitors
@@ -13,13 +39,13 @@ A [google drive document](https://docs.google.com/document/d/1AZlMTdyBrJAG-9qV4d
 
 ---
 
-#### Feathers
+#### <a name="feathers"></a>Feathers
 
 The server for the Vs application uses the [feathers.js](feathersjs.com) framework.  This framework provides tools for the client to make it easier to communicate with the server. While these are not necessary, it is recommended that the client use these tools in order to maintain consistency with the server, and to help make the client code more succinct.
 
 ---
 
-## REST (classic HTTP request/response) API
+## <a name="restApi"></a>REST (classic HTTP request/response) API
 This webpage explains how to set up a feathers.js REST client: https://docs.feathersjs.com/guides/step-by-step/basic-feathers/rest-client.html. Pay particular attention to the section labeled “Writing the HTML Frontend” – the rest of the page is not important at this point, and may be confusing for one who has not read the prior documentation.
 Alternatively, one can include the feathers JS files in a more modular way (which is a better design paradigm in the long run, though it will require a bit of setup).  This process will require using a module loader.  This page contains some details about the process: https://docs.feathersjs.com/api/client.html.
 
@@ -29,9 +55,11 @@ const feathersRestClient = feathers()
 .configure(feathers.rest(location.origin + ‘/api’).fetch(fetch));
 ```
 
-### Authentication
+---
 
-#### Authenticate user
+### <a name="authentication"></a>Authentication
+
+#### <a name="authenticateUser"></a>Authenticate user
     POST /api/authenticate
 Authenticates a user and returns a valid JWT if successful.
 
@@ -79,9 +107,9 @@ feathersRestClient.authenticate({
 
 ---
 
-### Visitations
+### <a name="visitations"></a>Visitations
 
-#### Get visitations
+#### <a name="getVisitations"></a>Get visitations
     POST /api/visitations/
 This initiates a Vs session.  If the visitor who sends the request is an approved visitor of the host, this will begin Vs.  If the visitor is not an approved visitor, this will send a request to the host asking for approval of the Vs.
 
@@ -110,7 +138,7 @@ feathersRestClient.service(‘visitations’).create({
 
 ---
 
-#### View Visitations Data
+#### <a name="viewVisitationsData"></a>View Visitations Data
     GET /api/visitations/
 Sends information about Vs.  This may be filtered in many ways, including to only send Vs which are currently occurring.
 
@@ -174,7 +202,7 @@ It is worth clarifying what the term “Vs session” refers to.  A Vs session i
 
 ---
 
-#### Remove visitor from visitations
+#### <a name="removeVisitorFromVisitations"></a>Remove visitor from visitations
     PATCH /api/visitations/:id
 
 ##### Request body (uses [JSON PATCH format](http://jsonpatch.com/))
@@ -203,7 +231,7 @@ feathersRestClient.service(‘visitations’).patch(':visitationsId', {
 
 ---
 
-### End Vs session
+### <a name="endVsSession"></a>End Vs session
     PATCH /api/visitations/:id
 
 ##### Request body (uses [JSON PATCH format](http://jsonpatch.com/))
@@ -233,9 +261,9 @@ feathersRestClient.service(‘visitations’).patch(':visitationsID', {
 ```
 
 ---
-### Visitations requests
+### <a name="visitationsRequests"></a>Visitations requests
 
-#### View visitations requests
+#### <a name="viewVisitationsRequests"></a>View visitations requests
     GET /api/visitations-requests/
 Returns information about any Vs requests that have been sent to the user specified by `hostUsername` in the request parameters.
 
@@ -274,7 +302,7 @@ feathersRestClient.service('visitations-requests').find({ query: {
 
 ---
 
-#### Respond to visitations request
+#### <a name="respondToVisitationsRequest"></a>Respond to visitations request
     DELETE /api/visitations-request/:id
 
 Responds to and then deletes the visitations request with the id specified by `:id` in the URL.
@@ -301,9 +329,9 @@ feathersRestClient.service('visitations-requests').remove(':visitationsRequestID
 
 ---
 
-### Approved Visitors
+### <a name="approvedVisitors"></a>Approved Visitors
 
-#### Add an approved visitor
+#### <a name="addAnApprovedVisitor"></a>Add an approved visitor
     PATCH /api/approved-visitors/:listOwnerUsername
 
 ##### Request body (uses [JSON PATCH format](http://jsonpatch.com/))
@@ -334,7 +362,7 @@ feathersRestClient.service(‘approved-visitors’).patch(':listOwnerUsername', 
 
 ---
 
-#### Remove an approved visitor
+#### <a name="removeAnApprovedVisitor"></a>Remove an approved visitor
   	PATCH /api/approved-visitors/:listOwnerUsername
 
 ##### Request body (uses [JSON PATCH format](http://jsonpatch.com/))
@@ -365,7 +393,7 @@ feathersRestClient.service(‘approved-visitors’).patch(':listOwnerUsername', 
 ```
 
 ---
-#### Block approved visitor addition
+#### <a name="blockApprovedVisitorAddition"></a>Block approved visitor addition
 	POST /api/approved-visitor-addition-block/
 
 Prevents a user from attempting to add the user who issues this command to their approved visitors list.  This restriction can be removed by the user who creates it.
@@ -394,7 +422,7 @@ feathersRestClient.service('approved-visitor-addition-block').create({
 
 ---
 
-#### Remove a block on approved visitor addition
+#### <a name="removeABlockOnApprovedVisitorAddition"></a>Remove a block on approved visitor addition
 	 DELETE /api/approved-visitor-addition-block/:approvedVisitorUsername/:listOwnerUsername
 Removes a ban which the user specified by `:approvedVisitorUsername` in the URL had put on another user, specified by `:listOwnerUsername`.  This ban had prevented the list owner from adding the other user as an approved visitor, and this command will remove that ban.
 
@@ -415,9 +443,9 @@ feathersRestClient.service('approved-visitor-addition-block').remove(':approvedV
 
 ---
 
-### Vs Restrictions
+### <a name="vsRestrictions"></a>Vs Restrictions
 
-#### Put a user on Vs restrictions
+#### <a name="putAUserOnVsRestrictions"></a>Put a user on Vs restrictions
 	 PUT /api/vs-restrictions/:username
 Applies Vs restrictions to the student specified by `:username` in the URL.
 
@@ -443,7 +471,7 @@ feathersRestClient.service('vs-restrictions').update(':usernameOfStudent', {
 ##### Successful response status code: `201`
 
 ---
-#### Remove a visitor from Vs restrictions
+#### <a name="removeAUserFromVsRestrictions"></a>Remove a user from Vs restrictions
 
 	 DELETE /api/vs-restrictions/:username
 Removes Vs restrictions from the student specified by `:username` in the URL.
@@ -465,7 +493,7 @@ feathersRestClient.service('vs-restrictions').remove(':usernameOfStudent', {})
 
 ---
 
-## Websockets API
+## <a name="websocketsApi"></a>Websockets API
 Websockets is another technique for having the server and client communicate.  While REST only allows the client to initiate communication, making requests for the server to respond to, Websockets allows either the client or server to initiate communication.  Thus, it is useful for notifications, so the server can send information to the client when a notification occurs, without the client first making a request.
 
 As with REST, feathers provides a client-side framework for Websockets.  Its configuration is quite simple and described in the “Changing the HTML for Feathers client WebSocket calls“ section of the following webpage: https://docs.feathersjs.com/guides/step-by-step/basic-feathers/socket-client.html.  As noted at the beginning of the REST API, there is a more modular way of including feathers files that is a better design paradigm.
