@@ -31,7 +31,7 @@ A [google drive document](https://docs.google.com/document/d/1AZlMTdyBrJAG-9qV4d
 ---
 #### <a name="appFunctions"></a>Application Functions
 * Authentication
-* Getting/Ending V’s
+* Getting/Ending V's
 * Add/remove approved visitors
 * Faculty adding or removing Vs restrictions
 * Display current Vs info for faculty
@@ -52,7 +52,7 @@ Alternatively, one can include the feathers JS files in a more modular way (whic
 In the feather client examples included in the REST API, it is assumed that the following commands have been run(with the proper javascript files included, as seen in the feathers documentation linked to above). These commands initialize the feathers rest client.
 ```javascript
 const feathersRestClient = feathers()
-.configure(feathers.rest(location.origin + ‘/api’).fetch(fetch));
+.configure(feathers.rest(location.origin + '/api').fetch(fetch));
 ```
 
 ---
@@ -75,16 +75,16 @@ Note that this is more complicated than the majority of the feathers requests, w
 ```javascript
 // Set up authentication abilities
 feathersRestClient.configure(feathers.authentication({
-    header: ‘x-auth-token’,
-    service: ‘authentication’,
+    header: 'x-auth-token',
+    service: 'authentication',
     storage: window.localStorage
 }));
 
 // Authenticate the user
 feathersRestClient.authenticate({
-    strategy: ‘local’,
-    username: ‘username’,
-    password: ‘password’
+    strategy: 'local',
+    username: ':username', // fill in real username and password
+    password: ':password'
 })
 .then(response => {
     // do something with the response if request is successful
@@ -121,9 +121,9 @@ This must include a valid JWT (javascript web token) in the header labeled `x-au
 
 ##### Feathers command:
 ```javascript
-feathersRestClient.service(‘visitations’).create({
-    visitorUsername: ‘visitorUsername’,
-    hostUsername: ‘hostUsername’
+feathersRestClient.service('visitations').create({
+    visitorUsername: 'visitorUsername',
+    hostUsername: 'hostUsername'
 }).then(results => {
     // do something with the response if request is successful
 })
@@ -163,7 +163,7 @@ All fields are optional.
 
 ##### Feathers command:
 ```javascript
-feathersRestClient.service(‘current-vs’).find({ query: {
+feathersRestClient.service('current-vs').find({ query: {
   dormitory: 'Webster' // or any other dormitory name
   onlyShowCurrent: true // or false
   // optionally include more fields
@@ -185,19 +185,19 @@ feathersRestClient.service(‘current-vs’).find({ query: {
   * `firstName`
   * `middleName`
   * `lastName`
-  * `dormitory`: The host’s dormitory (where the Vs are occurring).
+  * `dormitory`: The host's dormitory (where the Vs are occurring).
   * `gender`
   * `graduationYear`: The year the student is scheduled to graduate Exeter.
-  * `roomNumber`: The host’s room number (where the Vs are occurring)
+  * `roomNumber`: The host's room number (where the Vs are occurring)
 * `visitors`: An array of user objects for each visitor.  Each object includes all the same fields as a host object except for `roomNumber`.  Each object also includes the following additional fields:
   * `timeJoinedVs`: The time when this visitor joined the Vs session (in the form of an ISO date)
-  * `timeLeftVs`: The time when this visitor left the Vs session (in the form of an ISO date).  If they haven’t left, this field will be null.
-  * `approvedVisitor`: Whether this student is an approved visitor of the host’s (a boolean value).
+  * `timeLeftVs`: The time when this visitor left the Vs session (in the form of an ISO date).  If they haven't left, this field will be null.
+  * `approvedVisitor`: Whether this student is an approved visitor of the host's (a boolean value).
 * `startTime`: The time when the Vs session started (ie. when the first visitor joined Vs) (in the form of an ISO date)
-* `endTime`: The time when the Vs session ended (ie. when the last visitor left Vs) (in the form of an ISO date) (If the Vs haven’t ended, this will be null).
+* `endTime`: The time when the Vs session ended (ie. when the last visitor left Vs) (in the form of an ISO date) (If the Vs haven't ended, this will be null).
 - `ongoing`: A boolean.  True if the Vs are currently occurring, false otherwise.
 
-It is worth clarifying what the term “Vs session” refers to.  A Vs session is a continuous, uninterrupted period during which Vs are occurring in an individual’s room.  The same visitor does not have to be getting Vs for the whole time, as long as (an)other visitor(s) joins the Vs before the first visitor leaves.  The Vs session ends once all visitors have left the room, and at that point, a new Vs session begins the next time a visitor begins to get Vs in the room.
+It is worth clarifying what the term “Vs session” refers to.  A Vs session is a continuous, uninterrupted period during which Vs are occurring in an individual's room.  The same visitor does not have to be getting Vs for the whole time, as long as (an)other visitor(s) joins the Vs before the first visitor leaves.  The Vs session ends once all visitors have left the room, and at that point, a new Vs session begins the next time a visitor begins to get Vs in the room.
 
 
 ---
@@ -217,7 +217,7 @@ This must include a valid JWT (javascript web token) in the header labeled `x-au
 
 ##### Feathers command:
 ```javascript
-feathersRestClient.service(‘visitations’).patch(':visitationsId', {
+feathersRestClient.service('visitations').patch(':visitationsId', {
   op: "remove",
   path: "/visitors/:username" // substitute in the visitor's actual username
 })
@@ -247,7 +247,7 @@ This must include a valid JWT (javascript web token) in the header labeled `x-au
 
 ##### Feathers command:
 ```javascript
-feathersRestClient.service(‘visitations’).patch(':visitationsID', {
+feathersRestClient.service('visitations').patch(':visitationsID', {
   op: "replace",
   path: "ongoing",
   value: false
@@ -275,7 +275,7 @@ This must include a valid JWT (javascript web token) in the header labeled `x-au
 ##### Feathers command:
 ```javascript
 feathersRestClient.service('visitations-requests').find({ query: {
- hostUsername = ’XXXXX’
+ hostUsername = 'XXXXX'
 }})
 .then(results => {
     // do something with the response if request is successful
@@ -345,7 +345,7 @@ This must include a valid JWT (javascript web token) in the header labeled `x-au
 
 #### Feathers command:
 ```javascript
-feathersRestClient.service(‘approved-visitors’).patch(':listOwnerUsername', { // substitute in the actual username
+feathersRestClient.service('approved-visitors').patch(':listOwnerUsername', { // substitute in the actual username
   op: "add",
   path: "/approvedVisitors[-]",
 	value: `:approvedVisitorUsername` // substitute in the actual username
@@ -373,13 +373,13 @@ Removes an approved visitor from the approved visitors list of a user specified 
 
 This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for either the user specified by `:listOwnerUsername` in the URL or the user specified by `approvedVisitorUsername` in the request body.
 
-NOTE: THIS COMMAND CAN BE RUN EITHER BY A LIST OWNER REMOVING ONE OF THEIR APPROVED VISITORS, OR BY AN APPROVED VISITOR WHO WISHES TO STOP BEING ANOTHER STUDENT’S APPROVED VISITOR.
+NOTE: THIS COMMAND CAN BE RUN EITHER BY A LIST OWNER REMOVING ONE OF THEIR APPROVED VISITORS, OR BY AN APPROVED VISITOR WHO WISHES TO STOP BEING ANOTHER STUDENT'S APPROVED VISITOR.
 
 ##### Request Body:
-– `approvedVisitorUsername`: The username of the approved visitor who should be removed from the user’s approved visitors list.
+– `approvedVisitorUsername`: The username of the approved visitor who should be removed from the user's approved visitors list.
 #### Feathers command:
 ```javascript
-feathersRestClient.service(‘approved-visitors’).patch(':listOwnerUsername', { // substitute in the actual username
+feathersRestClient.service('approved-visitors').patch(':listOwnerUsername', { // substitute in the actual username
   op: "remove",
 	approvedVisitorUsername: `:approvedVisitorUsername` // substitute in the actual username
 })
@@ -500,11 +500,11 @@ As with REST, feathers provides a client-side framework for Websockets.  Its con
 The feathers command examples below assume that the following commands have already been run, with the files above included:
 
 ```
-const socket = io(location.origin + ‘/api’);
+const socket = io(location.origin + '/api');
 const feathersSocketClient = feathers().configure(feathers.socketio(socket));
 
-// All notifications are sent with the service called ‘notifications’
-const feathersNotificationReciever = feathersSocketClient.service(‘notifications’);
+// All notifications are sent with the service called 'notifications'
+const feathersNotificationReciever = feathersSocketClient.service('notifications');
 ```
 
 Note that this `feathersSocketClient` can be used instead of the `feathersRestClient` in the examples in the REST API section without any syntax errors.  In fact, the server will most likely be designed so that this replacement will work just fine.  However, that is not a guarantee, and so I would recommend using the REST client for the REST commands.
@@ -529,9 +529,9 @@ Sent to a host when a visitor has issued a request to get Vs with the host.  Not
   – `graduationYear`: The year the student is scheduled to graduate fromExeter.
 
 ##### Feathers client command:
-```
-feathersNotificationReciever.on(‘vs-request’, body => {
-    // do something with the information received (called ‘body’)
+```javascript
+feathersNotificationReciever.on('vs-request', body => {
+    // do something with the information received (called 'body')
 });
 ```
 
@@ -550,21 +550,21 @@ Contains the following fields:
     – `firstName`
     – `middleName`
     – `lastName`
-    – `dormitory`: The host’s dormitory (where the Vs are occurring).
+    – `dormitory`: The host's dormitory (where the Vs are occurring).
     – `gender`
     – `graduationYear`: The year the student is scheduled to graduate Exeter.
-    – `roomNumber`: The host’s room number (where the Vs are occurring)
+    – `roomNumber`: The host's room number (where the Vs are occurring)
   – `visitors`: An array of user objects for each visitor.  Each object includes all the same fields as a host object except for `roomNumber`.  Each object also includes the following additional fields:
     – `timeJoinedVs`: The time when this visitor joined the Vs session (in the form of an ISO date)
-    – `timeLeftVs`: The time when this visitor left the Vs session (in the form of an ISO date).  If they haven’t left, this field will be null.
-    – `approvedVisitor`: Whether this student is an approved visitor of the host’s (a boolean value).
+    – `timeLeftVs`: The time when this visitor left the Vs session (in the form of an ISO date).  If they haven't left, this field will be null.
+    – `approvedVisitor`: Whether this student is an approved visitor of the host's (a boolean value).
   – `startTime`: The time when the Vs session started (ie. when the first visitor joined Vs) (in the form of an ISO date)
-  – `endTime`: The time when the Vs session ended (ie. when the last visitor left Vs) (in the form of an ISO date) (If the Vs haven’t ended, this will be null).
+  – `endTime`: The time when the Vs session ended (ie. when the last visitor left Vs) (in the form of an ISO date) (If the Vs haven't ended, this will be null).
 
 ##### Feathers client command:
-```
-feathersNotificationReciever.on(‘vs-began-in-dorm’, body => {
-    // do something with the information received (called ‘body’)
+```javascript
+feathersNotificationReciever.on('vs-began-in-dorm', body => {
+    // do something with the information received (called 'body')
 });
 ```
 
@@ -577,7 +577,8 @@ Sent to a dorm faculty when there is a change in a Vs session currently occurrin
 Same body is sent as in the event `vs-began-in-dorm`, but with the current information.
 
 ##### Feathers client command:
-```
-feathersNotificationReciever.on(‘vs-in-dorm-changed’, body => {
-    // do something with the information received (called ‘body’)
+```javascript
+feathersNotificationReciever.on('vs-in-dorm-changed', body => {
+    // do something with the information received (called 'body')
 });
+```
