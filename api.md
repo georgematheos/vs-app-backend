@@ -26,6 +26,8 @@ A [google drive document](https://docs.google.com/document/d/1AZlMTdyBrJAG-9qV4d
   * [Vs Restrictions](#vsRestrictions)
     * [Put a user on Vs restrictions](#putAUserOnVsRestrictions)
     * [Remove a user from Vs restrictions](#removeAUserFromVsRestrictions)
+    * [Block Vs requests from a user](#blockVsRequestsFromAUser)
+    * [Remove Vs request block](#removeVsRequestBlock)
 * [Websockets API](#websocketsApi)
   * [Notification for Vs request](#notificationForVsRequest)
   * [Notification for Vs beginning in dorm](#notificationForVsBeginningInDorm)
@@ -245,6 +247,7 @@ feathersRestClient.service('visitations').patch(':visitationsID', { // fill in r
 ```
 
 ---
+
 ### <a name="visitationsRequests"></a>Visitations requests
 
 #### <a name="viewVisitationsRequests"></a>View visitations requests
@@ -288,7 +291,7 @@ Responds to and then deletes the visitations request with the id specified by `:
 * `acceptRequest`: A boolean.  If included and `true`,  the visitations request will be accepted and Vs will begin.  If not included or `false`, the visitations request will be denied and Vs will NOT begin.
 
 
-#### Feathers command:
+##### Feathers command:
 ```javascript
 feathersRestClient.service('visitations-requests').remove(':visitationsRequestID', { query: { // fill in real ID
 	acceptResuest: true // or false
@@ -303,6 +306,54 @@ feathersRestClient.service('visitations-requests').remove(':visitationsRequestID
 ##### Successful response status code:
 * If visitations request is accepted (and Vs begin): `200` (or `201`, if this is the first visitor in a Vs session, and so a Vs session is created).  Also, a visitations object will be sent with information about the Vs session.
 * If the visitations request is denied: `204`
+
+---
+
+#### <a name="blockVsRequestsFromAUser"></a>Block Vs requests from a user
+    POST /api/vs-request-block
+
+Prevents a user from sending Vs requests to the user who issues this request.  This restriction can be removed by the user who creates it.
+
+This must include a valid JWT (javascript web token) in the header labeled x-auth-token. This JWT must be valid for the user specified by `hostUsername` in the request body.
+
+##### Request body (JSON):
+* `hostUsername`: The username of the host who is restricting another student from sending them Vs requests.
+* `visitorUsername`: The username of the user who is being restricted from sending the host Vs requests.
+
+##### Feathers command:
+```javascript
+feathersRestClient.service('vs-request-block').create({
+	hostUsername: `:hostUsername`, // fill in correct usernames
+  visitorUsername: `:visitorUsername`
+}).then(results => {
+    // do something with the response if request is successful
+})
+.catch(err => {
+    // do something with error if request is unsuccessful
+});
+```
+
+##### Successful response status code: `201`
+
+---
+
+#### <a name="removeVsRequestBlock"></a>Remove Vs request block
+    DELETE /api/vs-request-block/:hostUsername/:visitorUsername
+Removes a Vs request block that the user specified by `:hostUsername` placed upon `:visitorUsername`.
+
+This must include a valid JWT (javascript web token) in the header labeled x-auth-token. This JWT must be valid for the user specified by `:hostUsername` in the URL.
+
+##### Feathers command:
+```javascript
+feathersRestClient.service('vs-request-block').remove(':hostUsername/:visitorUsername', {}).then(results => { // fill in real usernames
+    // do something with the response if request is successful
+})
+.catch(err => {
+    // do something with error if request is unsuccessful
+});
+```
+
+##### Successful response status code: `204`
 
 ---
 
