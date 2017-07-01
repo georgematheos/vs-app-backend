@@ -405,7 +405,8 @@ NOTE: THIS COMMAND CAN BE RUN EITHER BY A LIST OWNER REMOVING ONE OF THEIR APPRO
 
 ##### Request Body:
 – `approvedVisitorUsername`: The username of the approved visitor who should be removed from the user's approved visitors list.
-#### Feathers command:
+
+##### Feathers command:
 ```javascript
 feathersRestClient.service('approved-visitors').patch(':listOwnerUsername', { // substitute in the actual username
   op: "remove",
@@ -421,6 +422,30 @@ feathersRestClient.service('approved-visitors').patch(':listOwnerUsername', { //
 ```
 
 ---
+
+#### <a name="viewApprovedVisitors"></a>View approved visitors
+    GET /api/approved-visitors/:listOwnerUsername
+
+Returns a list of the approved visitors of a user specified by `:listOwnerUsername` in the URL.
+
+This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for the user specified by `:listOwnerUsername` in the URL.
+
+##### Feathers command:
+```javascript
+feathersRestClient.service('approved-visitors').get(':listOwnerUsername', {}) // substitute in the actual username
+.then(results => {
+    // do something with the response if request is successful
+})
+.catch(err => {
+    // do something with error if request is unsuccessful
+});
+
+```
+
+##### Successful response status code: `200`
+
+---
+
 #### <a name="blockApprovedVisitorAddition"></a>Block approved visitor addition
 	POST /api/approved-visitor-addition-block/
 
