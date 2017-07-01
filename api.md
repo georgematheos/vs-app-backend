@@ -26,7 +26,10 @@ A [google drive document](https://docs.google.com/document/d/1AZlMTdyBrJAG-9qV4d
   * [Vs Restrictions](#vsRestrictions)
     * [Put a user on Vs restrictions](#putAUserOnVsRestrictions)
     * [Remove a user from Vs restrictions](#removeAUserFromVsRestrictions)
-  * [Websockets API](#websocketsApi)
+* [Websockets API](#websocketsApi)
+  * [Notification for Vs request](#notificationForVsRequest)
+  * [Notification for Vs beginning in dorm](#notificationForVsBeginningInDorm)
+  * [Notification for Vs in dorm changing](#notificationForVsInDormChanging)
 
 ---
 #### <a name="appFunctions"></a>Application Functions
@@ -513,7 +516,8 @@ The use of the websockets client is for receiving information from the server, s
 
 ---
 
-#### Event: `vs-request`
+#### <a name="notificationForVsRequest"></a>Notification for Vs request
+##### Event: `vs-request`
 
 Sent to a host when a visitor has issued a request to get Vs with the host.  Note that the body is the same as the visitations request object described in the REST API under the `GET /api/visitations-requests/:hostUsername` request description.
 
@@ -537,7 +541,8 @@ feathersNotificationReciever.on('vs-request', body => {
 
 ---
 
-#### Event: `vs-began-in-dorm`
+#### <a name="notificationForVsBeginningInDorm"></a> Notification for Vs beginning in dorm
+##### Event: `vs-began-in-dorm`
 
 Sent to a dorm faculty member when a student in the dorm begins getting Vs.
 
@@ -570,7 +575,8 @@ feathersNotificationReciever.on('vs-began-in-dorm', body => {
 
 ---
 
-#### Event: `vs-in-dorm-changed`
+#### <a name="notificationForVsInDormChanging"></a>Notification for Vs in dorm changing
+##### Event: `vs-in-dorm-changed`
 Sent to a dorm faculty when there is a change in a Vs session currently occurring in the dorm.  This includes someone joining or leaving the Vs, or the Vs session ending.
 
 ##### Body:
