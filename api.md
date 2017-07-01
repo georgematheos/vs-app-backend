@@ -445,6 +445,9 @@ feathersRestClient.service('approved-visitors').get(':listOwnerUsername', {}) //
 
 ##### Successful response status code: `200`
 
+##### Response body:
+* `approvedVisitors`: An array of [user objects](#userObject) representing the approved visitors.  These objects do not contain the field `roomNumber`.
+
 ---
 
 #### <a name="blockApprovedVisitorAddition"></a>Block approved visitor addition
