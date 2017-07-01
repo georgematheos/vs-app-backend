@@ -23,6 +23,7 @@ A [google drive document](https://docs.google.com/document/d/1AZlMTdyBrJAG-9qV4d
   * [Approved Visitors](#approvedVisitors)
     * [Add an approved visitor](#addAnApprovedVisitor)
     * [Remove an approved visitor](#removeAnApprovedVisitor)
+    * [View Approved Visitors](#viewApprovedVisitors)
     * [Block approved visitor addition](#blockApprovedVisitorAddition)
     * [Remove a block on approved visitor addition](#removeABlockOnApprovedVisitorAddition)
   * [Vs Restrictions](#vsRestrictions)
