@@ -120,8 +120,8 @@ This initiates a Vs session.  If the visitor who sends the request is an approve
 This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for the person specified in the request body as by `visitorUsername`.
 
 ##### Request body (JSON):
-– `visitorUsername`: The username of the visitor initiating Vs.
-– `hostUsername`: The username of the host the visitor is initiating Vs with.
+* `visitorUsername`: The username of the visitor initiating Vs.
+* `hostUsername`: The username of the host the visitor is initiating Vs with.
 
 ##### Feathers command:
 ```javascript
