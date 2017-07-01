@@ -30,6 +30,11 @@ A [google drive document](https://docs.google.com/document/d/1AZlMTdyBrJAG-9qV4d
   * [Notification for Vs request](#notificationForVsRequest)
   * [Notification for Vs beginning in dorm](#notificationForVsBeginningInDorm)
   * [Notification for Vs in dorm changing](#notificationForVsInDormChanging)
+* [Object Type Definitions](#objectTypeDefinitions)
+  * [User Object](#userObject)
+  * [Visitations Object](#visitationsObject)
+* [Term Definitions](#termDefinitions)
+  * [Visitations Session](#visitationsSessionTerm)
 
 ---
 #### <a name="appFunctions"></a>Application Functions
@@ -102,11 +107,7 @@ feathersRestClient.authenticate({
 ##### Response body (JSON):
 * `accessToken`: A JWT valid for the user.
 * `expiration`: The date and time when the token expires
-* `isStudent`: a boolean, which is true if the user is a student and false if the user is a faculty
-* `isDean`: a boolean, which is true if the user is a dean and false if the user is not
-* `dormitory`: the dorm the user is affiliated with/a member of.  Is empty if the faculty or student is not affiliated with any dorm.
-* `isDayStudent`: a boolean, true if user is a day student, false if not
-* `profileImageURL`: a url linking to an image of the user
+* `user`: A [user object](#user object) with information about the user.
 
 ---
 
@@ -180,28 +181,8 @@ feathersRestClient.service('current-vs').find({ query: {
 ```
 
 ##### Response body (JSON):
-* `id`: A unique identifier for the visitations session.
 * `resultsFound`: The number of results found which matched the search criteria (which may be more than the number of results returned in this request. For example, if there are 60 results that match criteria, but `maxResults` was set to 20 in the request, only 20 results will be sent by the server, but `resultsFound` will have a value of 60).
-* `visitations`: An array of visitations objects, each of which has the following fields:
-* `host`: A user object for the host.  Contains the following fields:
-  * `username`
-  * `firstName`
-  * `middleName`
-  * `lastName`
-  * `dormitory`: The host's dormitory (where the Vs are occurring).
-  * `gender`
-  * `graduationYear`: The year the student is scheduled to graduate Exeter.
-  * `roomNumber`: The host's room number (where the Vs are occurring)
-* `visitors`: An array of user objects for each visitor.  Each object includes all the same fields as a host object except for `roomNumber`.  Each object also includes the following additional fields:
-  * `timeJoinedVs`: The time when this visitor joined the Vs session (in the form of an ISO date)
-  * `timeLeftVs`: The time when this visitor left the Vs session (in the form of an ISO date).  If they haven't left, this field will be null.
-  * `approvedVisitor`: Whether this student is an approved visitor of the host's (a boolean value).
-* `startTime`: The time when the Vs session started (ie. when the first visitor joined Vs) (in the form of an ISO date)
-* `endTime`: The time when the Vs session ended (ie. when the last visitor left Vs) (in the form of an ISO date) (If the Vs haven't ended, this will be null).
-- `ongoing`: A boolean.  True if the Vs are currently occurring, false otherwise.
-
-It is worth clarifying what the term “Vs session” refers to.  A Vs session is a continuous, uninterrupted period during which Vs are occurring in an individual's room.  The same visitor does not have to be getting Vs for the whole time, as long as (an)other visitor(s) joins the Vs before the first visitor leaves.  The Vs session ends once all visitors have left the room, and at that point, a new Vs session begins the next time a visitor begins to get Vs in the room.
-
+* `visitations`: An array of [visitations objects](#visitationsObject), representing the [visitations sessions](#visitationsSessionTerm) which match the search criteria.
 
 ---
 
@@ -294,14 +275,7 @@ feathersRestClient.service('visitations-requests').find({ query: {
 * `visitations-requests`: An array of visitations requests objects, each of which contains the following fields:
   * `id`: A unique identifier for the visitations request.
   * `timeRequestIssued`: The date and time (ISO) when the request was issued by the visitor.
-  * `visitor`: An object containing information about the user who issued the Vs request.  Includes the following fields:
-    * `username`
-    * `firstName`
-    * `middleName`
-    * `lastName`
-    * `dormitory`
-    * `gender`
-    * `graduationYear`: The year the student is scheduled to graduate fromExeter.
+  * `visitor`: A [user object](#userObject) containing information about the user who issued the Vs request.  Does not contain the field `roomNumber.`
 
 ---
 
@@ -523,14 +497,7 @@ Sent to a host when a visitor has issued a request to get Vs with the host.  Not
 
 ##### Body:
 – `timeRequestIssued`: The date and time (ISO) when the request was issued by the visitor.
-– `visitor`: An object containing information about the user who issued the Vs request.  Includes the following fields:
-  – `username`
-  – `firstName`
-  – `middleName`
-  – `lastName`
-  – `dormitory`
-  – `gender`
-  – `graduationYear`: The year the student is scheduled to graduate fromExeter.
+– `visitor`: A [user object](#userObject) containing information about the visitor.  Does not include the field `roomNumber`.
 
 ##### Feathers client command:
 ```javascript
@@ -547,24 +514,7 @@ feathersNotificationReciever.on('vs-request', body => {
 Sent to a dorm faculty member when a student in the dorm begins getting Vs.
 
 ##### Body:
-A visitations object.  Note that this is identical to the visitations object described in the REST API section describing the command `GET /api/vs-data/:dormitory/`.
-
-Contains the following fields:
-– `host`: A user object for the host.  Contains the following fields:
-    – `username`
-    – `firstName`
-    – `middleName`
-    – `lastName`
-    – `dormitory`: The host's dormitory (where the Vs are occurring).
-    – `gender`
-    – `graduationYear`: The year the student is scheduled to graduate Exeter.
-    – `roomNumber`: The host's room number (where the Vs are occurring)
-  – `visitors`: An array of user objects for each visitor.  Each object includes all the same fields as a host object except for `roomNumber`.  Each object also includes the following additional fields:
-    – `timeJoinedVs`: The time when this visitor joined the Vs session (in the form of an ISO date)
-    – `timeLeftVs`: The time when this visitor left the Vs session (in the form of an ISO date).  If they haven't left, this field will be null.
-    – `approvedVisitor`: Whether this student is an approved visitor of the host's (a boolean value).
-  – `startTime`: The time when the Vs session started (ie. when the first visitor joined Vs) (in the form of an ISO date)
-  – `endTime`: The time when the Vs session ended (ie. when the last visitor left Vs) (in the form of an ISO date) (If the Vs haven't ended, this will be null).
+A [visitations object](#visitationsObject).
 
 ##### Feathers client command:
 ```javascript
@@ -580,7 +530,7 @@ feathersNotificationReciever.on('vs-began-in-dorm', body => {
 Sent to a dorm faculty when there is a change in a Vs session currently occurring in the dorm.  This includes someone joining or leaving the Vs, or the Vs session ending.
 
 ##### Body:
-Same body is sent as in the event `vs-began-in-dorm`, but with the current information.
+A [visitations object](#visitationsObject) with current information about the [visitations session](#visitationsSessionTerm).
 
 ##### Feathers client command:
 ```javascript
@@ -588,3 +538,45 @@ feathersNotificationReciever.on('vs-in-dorm-changed', body => {
     // do something with the information received (called 'body')
 });
 ```
+
+## <a name="objectTypeDefinitions"></a>Object Type Definitions
+This section contains the definitions of some standard object types that are transmitted using this API.
+
+#### <a name="userObject"></a>User Object
+This is an object containing user information.
+
+##### Fields:
+* `username`
+* `firstName`
+* `middleName`
+* `lastName`
+* `gender`
+* `isStudent`: A boolean.  True if user is a student, false otherwise.
+* `isDayStudent`: A boolean.  True if the user is a day student, false otherwise.  (Field may not be included if the user is not a student.)
+* `isDean`: A boolean, which is true if the user is a dean, and false otherwise.  (Field may not be included if the user is a student.)
+* `profileImageURL`: a url linking to an image of the user
+* `graduationYear`: The year the student is scheduled to graduate Exeter. (field null or not included for faculty)
+* `dormitory`: The dormitory a student or faculty member is affiliated with (field null or not included for users without dorm affiliation).
+Only
+* `roomNumber`: The student's (or faculty, if the faculty lives in a dorm) room number (field null or not included for day students or faculty who do not live in a dorm).  Field may not be included.
+
+
+#### <a name="visitationsObject"></a>Visitations Object
+This is an object containing information about a visitations session.
+
+##### Fields:
+* `id`: A unique identifier for the visitations session.
+* `startTime`: The time when the Vs session started (ie. when the first visitor joined Vs) (in the form of an ISO date)
+* `endTime`: The time when the Vs session ended (ie. when the last visitor left Vs) (in the form of an ISO date) (If the Vs haven't ended, this will be null or not included).
+- `ongoing`: A boolean.  True if the Vs are currently occurring, false otherwise.
+* `host`: A [user object](#userObject) containing information about the host of the Vs session.  Note that the dorm and room number info for this object is the room and dorm in which the Vs are occurring.
+* `visitors`: An array of [user objects](#userObject), each containing information about a visitor in the Vs session.  The field `roomNumber` is not included for any user object in this array.  Each object in the array, however, has the following additional fields:
+  * `timeJoinedVs`: An ISO date. The time when this visitor joined the Vs session.
+  * `timeLeftVs`: An ISO date. The time when this visitor left the Vs session.  If the visitor hasn't left, this field will be null.
+  * `approvedVisitor`: A boolean.  Whether this student is an approved visitor of the host.
+
+## <a name="termDefinitions"></a>Term definitions
+This section contains definitions of a few terms used in the API.
+
+#### <a name="visitationsSessionTerm"></a>Visitations Session
+A visitations session is a continuous, uninterrupted period during which Vs are occurring in an individual's room.  The same visitor does not have to be getting Vs for the whole time, as long as (an)other visitor(s) joins the Vs before the first visitor leaves.  The Vs session ends once all visitors have left the room, and at that point, a new Vs session begins the next time a visitor begins to get Vs in the room.
