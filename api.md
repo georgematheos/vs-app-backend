@@ -122,8 +122,8 @@ This must include a valid JWT (javascript web token) in the header labeled `x-au
 ##### Feathers command:
 ```javascript
 feathersRestClient.service('visitations').create({
-    visitorUsername: 'visitorUsername',
-    hostUsername: 'hostUsername'
+    visitorUsername: ':visitorUsername', // fill in real usernames
+    hostUsername: ':hostUsername'
 }).then(results => {
     // do something with the response if request is successful
 })
@@ -166,7 +166,7 @@ All fields are optional.
 feathersRestClient.service('current-vs').find({ query: {
   dormitory: 'Webster' // or any other dormitory name
   onlyShowCurrent: true // or false
-  // optionally include more fields
+  // optionally include more fields or exclude fields shown
 }})
 .then(results => {
   // do something with the response if request is successful
@@ -217,7 +217,7 @@ This must include a valid JWT (javascript web token) in the header labeled `x-au
 
 ##### Feathers command:
 ```javascript
-feathersRestClient.service('visitations').patch(':visitationsId', {
+feathersRestClient.service('visitations').patch(':visitationsId', { // fill in real ID
   op: "remove",
   path: "/visitors/:username" // substitute in the visitor's actual username
 })
@@ -247,7 +247,7 @@ This must include a valid JWT (javascript web token) in the header labeled `x-au
 
 ##### Feathers command:
 ```javascript
-feathersRestClient.service('visitations').patch(':visitationsID', {
+feathersRestClient.service('visitations').patch(':visitationsID', { // fill in real ID
   op: "replace",
   path: "ongoing",
   value: false
@@ -275,7 +275,7 @@ This must include a valid JWT (javascript web token) in the header labeled `x-au
 ##### Feathers command:
 ```javascript
 feathersRestClient.service('visitations-requests').find({ query: {
- hostUsername = 'XXXXX'
+ hostUsername = ':hostUsername' // fill in real username
 }})
 .then(results => {
     // do something with the response if request is successful
@@ -313,7 +313,7 @@ Responds to and then deletes the visitations request with the id specified by `:
 
 #### Feathers command:
 ```javascript
-feathersRestClient.service('visitations-requests').remove(':visitationsRequestID', { query: {
+feathersRestClient.service('visitations-requests').remove(':visitationsRequestID', { query: { // fill in real ID
 	acceptResuest: true // or false
 }}).then(results => {
     // do something with the response if request is successful
@@ -407,7 +407,7 @@ This must include a valid JWT (javascript web token) in the header labeled `x-au
 #### Feathers command:
 ```javascript
 feathersRestClient.service('approved-visitor-addition-block').create({
-  approvedVisitorUsername: ':aUsername'
+  approvedVisitorUsername: ':aUsername' // substitute in real usernames
 	listOwnerUsername: ':anotherUsername'
 })
 .then(results => {
@@ -457,7 +457,7 @@ Optional.
 
 ##### Feathers command:
 ```javascript
-feathersRestClient.service('vs-restrictions').update(':usernameOfStudent', {
+feathersRestClient.service('vs-restrictions').update(':usernameOfStudent', { // fillin real username
   endTime: // an ISO date
 })
 .then(results => {
@@ -480,7 +480,7 @@ This must include a valid JWT (javascript web token) in the header labeled `x-au
 
 #### Feathers command:
 ```javascript
-feathersRestClient.service('vs-restrictions').remove(':usernameOfStudent', {})
+feathersRestClient.service('vs-restrictions').remove(':usernameOfStudent', {}) // fill in real username
 .then(results => {
     // do something with the response if request is successful
 })
@@ -499,7 +499,7 @@ Websockets is another technique for having the server and client communicate.  W
 As with REST, feathers provides a client-side framework for Websockets.  Its configuration is quite simple and described in the “Changing the HTML for Feathers client WebSocket calls“ section of the following webpage: https://docs.feathersjs.com/guides/step-by-step/basic-feathers/socket-client.html.  As noted at the beginning of the REST API, there is a more modular way of including feathers files that is a better design paradigm.
 The feathers command examples below assume that the following commands have already been run, with the files above included:
 
-```
+```javascript
 const socket = io(location.origin + '/api');
 const feathersSocketClient = feathers().configure(feathers.socketio(socket));
 
