@@ -24,6 +24,7 @@ A [google drive document](https://docs.google.com/document/d/1AZlMTdyBrJAG-9qV4d
     * [Add an approved visitor](#addAnApprovedVisitor)
     * [Remove an approved visitor](#removeAnApprovedVisitor)
     * [View Approved Visitors](#viewApprovedVisitors)
+    * [View users for whom one is an approved visitor](#viewUsersForWhomOneIsAnApprovedVisitor)
     * [Block approved visitor addition](#blockApprovedVisitorAddition)
     * [Remove a block on approved visitor addition](#removeABlockOnApprovedVisitorAddition)
   * [Vs Restrictions](#vsRestrictions)
@@ -447,6 +448,31 @@ feathersRestClient.service('approved-visitors').get(':listOwnerUsername', {}) //
 
 ##### Response body:
 * `approvedVisitors`: An array of [user objects](#userObject) representing the approved visitors.  These objects do not contain the field `roomNumber`.
+
+---
+
+#### <a name="viewUsersForWhomOneIsAnApprovedVisitor"></a>View users for whom one is an approved visitor
+    GET /api/host-approvers/:approvedVisitorUsername
+Returns information about all users for whom the user sending this request is an approved visitor.
+
+This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for the user specified by `:approvedVisitorUsername` in the URL.
+
+##### Feathers command:
+```javascript
+feathersRestClient.service('host-approvers').get(':approvedVisitorUsername', {}) // substitute in the actual username
+.then(results => {
+    // do something with the response if request is successful
+})
+.catch(err => {
+    // do something with error if request is unsuccessful
+});
+
+```
+
+##### Successful response status code: `200`
+
+##### Response body:
+* `hostApprovers`: An array of [user objects](#userObject) representing the hosts for whom the request issuer is an approved visitor.
 
 ---
 
