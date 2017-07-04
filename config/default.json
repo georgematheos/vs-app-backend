@@ -13,6 +13,7 @@
       "local"
     ],
     "path": "/authentication",
+    "header": "x-auth-token",
     "service": "users",
     "jwt": {
       "header": {
@@ -27,7 +28,7 @@
     "local": {
       "entity": "user",
       "service": "users",
-      "usernameField": "email",
+      "usernameField": "username",
       "passwordField": "password"
     }
   }
