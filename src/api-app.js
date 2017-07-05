@@ -1,8 +1,4 @@
 const path = require('path');
-const favicon = require('serve-favicon');
-const compress = require('compression');
-const cors = require('cors');
-const helmet = require('helmet');
 const bodyParser = require('body-parser');
 
 const feathers = require('feathers');
@@ -16,23 +12,22 @@ const notFound = require('feathers-errors/not-found');
 
 const middleware = require('./middleware');
 const services = require('./services');
-const appHooks = require('./app.hooks');
 
-const authentication = require('./authentication');
+// note that these are really hooks for the api
+// but the name of the file is still app.hooks.js
+// this is so the feathers command line tools work properly
+const appHooks = require('./app.hooks');
 
 const app = feathers();
 
 // Load app configuration
+// TODO: do we really need to load whole config for both the api app and the root app?
 app.configure(configuration(path.join(__dirname, '..')));
-// Enable CORS, security, compression, favicon and body parsing
-app.use(cors());
-app.use(helmet());
-app.use(compress());
+
+// Enable body parsing
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(favicon(path.join(app.get('public'), 'favicon.ico')));
-// Host the public folder
-app.use('/', feathers.static(app.get('public')));
+
 // Configure other middleware (see `middleware/index.js`)
 app.configure(middleware);
 
@@ -41,14 +36,10 @@ app.configure(hooks());
 app.configure(rest());
 app.configure(socketio());
 
-app.configure(authentication);
-
 // Set up our services (see `services/index.js`)
 app.configure(services);
-// Configure a middleware for 404s and the error handler
-app.use(notFound());
-app.use(handler());
 
+// Use our hooks
 app.hooks(appHooks);
 
 module.exports = app;
