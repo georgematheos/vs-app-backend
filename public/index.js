@@ -1,5 +1,5 @@
 const feathersRestClient = feathers()
-.configure(feathers.rest(location.origin).fetch(fetch));
+.configure(feathers.rest(location.origin + '/api').fetch(fetch));
 
 // Configure hooks
 feathersRestClient.configure(feathers.hooks());
