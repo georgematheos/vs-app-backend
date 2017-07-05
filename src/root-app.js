@@ -10,7 +10,7 @@ const configuration = require('feathers-configuration');
 const handler = require('feathers-errors/handler');
 const notFound = require('feathers-errors/not-found');
 
-const apiApp = require('./apiApp');
+const apiApp = require('./api-app');
 
 const app = feathers();
 

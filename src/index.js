@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 const logger = require('winston');
-const app = require('./app');
-const apiApp = require('./apiApp');
+const app = require('./root-app');
+const apiApp = require('./api-app');
 const port = app.get('port');
 
 // Start server
