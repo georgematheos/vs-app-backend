@@ -58,7 +58,7 @@ The server for the Vs application uses the [feathers.js](feathersjs.com) framewo
 ---
 
 ## <a name="restApi"></a>REST (classic HTTP request/response) API
-This webpage explains how to set up a feathers.js REST client: https://docs.feathersjs.com/guides/step-by-step/basic-feathers/rest-client.html. Pay particular attention to the section labeled “Writing the HTML Frontend” – the rest of the page is not important at this point, and may be confusing for one who has not read the prior documentation.
+This webpage explains how to set up a feathers.js REST client: https://docs.feathersjs.com/guides/step-by-step/basic-feathers/rest-client.html. Pay particular attention to the section labeled “Writing the HTML Frontend” – the rest of the page is not important at this point, and may be confusing for one who has not read the prior documentation.  Note that when including the feathers source in an HTML file that this page may display an inaccurate version of the url which applies to an outdated version of feathers. https://docs.feathersjs.com/api/client.html should contain an example with a more accurate url.
 Alternatively, one can include the feathers JS files in a more modular way (which is a better design paradigm in the long run, though it will require a bit of setup).  This process will require using a module loader.  This page contains some details about the process: https://docs.feathersjs.com/api/client.html.
 
 In the feather client examples included in the REST API, it is assumed that the following commands have been run(with the proper javascript files included, as seen in the feathers documentation linked to above). These commands initialize the feathers rest client.
