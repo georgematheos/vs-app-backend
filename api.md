@@ -102,6 +102,7 @@ feathersRestClient.authenticate({
     // feathers automatically configures hooks so the jwt is sent with further feathers requests
     // make sure the feathersRestClient.authenticate command has been run before making requests that require authentication
     // note that due to the asynchronous nature of this function, this will probably be more complicated than simply running commands at a lower down point in the code than the authentication
+    // also note that if a session continues after this token has expired, requests will be sent with the outdated token, so this function will have to be called again to get a new one
 
     // of course, you may do something with the response in this .then if it is successful
 })
