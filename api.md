@@ -99,7 +99,11 @@ feathersRestClient.authenticate({
     password: ':password'
 })
 .then(response => {
-    // do something with the response if request is successful
+    // feathers automatically configures hooks so the jwt is sent with further feathers requests
+    // make sure the feathersRestClient.authenticate command has been run before making requests that require authentication
+    // note that due to the asynchronous nature of this function, this will probably be more complicated than simply running commands at a lower down point in the code than the authentication
+
+    // of course, you may do something with the response in this .then if it is successful
 })
 .catch(err => {
     // do something with error if request is unsuccessful
