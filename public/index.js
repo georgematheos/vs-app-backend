@@ -10,7 +10,20 @@ feathersRestClient.configure(feathers.authentication({
   storage: window.localStorage
 }));
 
-console.log(feathersRestClient);
+// Test request without authenticationg
+console.log('Testing POST /api/auth-tester without  authentication');
+feathersRestClient.service('auth-tester').create({
+  message: 'This is a test'
+  })
+.then(response => {
+  console.log('Request successful.  Response:');
+  console.log(response);
+})
+.catch(err => {
+  console.log('Request unsuccessful. Error:');
+  console.log(err);
+});
+
 
 // Authenticate the user
 feathersRestClient.authenticate({
@@ -19,8 +32,23 @@ feathersRestClient.authenticate({
   password: 'pass'
 })
 .then(response => {
-  console.log('SUCCESSFUL AUTHENTICATION.  RESPONSE:');
+  console.log('Successful authentication.  Response:');
   console.log(response);
+
+  // Test request after authentication
+  console.log('Testing POST /api/auth-tester after successful authentication.');
+
+  feathersRestClient.service('auth-tester').create({
+    message: 'This is a test'
+    })
+  .then(response => {
+    console.log('Request successful.  Response:');
+    console.log(response);
+  })
+  .catch(err => {
+    console.log('Request unsuccessful. Error:');
+    console.log(err);
+  });
 })
 .catch(err => {
   console.log('ERROR DURING AUTHENTICATION:');
