@@ -28,6 +28,13 @@ app.configure(configuration(path.join(__dirname, '..')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// TODO: probably this should be removed before production, or replaced with a fancier logger
+// Make note that we made it to the api feathers app
+app.use((req, res, next) => {
+  console.log("Request has reached the api app.");
+  next();
+});
+
 // Configure other middleware (see `middleware/index.js`)
 app.configure(middleware);
 
