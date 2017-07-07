@@ -34,7 +34,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use((req, res, next) => {
   console.log("Request has reached the api app.");
   next();
-})
+});
 
 // Configure other middleware (see `middleware/index.js`)
 app.configure(middleware);
