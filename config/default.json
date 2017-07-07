@@ -13,6 +13,7 @@
       "local"
     ],
     "path": "/authentication",
+    "header": "x-auth-token",
     "service": "users",
     "jwt": {
       "header": {
