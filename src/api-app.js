@@ -13,6 +13,8 @@ const notFound = require('feathers-errors/not-found');
 const middleware = require('./middleware');
 const services = require('./services');
 
+const authentication = require('./authentication');
+
 // note that these are really hooks for the api
 // but the name of the file is still app.hooks.js
 // this is so the feathers command line tools work properly
@@ -28,6 +30,13 @@ app.configure(configuration(path.join(__dirname, '..')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// TODO: probably this should be removed before production, or replaced with a fancier logger
+// Make note that we made it to the api feathers app
+app.use((req, res, next) => {
+  console.log("Request has reached the api app.");
+  next();
+});
+
 // Configure other middleware (see `middleware/index.js`)
 app.configure(middleware);
 
@@ -35,6 +44,9 @@ app.configure(middleware);
 app.configure(hooks());
 app.configure(rest());
 app.configure(socketio());
+
+// configure authentication
+app.configure(authentication);
 
 // Set up our services (see `services/index.js`)
 app.configure(services);
