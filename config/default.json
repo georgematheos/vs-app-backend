@@ -31,5 +31,6 @@
       "usernameField": "username",
       "passwordField": "password"
     }
-  }
+  },
+  "nedb": "../data"
 }
