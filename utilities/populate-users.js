@@ -34,6 +34,11 @@ function populateUsers(app) {
   .catch(err => {
     console.log('An error occurred while creating users:');
     console.log(err);
+
+    if (err.errorType === 'uniqueViolated') {
+      console.log();
+      console.log('It looks like this error was caused by attempting to create a user with a username that already exists.  To avoid this issue, try running the delete-users utility and then the populate-users utility.');
+    }
   });
 }
 
