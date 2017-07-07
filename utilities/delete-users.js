@@ -24,11 +24,17 @@ function deleteUsers(app) {
         console.log(err);
       });
     }
+
+    // notify user if not all results were retrieved and thus not all users were deleted
+    // TODO: actually solve this problem...
+    if (results.total > results.data.length) {
+      console.log('NOTE: not all users have been deleted. If the delete-users utility is run enough times, all users will be deleted. Alternatively, the delete-users utility could be modified to delete more users at a time.');
+    }
   })
   .catch(err => {
     console.log('An error occurred while attempting to get user information from users database:');
     console.log(err);
-  })
+  });
 }
 
 module.exports = deleteUsers;
