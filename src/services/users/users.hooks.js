@@ -13,7 +13,7 @@ const restrict = [
 
 module.exports = {
   before: {
-    all: [],
+    all: [ commonHooks.disallow('external') ], // don't allow access to this service except by server
     find: [ authenticate('jwt') ],
     get: [ ...restrict ],
     create: [ hashPassword() ],
