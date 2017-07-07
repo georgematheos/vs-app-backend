@@ -43,6 +43,9 @@ app.configure(hooks());
 app.configure(rest());
 app.configure(socketio());
 
+// configure authentication
+app.configure(authentication);
+
 // Set up our services (see `services/index.js`)
 app.configure(services);
 
