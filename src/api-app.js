@@ -13,6 +13,8 @@ const notFound = require('feathers-errors/not-found');
 const middleware = require('./middleware');
 const services = require('./services');
 
+const authentication = require('./authentication');
+
 // note that these are really hooks for the api
 // but the name of the file is still app.hooks.js
 // this is so the feathers command line tools work properly
