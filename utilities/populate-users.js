@@ -5,26 +5,21 @@
 * Read ./utilities.md for usage information.
 */
 
+// Import user data
+// Credit to Thomas Matheos for writing the sample users data
+const USER_DATA = require('./users.json');
+
 function populateUsers(app) {
   const users = app.service('/users');
 
-  Promise.all([
-    users.create({
-      username: 'user0',
-      password: 'password',
-      firstName: 'User',
-      middleName: 'Number',
-      lastName: 'Zero',
-      gender: 'Fluid',
-      isStudent: true,
-      isDayStudent: true,
-      isDean: false,
-      profileImageUrl: 'http://s3.amazonaws.com/nvest/Blank_Club_Website_Avatar_Gray.jpg',
-      graduationYear: 2018,
-      dormitory: null,
-      roomNumber: null
-    })
-  ])
+  // Create an array of promises to create users from data
+  let userCreatePromises = [];
+  for (let userDatum of USER_DATA) {
+    userCreatePromises.push(users.create(userDatum));
+  }
+
+  // Use Promise.all to treat all the individual promises as one collective promise
+  Promise.all(userCreatePromises)
   .then(results => {
     console.log('The following users have been created:');
     for (let result of results) {
