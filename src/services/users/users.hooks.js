@@ -6,14 +6,14 @@ const { hashPassword } = require('feathers-authentication-local').hooks;
 const restrict = [
   authenticate('jwt'),
   restrictToOwner({
-    idField: 'id',
-    ownerField: 'id'
+    idField: '_id',
+    ownerField: '_id'
   })
 ];
 
 module.exports = {
   before: {
-    all: [],
+    all: [ commonHooks.disallow('external') ], // don't allow access to this service except by server
     find: [ authenticate('jwt') ],
     get: [ ...restrict ],
     create: [ hashPassword() ],
