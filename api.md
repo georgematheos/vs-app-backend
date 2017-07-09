@@ -77,8 +77,8 @@ Authenticates a user and returns a valid JWT if successful.
 
 Request Body:
 Must include a json that includes the following:
-– `username`
-– `password`
+* `username`
+* `password`
 
 ##### Feathers command
 Note that this is more complicated than the majority of the feathers requests, which have the same general form.  This command sets up authentication so a JWT is automatically sent with each feathers HTTP request once a user is logged in, in a header field labeled `x-auth-token`.  For more info about authentication: https://docs.feathersjs.com/api/authentication/client.html.
