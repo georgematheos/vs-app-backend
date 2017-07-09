@@ -198,11 +198,11 @@ feathersRestClient.service('current-vs').find({ query: {
 #### <a name="removeVisitorFromVisitations"></a>Remove visitor from visitations
     PATCH /api/visitations/:id
 
-##### Request body (uses [JSON PATCH format](http://jsonpatch.com/))
-* `op`: "remove" - This is the operation to be performed.  In this case, the value should be "remove".
-* `path`: "/visitors/:username" This is the path of the visitor to be removed.  This should always have the form "/visitors/:username", where `:username` is the username of the visitor to remove from the Vs session.
+##### Request body
+* `op`: "removeVisitor" - The operation to perform is to remove a visitor.
+* `visitorUsername`: This is the username of the visitor to remove from the [visitations session](#visitationsSessionTerm).
 
-Removes the specified visitor from a visitations session.  If this is the last/only visitor in the Vs session, the Vs session will end.
+Removes the specified visitor from a [visitations session](#visitationSessionType).  If this is the last/only visitor in the Vs session, the Vs session will end.
 
 This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for either the visitor who is being removed or for the host of the Vs session the visitor is being removed from.
 
@@ -211,8 +211,8 @@ This must include a valid JWT (javascript web token) in the header labeled `x-au
 ##### Feathers command:
 ```javascript
 feathersRestClient.service('visitations').patch(':visitationsId', { // fill in real ID
-  op: "remove",
-  path: "/visitors/:username" // substitute in the visitor's actual username
+  op: "removeVisitor",
+  visitorUsername: ":visitorUsername" // substitute in the visitor's actual username
 })
 .then(results => {
     // do something with the response if request is successful
@@ -227,23 +227,19 @@ feathersRestClient.service('visitations').patch(':visitationsId', { // fill in r
 ### <a name="endVsSession"></a>End Vs session
     PATCH /api/visitations/:id
 
-##### Request body (uses [JSON PATCH format](http://jsonpatch.com/))
-* `op`: "replace" - This is the operation to be performed.  In this case, the value should be "replace".
-* `path`: "/ongoing" - This is the path of the field to be changed; in this case, it is the field "/ongoing", which tracks whether Vs are still currently occurring.
-* `value`: false - This is the new value of the field. Since Vs are no longer ongoing (since the user is ending them), set this to false.
+##### Request body
+* `op`: "endVisitations" - The operation to perform is to end the [visitations session](#visitationSessionType).
 
-Ends the visitations session specified by `:id` in the URL.
+Ends the [visitations session](#visitationSessionType) specified by `:id` in the URL.
 
-This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for the host of the visitations session.
+This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for the host of the [visitations session](#visitationSessionType).
 
 ##### Successful response status code: `200`
 
 ##### Feathers command:
 ```javascript
 feathersRestClient.service('visitations').patch(':visitationsID', { // fill in real ID
-  op: "replace",
-  path: "ongoing",
-  value: false
+  op: "endVisitations"
 })
 .then(results => {
     // do something with the response if request is successful
@@ -369,10 +365,9 @@ feathersRestClient.service('vs-request-block').remove(':hostUsername/:visitorUse
 #### <a name="addAnApprovedVisitor"></a>Add an approved visitor
     PATCH /api/approved-visitors/:listOwnerUsername
 
-##### Request body (uses [JSON PATCH format](http://jsonpatch.com/))
-* `op`: "add" - This is the operation to be performed.  In this case, the value should be "add".
-* `path`: "/approvedVisitors[-]" - This is the path of the field to be added. In this case, we want to add a value to the end of the array specified by `/approvedVisitors`. The syntax to access the end of this array is `approvedVisitors[-]`
-* `value`: ":approvedVisitorUsername" - This is the new value of the field. We want to make it the username of the person the user would like to add as an approved visitor.
+##### Request body
+* `op`: "addApprovedVisitor" - The operation to perform is to add an approved visitor.
+* `approvedVisitorUsername`: The username of the user to be made an approved visitor.
 
 Adds an approved visitor for the user specified by `:listOwnerUsername` in the URL.
 
@@ -381,9 +376,8 @@ This must include a valid JWT (javascript web token) in the header labeled `x-au
 #### Feathers command:
 ```javascript
 feathersRestClient.service('approved-visitors').patch(':listOwnerUsername', { // substitute in the actual username
-  op: "add",
-  path: "/approvedVisitors[-]",
-	value: `:approvedVisitorUsername` // substitute in the actual username
+  op: "addApprovedVisitor",
+  approvedVisitorUsername: ":username" // fill in the actual username
 })
 .then(results => {
     // do something with the response if request is successful
@@ -400,9 +394,9 @@ feathersRestClient.service('approved-visitors').patch(':listOwnerUsername', { //
 #### <a name="removeAnApprovedVisitor"></a>Remove an approved visitor
   	PATCH /api/approved-visitors/:listOwnerUsername
 
-##### Request body (uses [JSON PATCH format](http://jsonpatch.com/))
-* `op`: "remove" - This is the operation to be performed.  In this case, the value should be "remove".
-* `approvedVisitorUsername`: ":aUsername" - This is the username of the user who we would like to remove from the list.  The server will handle the logic of removing this user.
+##### Request body
+* `op`: "removeApprovedVisitor" - The operation to perform is to remove an approved visitor.
+* `approvedVisitorUsername` - This is the username of the user who we would like to remove from the list.  The server will handle the logic of removing this user.
 
 Removes an approved visitor from the approved visitors list of a user specified by `:listOwnerUsername` in the URL.
 
@@ -410,14 +404,11 @@ This must include a valid JWT (javascript web token) in the header labeled `x-au
 
 NOTE: THIS COMMAND CAN BE RUN EITHER BY A LIST OWNER REMOVING ONE OF THEIR APPROVED VISITORS, OR BY AN APPROVED VISITOR WHO WISHES TO STOP BEING ANOTHER STUDENT'S APPROVED VISITOR.
 
-##### Request Body:
-– `approvedVisitorUsername`: The username of the approved visitor who should be removed from the user's approved visitors list.
-
 ##### Feathers command:
 ```javascript
 feathersRestClient.service('approved-visitors').patch(':listOwnerUsername', { // substitute in the actual username
-  op: "remove",
-	approvedVisitorUsername: `:approvedVisitorUsername` // substitute in the actual username
+  op: "removeApprovedVisitor",
+	approvedVisitorUsername: `:username` // substitute in the actual username
 })
 .then(results => {
     // do something with the response if request is successful
@@ -673,10 +664,10 @@ Only
 
 
 #### <a name="visitationsObject"></a>Visitations Object
-This is an object containing information about a visitations session.
+This is an object containing information about a [visitations session](#visitationSessionType).
 
 ##### Fields:
-* `id`: A unique identifier for the visitations session.
+* `id`: A unique identifier for the [visitations session](#visitationSessionType).
 * `startTime`: The time when the Vs session started (ie. when the first visitor joined Vs) (in the form of an ISO date)
 * `endTime`: The time when the Vs session ended (ie. when the last visitor left Vs) (in the form of an ISO date) (If the Vs haven't ended, this will be null or not included).
 - `ongoing`: A boolean.  True if the Vs are currently occurring, false otherwise.
