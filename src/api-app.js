@@ -20,6 +20,8 @@ const authentication = require('./authentication');
 // this is so the feathers command line tools work properly
 const appHooks = require('./app.hooks');
 
+const mongodb = require('./mongodb');
+
 const app = feathers();
 
 // Load app configuration
@@ -42,6 +44,7 @@ app.configure(middleware);
 
 // Set up Plugins and providers
 app.configure(hooks());
+app.configure(mongodb);
 app.configure(rest());
 app.configure(socketio());
 
