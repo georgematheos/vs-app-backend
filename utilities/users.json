@@ -15,7 +15,7 @@
         "roomNumber": null
     },
     {
-        "username": "mlisa@exeter.edu",
+        "username": "mlisa",
         "password": "password",
         "firstName": "Mona",
         "middleName": "Gherardini",
@@ -30,7 +30,7 @@
         "roomNumber": 209
     },
     {
-        "username": "swoman@exeter.edu",
+        "username": "swoman",
         "password": "password",
         "firstName": "Super",
         "middleName": "Monalisa",
@@ -45,7 +45,7 @@
         "roomNumber": 409
     },
     {
-        "username": "cnorris@exeter.edu",
+        "username": "cnorris",
         "password": "password",
         "firstName": "Chuck",
         "middleName": "Monalisa",
@@ -60,7 +60,7 @@
         "roomNumber": null
     },
     {
-        "username": "mjackson@exeter.edu",
+        "username": "mjackson",
         "password": "password",
         "firstName": "Michael",
         "middleName": "Monalisa",
@@ -75,7 +75,7 @@
         "roomNumber": 205
     },
     {
-        "username": "jsparrow@exeter.edu",
+        "username": "jsparrow",
         "password": "password",
         "firstName": "Jack",
         "middleName": "Monalisa",
@@ -90,7 +90,7 @@
         "roomNumber": 108
     },
     {
-        "username": "rhood@exeter.edu",
+        "username": "rhood",
         "password": "password",
         "firstName": "Robin",
         "middleName": "Monalisa",
@@ -105,7 +105,7 @@
         "roomNumber": 119
     },
     {
-        "username": "cphilopator@exeter.edu",
+        "username": "cphilopator",
         "password": "password",
         "firstName": "Cleopatra",
         "middleName": "Monalisa",
@@ -120,7 +120,7 @@
         "roomNumber": 104
     },
     {
-        "username": "bbalduchy@exeter.edu",
+        "username": "bbalduchy",
         "password": "password",
         "firstName": "Baldy",
         "middleName": "Monalisa",
