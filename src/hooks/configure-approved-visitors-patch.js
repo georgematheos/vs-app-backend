@@ -82,8 +82,6 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
           hook.data = { approvedVisitors: approvedVisitorsList }
         });
 
-        // no need for a break; since we have already returned something
-
       case "removeApprovedVisitor":
         // the only people allowed to remove an approved visitor is the owner of the approved visitor list or the approved visitor to be removed
         // check that this is actually one of the 2 acceptable people and deny access if it isn't
