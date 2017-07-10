@@ -1,6 +1,8 @@
 const { authenticate } = require('feathers-authentication').hooks;
 const { disallow } = require('feathers-hooks-common');
 
+const configureApprovedVisitorsPatch = require('../../hooks/configure-approved-visitors-patch');
+
 module.exports = {
   before: {
     all: [ authenticate('jwt') ],
@@ -8,7 +10,7 @@ module.exports = {
     get: [],
     create: [ disallow('external') ],
     update: [ disallow() ],
-    patch: [],
+    patch: [configureApprovedVisitorsPatch()],
     remove: [ disallow() ]
   },
 
