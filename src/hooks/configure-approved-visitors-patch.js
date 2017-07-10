@@ -21,7 +21,61 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
         if (hook.params.user.username !== hook.id) {
           return Promise.reject(new errors.Forbidden('only a user with the username ' + hook.id + ' may perform this action'));
         }
-        break;
+
+        // if we get here, it is valid for this user to make this request
+
+        // a few variables
+        let createNewList = false; // whether we'll need to create a new approved visitors list
+        let approvedVisitorsListId; // the ID of the list data we're going to modify with the PATCH request
+        let approvedVisitorsList = []; // the list of approved visitors (to fill in later)
+
+        const approvedVisitors = hook.app.service('approved-visitors');
+
+        // find the info on the list owner specified in the URL
+        return approvedVisitors.find({ listOwnerUsername: hook.id })
+        .then(results => {
+          // if no entry exists in the database for this user, note that we will have to create one
+          if (results.total === 0) {
+            createNewList = true;
+          }
+          // if an entry was returned, this is the approved visitor list data, so make note of the ID and data
+          else {
+            approvedVisitorsListId = results.data[0]._id;
+            console.log('yup');
+            console.log(results);
+            approvedVisitorsList = results.data[0].approvedVisitors;
+            console.log(approvedVisitorsList)
+          }
+
+          return hook;
+        })
+        .then(hook => { // CREATE NEW LIST IF NECESSARY
+          // only run this hook if we need to create a new list, so exit it if we don't
+          if (!createNewList) {
+            return hook;
+          }
+
+          // create an empty list
+          return approvedVisitors.create({
+            listOwnerUsername: hook.id,
+            approvedVisitors: [ ] // empty list for now
+          })
+          .then(results => {
+            approvedVisitorsListId = results._id; // the id of the approved visitor list is that of the one just created
+
+            return hook;
+          });
+        })
+        .then(hook => {
+          // add the new approved visitor to the list of approved visitors
+          approvedVisitorsList.push(hook.data.approvedVisitorUsername);
+
+          // set the ID of the entity to be modified, and the data to modify it with, to the correct values
+          hook.id = approvedVisitorsListId;
+          hook.data = { approvedVisitors: approvedVisitorsList }
+        });
+
+        // no need for a break; statement since we have already returned something
 
       case "removeApprovedVisitor":
         // the only people allowed to remove an approved visitor is the owner of the approved visitor list or the approved visitor to be removed

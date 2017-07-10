@@ -6,7 +6,7 @@ const configureApprovedVisitorsPatch = require('../../hooks/configure-approved-v
 module.exports = {
   before: {
     all: [ authenticate('jwt') ],
-    find: [ disallow() ],
+    find: [],
     get: [],
     create: [ disallow('external') ],
     update: [ disallow() ],
