@@ -12,6 +12,3 @@ The server source code is in `src`.
 The feathers app started by `src/index.js` is created in `src/root-app.js`.  This root app puts an instance of the feathers app created in `src/api-app.js` at the URL route `/api`.  The feathers api app is where most of the server's brains are.  The root app mostly just serves the public files, and handles some middleware like CORS, compression, and security.
 
 Scripts to perform utility operations for server admins can be found in the `utilities` directory.  For more information, see [`utilities/utilities.md`](utilities/utilities.md).
-
-### Users branch
-This branch is for work on the users service.  Currently, it is being used for the creation of a temporary users database interface to allow for testing.
