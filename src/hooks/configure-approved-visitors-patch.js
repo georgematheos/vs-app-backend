@@ -105,10 +105,40 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
         }
 
         // if we get here, it is valid for this user to be making this request
-        return approvedVisitors.find({ query: { listOwnerUsername: listOwnerUsername } });
+        return approvedVisitors.find({ query: { listOwnerUsername: listOwnerUsername } })
+        .then(results => {
+          // some variables
+          let resultsFound;
+          let approvedVisitorsList = [];
+          let index = -1;
+
+          if (results.total === 0) {
+            resultsFound = false;
+          }
+          else {
+            resultsFound = true;
+            approvedVisitorsList = results.data[0].approvedVisitors;
+
+            // find where in the list the username to remove is
+            index = approvedVisitorsList.indexOf(approvedVisitorUsername);
+          }
+
+          // if no approved visitor list exists for the list owner,
+          // or the approvedVisitorUsername is not in the list, send an error
+          if (index < 0 || !resultsFound) {
+            throw new errors.NotFound('the user with the username `' + approvedVisitorUsername + '` was not an approved visitor for the user with the username `' + listOwnerUsername + '` , and thus could not be removed');
+          }
+
+          // remove the proper value from the approved visitors list
+          approvedVisitorsList.splice(index, 1);
+
+          // format the PATCH request properly
+          hook.id = results.data[0]._id;
+          hook.data = { approvedVisitors: approvedVisitorsList };
+        });
 
       default:
-        // if the operation isn't one enumerated above, we don't know how to deal with it, so it is a malformed request
+        // if the operation isn't one enumerated above, we don't know how to deal with it, so it is unprocessable
         throw new errors.Unprocessable('the provided operation (op: `' + hook.data.op + '`) was not recognized');
     }
 
