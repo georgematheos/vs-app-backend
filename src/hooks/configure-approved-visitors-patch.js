@@ -48,7 +48,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
             // check that the person to add isn't already an approved visitor for the list owner
             // if they are, throw an error
             if (approvedVisitorsList.includes(approvedVisitorUsername)) {
-              throw new errors.Forbidden('the user with username `' + approvedVisitorUsername + '` is already an approved visitor for the user with username `' + listOwnerUsername + '`');
+              throw new errors.Conflict('the user with username `' + approvedVisitorUsername + '` is already an approved visitor for the user with username `' + listOwnerUsername + '`');
             }
           }
 
