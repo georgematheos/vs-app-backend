@@ -54,6 +54,16 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
 
           return hook;
         })
+        /* make sure approvedVisitorUsername is valid for some user */
+        .then(hook => {
+          users = hook.app.service('/users');
+          return users.find({ username: approvedVisitorUsername })
+          .then(results => {
+            if (results.total === 0) {
+              throw new errors.NotFound('no user with the username specified by approvedVisitorUsername, ' + approvedVisitorUsername + ', was found');
+            }
+          });
+        })
         /* create a new list if necessary */
         .then(hook => {
           // only run this hook if we need to create a new list, so exit it if we don't
