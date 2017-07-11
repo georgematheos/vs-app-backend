@@ -13,13 +13,22 @@ const errors = require('feathers-errors');
 
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {
-    const listOwnerUsername = hook.id;
-    const approvedVisitorUsername = hook.data.approvedVisitorUsername;
-    const approvedVisitors = hook.app.service('approved-visitors');
+    // a few checks to ensure valid request format
+    if (!hook.id) {
+      throw new errors.BadRequest('the username of the list owner (the person for whom an approved visitor should be added or removed) must be provided in the URL');
+    }
 
     if (!hook.data.op) {
       throw new errors.BadRequest('the field `op` must be included in the request body');
     }
+
+    if (!hook.data.approvedVisitorUsername) {
+      throw new errors.BadRequest('the request body for this operation must include a field called `approvedVisitorUsername` specifying the username of the user to add or remove as an approved visitor');
+    }
+
+    const listOwnerUsername = hook.id;
+    const approvedVisitorUsername = hook.data.approvedVisitorUsername;
+    const approvedVisitors = hook.app.service('approved-visitors');
 
     // depending on the operation to be performed (hook.data.op), we do different things
     switch (hook.data.op) {
