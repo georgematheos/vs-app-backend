@@ -14,6 +14,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {
     const listOwnerUsername = hook.id;
     const approvedVisitorUsername = hook.data.approvedVisitorUsername;
+    const approvedVisitors = hook.app.service('approved-visitors');
 
     if (!hook.data.op) {
       throw new errors.BadRequest('the field `op` must be included in the request body');
@@ -35,10 +36,8 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
         let approvedVisitorsListId; // the ID of the list data we're going to modify with the PATCH request
         let approvedVisitorsList = []; // the list of approved visitors (to fill in later)
 
-        const approvedVisitors = hook.app.service('approved-visitors');
-
         // find the info on the list owner specified in the URL
-        return approvedVisitors.find({ listOwnerUsername: listOwnerUsername })
+        return approvedVisitors.find({ query: { listOwnerUsername: listOwnerUsername } })
         .then(results => {
           // if no entry exists in the database for this user, note that we will have to create one
           if (results.total === 0) {
@@ -60,7 +59,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
         })
         /* make sure approvedVisitorUsername is valid for some user */
         .then(hook => {
-          users = hook.app.service('/users');
+          const users = hook.app.service('/users');
           return users.find({ query: { username: approvedVisitorUsername } })
           .then(results => {
             console.log(results);
@@ -104,7 +103,9 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
         if (hook.params.user.username !== hook.id && hook.params.user.username !== hook.data.approvedVisitorUsername) {
           throw new errors.NotAuthenticated('only the user with a username `' + hook.id + '` or `' + hook.data.approvedVisitorUsername + '` may perform this action');
         }
-        break;
+
+        // if we get here, it is valid for this user to be making this request
+        return approvedVisitors.find({ query: { listOwnerUsername: listOwnerUsername } });
 
       default:
         // if the operation isn't one enumerated above, we don't know how to deal with it, so it is a malformed request
