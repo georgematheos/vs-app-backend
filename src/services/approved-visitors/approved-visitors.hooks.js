@@ -2,6 +2,7 @@ const { authenticate } = require('feathers-authentication').hooks;
 const { disallow } = require('feathers-hooks-common');
 
 const configureApprovedVisitorsPatch = require('../../hooks/configure-approved-visitors-patch');
+const restrictToUserType = require('../../hooks/restrict-to-user-type.js');
 
 module.exports = {
   before: {
@@ -10,7 +11,13 @@ module.exports = {
     get: [],
     create: [ disallow('external') ],
     update: [ disallow() ],
-    patch: [configureApprovedVisitorsPatch()],
+    patch: [
+      restrictToUserType({ validTypes: [ { // only boarding students may add or remove approved visitors
+        isStudent: true,
+        isDayStudent: false
+      } ]}),
+      configureApprovedVisitorsPatch()
+    ],
     remove: [ disallow() ]
   },
 
