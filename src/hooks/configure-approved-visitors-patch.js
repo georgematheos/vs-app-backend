@@ -21,7 +21,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
         // the only person allowed to add an approved visitor is the owner of the approved visitor list
         // check that this is actually that person and deny access if it isn't
         if (hook.params.user.username !== listOwnerUsername) {
-          throw new errors.Forbidden('only a user with the username `' + hook.id + '` may perform this action');
+          throw new errors.NotAuthenticated('only a user with the username `' + hook.id + '` may perform this action');
         }
 
         // if we get here, it is valid for this user to make this request
@@ -86,7 +86,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
         // the only people allowed to remove an approved visitor is the owner of the approved visitor list or the approved visitor to be removed
         // check that this is actually one of the 2 acceptable people and deny access if it isn't
         if (hook.params.user.username !== hook.id && hook.params.user.username !== hook.data.approvedVisitorUsername) {
-          throw new errors.Forbidden('only the user with a username `' + hook.id + '` or `' + hook.data.approvedVisitorUsername + '` may perform this action');
+          throw new errors.NotAuthenticated('only the user with a username `' + hook.id + '` or `' + hook.data.approvedVisitorUsername + '` may perform this action');
         }
         break;
 
