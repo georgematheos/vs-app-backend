@@ -30,7 +30,10 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
           throw new errors.NotAuthenticated('only a user with the username `' + hook.id + '` may perform this action');
         }
 
-        // if we get here, it is valid for this user to make this request
+        // make sure user isn't trying to add themself as an approved visitor
+        if (approvedVisitorUsername === listOwnerUsername) {
+          throw new errors.Forbidden('the user with the username `' + listOwnerUsername + '` may not add themself as an approved visitor');
+        }
 
         // a few variables
         let createNewList = false; // whether we'll need to create a new approved visitors list
