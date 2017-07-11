@@ -5,7 +5,8 @@
 * configure-approved-visitors-patch
 * This is a hook to be run before a patch request to the approved-visitors service.
 * This will set up whatever operation needs to be performed.
-* There are two possible operations: `addApprovedVisitor` and `removeApprovedVisitor`
+* There are two possible operations: `addApprovedVisitor` and `removeApprovedVisitor`.
+* This file contains the code to handle either of these requests.
 */
 
 const errors = require('feathers-errors');
@@ -141,7 +142,5 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
         // if the operation isn't one enumerated above, we don't know how to deal with it, so it is unprocessable
         throw new errors.Unprocessable('the provided operation (op: `' + hook.data.op + '`) was not recognized');
     }
-
-    return Promise.resolve(hook);
   };
 };
