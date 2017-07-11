@@ -15,6 +15,10 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
     const listOwnerUsername = hook.id;
     const approvedVisitorUsername = hook.data.approvedVisitorUsername;
 
+    if (!hook.data.op) {
+      throw new errors.BadRequest('the field `op` must be included in the request body');
+    }
+
     // depending on the operation to be performed (hook.data.op), we do different things
     switch (hook.data.op) {
       case "addApprovedVisitor":
@@ -102,7 +106,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
 
       default:
         // if the operation isn't one enumerated above, we don't know how to deal with it, so it is a malformed request
-        throw new errors.BadRequest('the provided operation (op: `' + hook.data.op + '`) was unrecognized');
+        throw new errors.Unprocessable('the provided operation (op: `' + hook.data.op + '`) was not recognized');
     }
 
     return Promise.resolve(hook);
