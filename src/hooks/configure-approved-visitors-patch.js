@@ -46,7 +46,6 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
 
         // a few variables
         let createNewList = false; // whether we'll need to create a new approved visitors list
-        let approvedVisitorsListId; // the ID of the list data we're going to modify with the PATCH request
         let approvedVisitorsList = []; // the list of approved visitors (to fill in later)
 
         // find the info on the list owner specified in the URL
@@ -56,9 +55,8 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
           if (results.total === 0) {
             createNewList = true;
           }
-          // if an entry was returned, this is the approved visitor list data, so make note of the ID and data
+          // if an entry was returned, this is the approved visitor list data, so make note of the data
           else {
-            approvedVisitorsListId = results.data[0]._id;
             approvedVisitorsList = results.data[0].approvedVisitors;
 
             // check that the person to add isn't already an approved visitor for the list owner
@@ -94,27 +92,21 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
             listOwnerUsername: hook.id,
             approvedVisitors: [ ] // empty list for now
           })
-          .then(results => {
-            approvedVisitorsListId = results._id; // the id of the approved visitor list is that of the one just created
-
-            return hook;
-          });
+          .then(results => hook); // make sure the hook object enters next .then
         })
-        /* configure hook object with properly formatted patch request */
+        /* configure hook object with properly formatted patch request data */
         .then(hook => {
           // add the new approved visitor to the list of approved visitors
           approvedVisitorsList.push(approvedVisitorUsername);
 
-          // set the ID of the entity to be modified, and the data to modify it with, to the correct values
-          hook.id = approvedVisitorsListId;
           hook.data = { approvedVisitors: approvedVisitorsList }
         });
 
       case "removeApprovedVisitor":
         // the only people allowed to remove an approved visitor is the owner of the approved visitor list or the approved visitor to be removed
         // check that this is actually one of the 2 acceptable people and deny access if it isn't
-        if (hook.params.user.username !== hook.id && hook.params.user.username !== hook.data.approvedVisitorUsername) {
-          throw new errors.NotAuthenticated('only the user with a username `' + hook.id + '` or `' + hook.data.approvedVisitorUsername + '` may perform this action');
+        if (hook.params.user.username !== listOwnerUsername && hook.params.user.username !== approvedVisitorUsername) {
+          throw new errors.NotAuthenticated('only the user with a username `' + listOwnerUsername + '` or `' + approvedVisitorUsername + '` may perform this action');
         }
 
         // if we get here, it is valid for this user to be making this request
@@ -146,7 +138,6 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
           approvedVisitorsList.splice(index, 1);
 
           // format the PATCH request properly
-          hook.id = results.data[0]._id;
           hook.data = { approvedVisitors: approvedVisitorsList };
         });
 

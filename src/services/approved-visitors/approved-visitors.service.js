@@ -7,7 +7,12 @@ module.exports = function () {
   const app = this;
   const paginate = app.get('paginate');
   const mongoClient = app.get('mongoClient');
-  const options = { paginate };
+  const options = {
+    // we use the username of the list owner
+    //as the unique identifier for an approved-visitor info object
+    id: 'listOwnerUsername',
+    paginate
+  };
 
   // Initialize our service with any options it requires
   app.use('/approved-visitors', createService(options));
