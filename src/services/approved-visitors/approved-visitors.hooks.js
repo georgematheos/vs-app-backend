@@ -2,6 +2,7 @@ const { authenticate } = require('feathers-authentication').hooks;
 const { disallow, discard } = require('feathers-hooks-common');
 
 const configureApprovedVisitorsPatch = require('../../hooks/configure-approved-visitors-patch');
+const configureAddRemovePatch = require('../../hooks/configure-add-remove-patch');
 const restrictToUserType = require('../../hooks/restrict-to-user-type');
 const usernameToUser = require('../../hooks/username-to-user');
 
@@ -17,7 +18,18 @@ module.exports = {
         isStudent: true,
         isDayStudent: false
       } ]}),
-      configureApprovedVisitorsPatch()
+      configureAddRemovePatch({
+        serviceName: 'approved-visitors',
+        addOp: 'addApprovedVisitor',
+        removeOp: 'removeApprovedVisitor',
+        ownerUsernameFieldName: 'listOwnerUsername',
+        operateeUsernameFieldName: 'approvedVisitorUsername',
+        operateeListFieldName: 'approvedVisitors',
+        ownerDescription: 'list owner',
+        operateeDescription: 'approved visitor',
+        operateeMayPerformAdd: false,
+        operateeMayPerformRemove: true
+      })
     ],
     remove: [ disallow() ]
   },

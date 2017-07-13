@@ -17,25 +17,28 @@ const errors = require('feathers-errors');
 const REQUIRED_OPTIONS_FIELDS = [
   'serviceName',
   'addOp',
-  'operatorUsernameFieldName',
+  'removeOp',
+  'ownerUsernameFieldName',
   'operateeUsernameFieldName',
   'operateeListFieldName',
-  'operatorDescription',
+  'ownerDescription',
   'operateeDescription',
+  'operateeMayPerformAdd',
+  'operateeMayPerformRemove'
 ]
 
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {
     // make sure all required fields were included in the options object
     for (let requiredField of REQUIRED_OPTIONS_FIELDS) {
-      if (!options[requiredField]) {
-        throw new errors.GeneralError('Server-side error: the field ' + requiredField + ' was not included in the options object passed to the configure-add-remove-patch hook, but it must be.');
+      if (!(requiredField in options)) {
+        throw new errors.GeneralError('Server-side error: the field `' + requiredField + '` was not included in the options object passed to the configure-add-remove-patch hook, but it must be.');
       }
     }
 
     // a few checks to ensure valid request format
     if (!hook.id) {
-      throw new errors.BadRequest('the username of the ' + options.operatorDescription + ' must be provided in the URL');
+      throw new errors.BadRequest('the username of the ' + options.ownerDescription + ' must be provided in the URL');
     }
 
     if (!hook.data.op) {
@@ -46,22 +49,24 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
       throw new errors.BadRequest('the request body for this operation must include a field called `' + options.operateeUsernameFieldName + '` specifying the username of the user to add or remove as a(n) ' + options.operateeDescription);
     }
 
-    const operatorUsername = hook.id;
+    const ownerUsername = hook.id;
     const operateeUsername = hook.data[options.operateeUsernameFieldName];
     const service = hook.app.service(options.serviceName);
 
     // depending on the operation to be performed (hook.data.op), we do different things
     switch (hook.data.op) {
       case options.addOp:
-        // the only person allowed to add to this list is the owner of the list
-        // check that this is actually that person and deny access if it isn't
-        if (hook.params.user.username !== operatorUsername) {
-          throw new errors.NotAuthenticated('only a user with the username `' + operatorUsername + '` may perform this action');
+        // check that this is owner of the list
+        // (or the operatee, if they are allowed to perform the add operation),
+        // and deny access if it isn't
+        if (!((hook.params.user.username === ownerUsername) ||
+        (options.operateeMayPerformAdd && hook.params.user.username === operateeUsername))) {
+          throw new errors.NotAuthenticated('only a user with the username `' + ownerUsername + ((options.operateeMayPerformAdd) ? ('` or `' + operateeUsername) : '') + '` may perform this action');
         }
 
         // make sure user isn't trying to add themself
-        if (operateeUsername === operatorUsername) {
-          throw new errors.Forbidden('the user with the username `' + operatorUsername + '` may not add themself as a(n) ' + options.operateeDescription);
+        if (operateeUsername === ownerUsername) {
+          throw new errors.Forbidden('the user with the username `' + ownerUsername + '` may not add themself as a(n) ' + options.operateeDescription);
         }
 
         // a few variables
@@ -69,8 +74,8 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
         let list = []; // the list (to fill in later)
 
         // find the info on the list owner specified in the URL
-        let queryObject = {};
-        queryObject[options.operatorUsernameFieldName] = operatorUsername;
+        var queryObject = {};
+        queryObject[options.ownerUsernameFieldName] = ownerUsername;
         return service.find({ query: queryObject })
         .then(results => {
           // if no entry exists in the database for this user, note that we will have to create one
@@ -84,7 +89,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
             // check that the person to add isn't already an approved visitor for the list owner
             // if they are, throw an error
             if (list.includes(operateeUsername)) {
-              throw new errors.Conflict('the user with username `' + operateeUsername + '` is already a(n) ' + options.operateeListFieldName + ' for the user with username `' + operatorUsername + '`');
+              throw new errors.Conflict('the user with username `' + operateeUsername + '` is already a(n) ' + options.operateeListFieldName + ' for the user with username `' + ownerUsername + '`');
             }
           }
 
@@ -116,7 +121,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
 
           // create an empty list
           let creationParams = {};
-          creationParams[options.operatorUsernameFieldName] = hook.id;
+          creationParams[options.ownerUsernameFieldName] = hook.id;
           creationParams[options.operateeListFieldName] = [ ] // empty list for now
           return service.create(creationParams)
           .then(results => hook); // make sure the hook object enters next .then
@@ -130,19 +135,25 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
           hook.data[options.operateeListFieldName] = list;
         });
 
-      case "removeApprovedVisitor":
-        // the only people allowed to remove an approved visitor is the owner of the approved visitor list or the approved visitor to be removed
-        // check that this is actually one of the 2 acceptable people and deny access if it isn't
-        if (hook.params.user.username !== operatorUsername && hook.params.user.username !== operateeUsername) {
-          throw new errors.NotAuthenticated('only the user with a username `' + operatorUsername + '` or `' + operateeUsername + '` may perform this action');
-        }
+      case options.removeOp:
+      // check that this is owner of the list
+      // (or the operatee, if they are allowed to perform the remvoe operation),
+      // and deny access if it isn't
+      if (!((hook.params.user.username === ownerUsername) ||
+      (options.operateeMayPerformRemove && hook.params.user.username === operateeUsername))) {
+        throw new errors.NotAuthenticated('only a user with the username `' + ownerUsername + ((options.operateeMayPerformAdd) ? ('` or `' + operateeUsername) : '') + '` may perform this action');
+      }
 
         // if we get here, it is valid for this user to be making this request
-        return approvedVisitors.find({ query: { listOwnerUsername: operatorUsername } })
+
+        // search database for the document
+        queryObject = {};
+        queryObject[options.ownerUsernameFieldName] = ownerUsername;
+        return service.find({ query: queryObject })
         .then(results => {
           // some variables
           let resultsFound;
-          let approvedVisitorsList = [];
+          let list = [];
           let index = -1;
 
           if (results.total === 0) {
@@ -150,23 +161,24 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
           }
           else {
             resultsFound = true;
-            approvedVisitorsList = results.data[0].approvedVisitors;
+            list = results.data[0][options.operateeListFieldName];
 
             // find where in the list the username to remove is
-            index = approvedVisitorsList.indexOf(operateeUsername);
+            index = list.indexOf(operateeUsername);
           }
 
-          // if no approved visitor list exists for the list owner,
+          // if no document exists for the list owner,
           // or the operateeUsername is not in the list, send an error
           if (index < 0 || !resultsFound) {
-            throw new errors.NotFound('the user with the username `' + operateeUsername + '` was not an approved visitor for the user with the username `' + operatorUsername + '` , and thus could not be removed');
+            throw new errors.NotFound('the user with the username `' + operateeUsername + '` was not a(n) ' + options.operateeDescription + ' for the user with the username `' + ownerUsername + '` , and thus could not be removed');
           }
 
-          // remove the proper value from the approved visitors list
-          approvedVisitorsList.splice(index, 1);
+          // remove the proper value from the list
+          list.splice(index, 1);
 
           // format the PATCH request properly
-          hook.data = { approvedVisitors: approvedVisitorsList };
+          hook.data = {};
+          hook.data[options.operateeListFieldName] = list;
         });
 
       default:
