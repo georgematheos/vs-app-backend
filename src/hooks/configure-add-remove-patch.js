@@ -8,24 +8,24 @@
 * This will set up whatever operation needs to be performed.
 * There are two possible operations, one to add and one to remove.
 * This file contains the code to handle either of these requests.
-* The options object contains the following fields:
+* The options object MUST contain certain fields.
+* For these fields and their descriptions, see the declaration of REQUIRED_OPTIONS_FIELDS below.
 */
 
-const errors = require('feathers-errors');
+const REQUIRED_OPTIONS_FIELDS = [ // the following fields MUST be inluded in the options object
+  'serviceName', // the name of the service this hook is on
+  'addOp', // the value of `op` for the add operation
+  'removeOp', // the value of `op` for the remove operation
+  'ownerUsernameFieldName', // the name of the field for the owner's username
+  'operateeUsernameFieldName', // the name of the field for the operatee's username
+  'operateeListFieldName', // the name of the field for the list of operatees
+  'ownerDescription', // the description, INCLUDING "a" or "an", of the owner (ex. "a list owner")
+  'operateeDescription', // the description, INCLUDING "a" or "an", of the operatee (ex. "an approved visitor")
+  'operateeMayPerformAdd', // a boolean; true if the operatee may add themself to this list
+  'operateeMayPerformRemove' // a boolean; true if the operatee may remove themself from this list
+];
 
-// the fields which must be included in the options object
-const REQUIRED_OPTIONS_FIELDS = [
-  'serviceName',
-  'addOp',
-  'removeOp',
-  'ownerUsernameFieldName',
-  'operateeUsernameFieldName',
-  'operateeListFieldName',
-  'ownerDescription',
-  'operateeDescription',
-  'operateeMayPerformAdd',
-  'operateeMayPerformRemove'
-]
+const errors = require('feathers-errors');
 
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {
