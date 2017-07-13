@@ -141,7 +141,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
       // and deny access if it isn't
       if (!((hook.params.user.username === ownerUsername) ||
       (options.operateeMayPerformRemove && hook.params.user.username === operateeUsername))) {
-        throw new errors.NotAuthenticated('only a user with the username `' + ownerUsername + ((options.operateeMayPerformAdd) ? ('` or `' + operateeUsername) : '') + '` may perform this action');
+        throw new errors.NotAuthenticated('only a user with the username `' + ownerUsername + ((options.operateeMayPerformRemove) ? ('` or `' + operateeUsername) : '') + '` may perform this action');
       }
 
         // if we get here, it is valid for this user to be making this request
