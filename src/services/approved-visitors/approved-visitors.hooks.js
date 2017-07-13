@@ -1,7 +1,6 @@
 const { authenticate } = require('feathers-authentication').hooks;
 const { disallow, discard } = require('feathers-hooks-common');
 
-const configureApprovedVisitorsPatch = require('../../hooks/configure-approved-visitors-patch');
 const configureAddRemovePatch = require('../../hooks/configure-add-remove-patch');
 const restrictToUserType = require('../../hooks/restrict-to-user-type');
 const usernameToUser = require('../../hooks/username-to-user');
