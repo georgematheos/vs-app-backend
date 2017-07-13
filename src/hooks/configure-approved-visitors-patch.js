@@ -68,15 +68,20 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
 
           return hook;
         })
-        /* make sure approvedVisitorUsername is valid for some user */
+        /* make sure approvedVisitorUsername is valid for some user (who is a student) */
         .then(hook => {
           const users = hook.app.service('/users');
           return users.find({ query: { username: approvedVisitorUsername } })
           .then(results => {
-            console.log(results);
+            // if no such user found
             if (results.total === 0) {
               throw new errors.NotFound('no user with the username `' + approvedVisitorUsername + '` was found');
             }
+            // if the user found isn't a student
+            if (!results.data[0].isStudent) {
+              throw new errors.Forbidden('the user with the username `' + approvedVisitorUsername + '` may not be added as an approved visitor because they are not a student');
+            }
+
             return hook;
           });
         })
