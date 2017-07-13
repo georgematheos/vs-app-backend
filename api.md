@@ -27,6 +27,7 @@ A [google drive document](https://docs.google.com/document/d/1AZlMTdyBrJAG-9qV4d
     * [View users for whom one is an approved visitor](#viewUsersForWhomOneIsAnApprovedVisitor)
     * [Block approved visitor addition](#blockApprovedVisitorAddition)
     * [Remove a block on approved visitor addition](#removeABlockOnApprovedVisitorAddition)
+    * [View Vs addition blocks you created](#viewVsAdditionBlocksYouCreated)
   * [Vs Restrictions](#vsRestrictions)
     * [Put a user on Vs restrictions](#putAUserOnVsRestrictions)
     * [Remove a user from Vs restrictions](#removeAUserFromVsRestrictions)
@@ -530,7 +531,7 @@ feathersRestClient.service('approved-visitor-addition-blocks').patch(':blockerUs
 ##### Successful response status code: `200`
 
 ---
-#### View Vs addition blocks you created
+#### <a name="viewVsAdditionBlocksYouCreated"></a>View Vs addition blocks you created
     GET /api/approved-visitor-addition-blocks/:blockerUsername
 
 Returns info on all the users the user specified by `:blockerUsername` in the URL has added as an approved visitor.
