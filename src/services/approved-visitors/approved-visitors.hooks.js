@@ -1,8 +1,9 @@
 const { authenticate } = require('feathers-authentication').hooks;
-const { disallow } = require('feathers-hooks-common');
+const { disallow, discard } = require('feathers-hooks-common');
 
 const configureApprovedVisitorsPatch = require('../../hooks/configure-approved-visitors-patch');
-const restrictToUserType = require('../../hooks/restrict-to-user-type.js');
+const restrictToUserType = require('../../hooks/restrict-to-user-type');
+const usernameToUser = require('../../hooks/username-to-user');
 
 module.exports = {
   before: {
@@ -22,9 +23,18 @@ module.exports = {
   },
 
   after: {
-    all: [],
+    all: [ discard('_id') ], // remove the id field
     find: [],
-    get: [],
+    get: [ usernameToUser( {
+      fieldName: 'approvedVisitors',
+      fieldsToRemove: [ '_id', 'password', 'roomNumber' ]
+    },
+    {
+      fieldName: 'listOwnerUsername',
+      newFieldName: 'listOwner',
+      fieldsToRemove: [ '_id', 'password' ]
+    })
+    ],
     create: [],
     update: [],
     patch: [],
