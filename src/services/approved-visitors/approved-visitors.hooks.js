@@ -25,8 +25,8 @@ module.exports = {
         ownerUsernameFieldName: 'listOwnerUsername',
         operateeUsernameFieldName: 'approvedVisitorUsername',
         operateeListFieldName: 'approvedVisitors',
-        ownerDescription: 'list owner',
-        operateeDescription: 'approved visitor',
+        ownerDescription: 'the list owner',
+        operateeDescription: 'an approved visitor',
         operateeMayPerformAdd: false,
         operateeMayPerformRemove: true
       })

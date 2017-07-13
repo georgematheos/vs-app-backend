@@ -19,8 +19,8 @@ const REQUIRED_OPTIONS_FIELDS = [ // the following fields MUST be inluded in the
   'ownerUsernameFieldName', // the name of the field for the owner's username
   'operateeUsernameFieldName', // the name of the field for the operatee's username
   'operateeListFieldName', // the name of the field for the list of operatees
-  'ownerDescription', // the description, INCLUDING "a" or "an", of the owner (ex. "a list owner")
-  'operateeDescription', // the description, INCLUDING "a" or "an", of the operatee (ex. "an approved visitor")
+  'ownerDescription', // the description, INCLUDING an article, of the owner (ex. "the list owner")
+  'operateeDescription', // the description, INCLUDING an article, of the operatee (ex. "an approved visitor")
   'operateeMayPerformAdd', // a boolean; true if the operatee may add themself to this list
   'operateeMayPerformRemove' // a boolean; true if the operatee may remove themself from this list
 ];
@@ -38,7 +38,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
 
     // a few checks to ensure valid request format
     if (!hook.id) {
-      throw new errors.BadRequest('the username of the ' + options.ownerDescription + ' must be provided in the URL');
+      throw new errors.BadRequest('the username of ' + options.ownerDescription + ' must be provided in the URL');
     }
 
     if (!hook.data.op) {
@@ -46,7 +46,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
     }
 
     if (!hook.data[options.operateeUsernameFieldName]) {
-      throw new errors.BadRequest('the request body for this operation must include a field called `' + options.operateeUsernameFieldName + '` specifying the username of the user to add or remove as a(n) ' + options.operateeDescription);
+      throw new errors.BadRequest('the request body for this operation must include a field called `' + options.operateeUsernameFieldName + '` specifying the username of the user to add or remove as ' + options.operateeDescription);
     }
 
     const ownerUsername = hook.id;
@@ -66,7 +66,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
 
         // make sure user isn't trying to add themself
         if (operateeUsername === ownerUsername) {
-          throw new errors.Forbidden('the user with the username `' + ownerUsername + '` may not add themself as a(n) ' + options.operateeDescription);
+          throw new errors.Forbidden('the user with the username `' + ownerUsername + '` may not add themself as ' + options.operateeDescription);
         }
 
         // a few variables
@@ -89,7 +89,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
             // check that the person to add isn't already an approved visitor for the list owner
             // if they are, throw an error
             if (list.includes(operateeUsername)) {
-              throw new errors.Conflict('the user with username `' + operateeUsername + '` is already a(n) ' + options.operateeListFieldName + ' for the user with username `' + ownerUsername + '`');
+              throw new errors.Conflict('the user with username `' + operateeUsername + '` is already ' + options.operateeDescription + ' for the user with username `' + ownerUsername + '`');
             }
           }
 
@@ -106,7 +106,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
             }
             // if the user found isn't a student
             if (!results.data[0].isStudent) {
-              throw new errors.Forbidden('the user with the username `' + operateeUsername + '` may not be added as a(n) ' + options.operateeDescription + ' because they are not a student');
+              throw new errors.Forbidden('the user with the username `' + operateeUsername + '` may not be added as ' + options.operateeDescription + ' because they are not a student');
             }
 
             return hook;
@@ -170,7 +170,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
           // if no document exists for the list owner,
           // or the operateeUsername is not in the list, send an error
           if (index < 0 || !resultsFound) {
-            throw new errors.NotFound('the user with the username `' + operateeUsername + '` was not a(n) ' + options.operateeDescription + ' for the user with the username `' + ownerUsername + '` , and thus could not be removed');
+            throw new errors.NotFound('the user with the username `' + operateeUsername + '` was not ' + options.operateeDescription + ' for the user with the username `' + ownerUsername + '` , and thus could not be removed');
           }
 
           // remove the proper value from the list
