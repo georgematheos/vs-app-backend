@@ -21,7 +21,7 @@ module.exports = function (...fields) { // eslint-disable-line no-unused-vars
     // if no fields to change are included, just return the hook
     if (fields.length === 0) { return hook; }
 
-    let promises = []; // all the promises from searching the users database
+    let promises = []; // all the promises from searching the users database (we'll add to this later)
     const users = hook.app.service('/users');
 
     for (let field of fields) {
@@ -33,8 +33,10 @@ module.exports = function (...fields) { // eslint-disable-line no-unused-vars
         // for each object in the array
         for (let index in hook.result[oldFieldName]) {
           promises.push(
+            // convert a single username to a user object
             singleUsernameToUser(hook.app.service('/users'), hook.result[oldFieldName][index], field.fieldsToRemove)
             .then(user => {
+              // set the hook's new field name to equal the user object
               hook.result[newFieldName][index] = user;
             })
           );
@@ -49,7 +51,7 @@ module.exports = function (...fields) { // eslint-disable-line no-unused-vars
           })
         );
       }
-      // if this isn't a string or array, we don't know how to deal with it, so throw an error
+      // if field specified isn't a string or array, we don't know how to deal with it, so throw an error
       else {
         throw new errors.GeneralError('Server-side failure when converting usernames to user objects. This occurred while attempting to interpret the call to the hook responsible for this, and was most likely caused by incorrect usage by another part of the server.');
       }
@@ -59,11 +61,9 @@ module.exports = function (...fields) { // eslint-disable-line no-unused-vars
       if (oldFieldName !== newFieldName) {
         delete hook.result[oldFieldName];
       }
-
     }
 
-    // Hooks can either return nothing or a promise
-    // that resolves with the `hook` object for asynchronous operations
+    // once all promises collected in our array are finished, resolve with the hook
     return Promise.all(promises).then(() => hook);
   };
 };
