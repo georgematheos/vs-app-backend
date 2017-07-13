@@ -443,6 +443,7 @@ feathersRestClient.service('approved-visitors').get(':listOwnerUsername', {}) //
 ##### Successful response status code: `200`
 
 ##### Response body:
+* `listOwner`: A [user object](#userObject) for the user who has added the other users as approved visitors.
 * `approvedVisitors`: An array of [user objects](#userObject) representing the approved visitors.  These objects do not contain the field `roomNumber`.
 
 ---
@@ -473,21 +474,21 @@ feathersRestClient.service('host-approvers').get(':approvedVisitorUsername', {})
 ---
 
 #### <a name="blockApprovedVisitorAddition"></a>Block approved visitor addition
-	POST /api/approved-visitor-addition-block/
+	 PATCH /api/approved-visitor-addition-blocks/:blockerUsername
+
+##### Request Body:
+* `op`: "addBlock" - The operation to perform is to add a block. In other words, to make it so a user is blocked from adding them as an approved visitor.
+* `blockeeUsername`: The username of the person to block (to prevent from attempting to add the person specified by `:blockerUsername` in the URL as an approved visitor).
 
 Prevents a user from attempting to add the user who issues this command to their approved visitors list.  This restriction can be removed by the user who creates it.
 
-This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for the user specified by `approvedVisitorUsername` in the request body.
+This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for the user specified by `:blockerUsername` in the URL.
 
-##### Request body:
-* `approvedVisitorUsername`: The user who is issuing this request and would not like to be added as an approved visitor.
-* `listOwnerUsername`: The username of the person to ban from adding the user specified by `approvedVisitorUsername`as an approved visitor.
-
-#### Feathers command:
+##### Feathers command:
 ```javascript
-feathersRestClient.service('approved-visitor-addition-block').create({
-  approvedVisitorUsername: ':aUsername' // substitute in real usernames
-	listOwnerUsername: ':anotherUsername'
+feathersRestClient.service('approved-visitor-addition-blocks').PATCH(':blockerUsername', {
+  op: 'addBlock',
+	blockeeUsername: ':blockeeUsername' // fill in real usernames
 })
 .then(results => {
     // do something with the response if request is successful
@@ -497,19 +498,27 @@ feathersRestClient.service('approved-visitor-addition-block').create({
 });
 ```
 
-##### Successful response status code: `201`
+##### Successful response status code: `200`
 
 ---
 
 #### <a name="removeABlockOnApprovedVisitorAddition"></a>Remove a block on approved visitor addition
-	 DELETE /api/approved-visitor-addition-block/:approvedVisitorUsername/:listOwnerUsername
-Removes a ban which the user specified by `:approvedVisitorUsername` in the URL had put on another user, specified by `:listOwnerUsername`.  This ban had prevented the list owner from adding the other user as an approved visitor, and this command will remove that ban.
+	 PATCH /api/approved-visitor-addition-blocks/:blockerUsername
 
-This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for the user specified by `:approvedVisitorUsername` in the url.
+#### Request Body:
+* `op`: "removeBlock" - the operation to perform is to remove a block on approved visitor addition the request issuer had previously created
+* `blockeeUsername`: the username of the user to unblock
 
-#### Feathers command:
+Removes a ban which the user specified by `:blockerUsername` in the URL had put on another user, specified by `blockeeUsername` in the request body.  This ban had prevented the list owner from adding the other user as an approved visitor, and this command will remove that ban.
+
+This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for the user specified by `:blockerUsername` in the url.
+
+##### Feathers command:
 ```javascript
-feathersRestClient.service('approved-visitor-addition-block').remove(':approvedVisitorUsername/:listOwnerUsername', {}) // substitute in correct values for these usernames
+feathersRestClient.service('approved-visitor-addition-blocks').patch(':blockerUsername', {
+  op: 'removeBlock',
+  blockeeUsername: ':blockeeUsername' // fill in real values for usernames
+})
 .then(results => {
     // do something with the response if request is successful
 })
@@ -518,7 +527,30 @@ feathersRestClient.service('approved-visitor-addition-block').remove(':approvedV
 });
 ```
 
-##### Successful response status code: `204`
+##### Successful response status code: `200`
+
+---
+#### View Vs addition blocks you created
+    GET /api/approved-visitor-addition-blocks/:blockerUsername
+
+Returns info on all the users the user specified by `:blockerUsername` in the URL has added as an approved visitor.
+
+This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for the user specified by `:blockerUsername` in the url.
+
+#### Feathers command:
+```javascript
+feathersRestClient.service('approved-visitor-addition-blocks').get(':blockerUsername', {}) // fill in real username
+.then(results => {
+    // do something with the response if request is successful
+})
+.catch(err => {
+    // do something with error if request is unsuccessful
+});
+```
+
+##### Response body
+* `blocker`: A [user object](#userObject) for the user who has blocked these users.
+* `blockees`: An array of [user objects](#userObject), one for each user who is blocked.
 
 ---
 
