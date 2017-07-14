@@ -10,6 +10,10 @@
 * This file contains the code to handle either of these requests.
 * The options object MUST contain certain fields.
 * For these fields and their descriptions, see the declaration of REQUIRED_OPTIONS_FIELDS below.
+* Note that this hook also puts the following fields on the hook.params object:
+* `ownerUsername` - the username of the list owner
+*`operateeUsername` - the username of the person to be added or removed from the list
+* `op` - either 'add', 'remove', (or undefined, but in this situation, this hook should throw an error), depending on whether someone is being added or removed from the hook
 */
 
 const REQUIRED_OPTIONS_FIELDS = [ // the following fields MUST be inluded in the options object
@@ -52,6 +56,12 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
     const ownerUsername = hook.id;
     const operateeUsername = hook.data[options.operateeUsernameFieldName];
     const service = hook.app.service(options.serviceName);
+
+    // note in the hook who the operator and operatee are so future hooks can use this data
+    hook.params.ownerUsername = ownerUsername;
+    hook.params.operateeUsername = operateeUsername;
+    if (hook.data.op === options.addOp) { hook.params.op = 'add' };
+    if (hook.data.op === options.removeOp) { hook.params.op = 'remove' };
 
     // depending on the operation to be performed (hook.data.op), we do different things
     switch (hook.data.op) {

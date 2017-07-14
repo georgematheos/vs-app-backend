@@ -5,6 +5,8 @@ const configureAddRemovePatch = require('../../hooks/configure-add-remove-patch'
 const restrictToUserType = require('../../hooks/restrict-to-user-type');
 const usernameToUser = require('../../hooks/username-to-user');
 
+const preventBlockedApprovedVisitorAddition = require('../../hooks/prevent-blocked-approved-visitor-addition');
+
 module.exports = {
   before: {
     all: [ authenticate('jwt') ],
@@ -13,10 +15,10 @@ module.exports = {
     create: [ disallow('external') ],
     update: [ disallow() ],
     patch: [
-      restrictToUserType({ validTypes: [ { // only boarding students may add or remove approved visitors
+      restrictToUserType({ validTypes: [{ // only boarding students may add or remove approved visitors
         isStudent: true,
         isDayStudent: false
-      } ]}),
+      }]}),
       configureAddRemovePatch({
         serviceName: 'approved-visitors',
         addOp: 'addApprovedVisitor',
@@ -28,7 +30,8 @@ module.exports = {
         operateeDescription: 'an approved visitor',
         operateeMayPerformAdd: false,
         operateeMayPerformRemove: true
-      })
+      }),
+      preventBlockedApprovedVisitorAddition()
     ],
     remove: [ disallow() ]
   },
