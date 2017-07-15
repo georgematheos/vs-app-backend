@@ -10,7 +10,6 @@ const errors = require('feathers-errors');
 
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {
-    console.log('Point A');
     // this hook should only be run if the operation is 'add', so if it isn't just return the hook object
     if (hook.params.op !== 'add') { return hook; }
 
@@ -18,12 +17,6 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
     return hook.app.service('/approved-visitor-addition-blocks')
     .find({ query: { blockerUsername: hook.params.operateeUsername } })
     .then(results => {
-      console.log('Point B');
-      console.log(results);
-      console.log(results.data[0].blockees);
-      console.log('operatee: ' + hook.params.operateeUsername );
-      console.log('operator: ' + hook.params.ownerUsername);
-  //    console.log(results.data[0].blockees.inc)
       // if this user has a block list, and it includes the operator, throw an error
       if (results.total !== 0 && results.data[0].blockees.includes(hook.params.ownerUsername)) {
         throw new errors.Forbidden('The user with the username `' + hook.params.operateeUsername + '` has blocked the user with the username `' + hook.params.ownerUsername + '` from adding them as an approved visitor.');
