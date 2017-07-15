@@ -25,12 +25,10 @@ module.exports = {
     find: [],
     get: [ usernameToUser({
       fieldName: 'approvedVisitorUsername',
-      newFieldName: 'approvedVisitor',
-      fieldsToRemove: [ '_id', 'password' ]
+      newFieldName: 'approvedVisitor'
     },
     {
-      fieldName: 'hostApprovers',
-      fieldsToRemove: [ '_id', 'password', 'roomNumber' ]
+      fieldName: 'hostApprovers'
     }) ],
     create: [],
     update: [],

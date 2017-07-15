@@ -27,7 +27,8 @@ module.exports = {
       commonHooks.when(
         hook => hook.params.provider,
         commonHooks.discard('password')
-      )
+      ),
+      commonHooks.discard('_id', 'password')
     ],
     find: [],
     get: [],

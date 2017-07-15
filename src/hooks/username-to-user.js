@@ -86,8 +86,11 @@ function singleUsernameToUser(usersService, username, fieldsToRemove) {
   })
   /* remove field names from user that should be removed */
   .then(user => {
-    for (let fieldToRemove of fieldsToRemove) {
-      delete user[fieldToRemove];
+    // make sure fieldsToRemove exists, if not, this can be ignored
+    if (fieldsToRemove) {
+      for (let fieldToRemove of fieldsToRemove) {
+        delete user[fieldToRemove];
+      }
     }
 
     return user;

@@ -37,12 +37,11 @@ module.exports = {
     find: [],
     get:  [ usernameToUser( {
       fieldName: 'blockees',
-      fieldsToRemove: [ '_id', 'password', 'roomNumber' ]
+      fieldsToRemove: [ 'roomNumber' ]
     },
     {
       fieldName: 'blockerUsername',
-      newFieldName: 'blocker',
-      fieldsToRemove: [ '_id', 'password' ]
+      newFieldName: 'blocker'
     })
     ],
     create: [],

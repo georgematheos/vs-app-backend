@@ -41,12 +41,11 @@ module.exports = {
     find: [],
     get: [ usernameToUser( {
       fieldName: 'approvedVisitors',
-      fieldsToRemove: [ '_id', 'password', 'roomNumber' ]
+      fieldsToRemove: [ 'roomNumber' ]
     },
     {
       fieldName: 'listOwnerUsername',
-      newFieldName: 'listOwner',
-      fieldsToRemove: [ '_id', 'password' ]
+      newFieldName: 'listOwner'
     })
     ],
     create: [],
