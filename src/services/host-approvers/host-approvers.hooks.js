@@ -1,11 +1,17 @@
 const { authenticate } = require('feathers-authentication').hooks;
-
+const errors = require('feathers-errors');
 
 module.exports = {
   before: {
     all: [ authenticate('jwt') ],
     find: [],
-    get: [],
+    get: [
+      // make sure the correct user is authenticated
+      hook => {
+        if (hook.id !== hook.params.user.username)
+        throw new errors.NotAuthenticated('only the user with username `' + hook.id + '` may make this request');
+      }
+    ],
     create: [],
     update: [],
     patch: [],
