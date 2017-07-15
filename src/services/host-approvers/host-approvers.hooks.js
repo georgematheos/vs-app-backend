@@ -1,4 +1,6 @@
 const { authenticate } = require('feathers-authentication').hooks;
+const usernameToUser = require('../../hooks/username-to-user');
+
 const errors = require('feathers-errors');
 
 module.exports = {
@@ -21,7 +23,15 @@ module.exports = {
   after: {
     all: [],
     find: [],
-    get: [],
+    get: [ usernameToUser({
+      fieldName: 'approvedVisitorUsername',
+      newFieldName: 'approvedVisitor',
+      fieldsToRemove: [ '_id', 'password' ]
+    },
+    {
+      fieldName: 'hostApprovers',
+      fieldsToRemove: [ '_id', 'password', 'roomNumber' ]
+    }) ],
     create: [],
     update: [],
     patch: [],
