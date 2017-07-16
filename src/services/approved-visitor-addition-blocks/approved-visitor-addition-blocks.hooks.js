@@ -13,9 +13,9 @@ module.exports = {
     create: [ disallow('external') ],
     update: [ disallow() ],
     patch: [
-      restrictToUserType({ validTypes: [ { // only students may add or remove approved visitors
+      restrictToUserType({ // only students may add or remove approved visitors
       isStudent: true
-    } ]}),
+    }),
     configureAddRemovePatch({
       serviceName: 'approved-visitor-addition-blocks',
       addOp: 'addBlock',

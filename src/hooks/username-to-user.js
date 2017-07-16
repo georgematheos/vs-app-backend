@@ -9,7 +9,7 @@
 * Each of these objects may (or must) contain the following fields:
 * fieldName -- the current name of the field (required)
 * newFieldName -- the name the field should have after this operation (optional; if not included, field name will remain the same)
-* userFieldsToRemove -- fields that should be removed from the user object that will replace the username.  This should contain an array of strings which are the field names to delete
+* fieldsToRemove -- fields that should be removed from the user object that will replace the username.  This should contain an array of strings which are the field names to delete (password will always be deleted)
 * Each field specified should either contain a username or an array of usernames.
 * Each username (or array of usernames) will be replaced with a user object (or an array thereof).
 */
@@ -86,11 +86,14 @@ function singleUsernameToUser(usersService, username, fieldsToRemove) {
   })
   /* remove field names from user that should be removed */
   .then(user => {
-    // make sure fieldsToRemove exists, if not, this can be ignored
-    if (fieldsToRemove) {
-      for (let fieldToRemove of fieldsToRemove) {
-        delete user[fieldToRemove];
-      }
+    // add password and _id to the fields to delete -- we always want to remove them
+    fieldsToRemove = fieldsToRemove || [];
+    fieldsToRemove.push('password');
+    fieldsToRemove.push('_id');
+
+    // delete all specified fields
+    for (let fieldToRemove of fieldsToRemove) {
+      delete user[fieldToRemove];
     }
 
     return user;
