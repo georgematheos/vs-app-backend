@@ -3,13 +3,14 @@ const { disallow, discard } = require('feathers-hooks-common');
 
 const configureAddRemovePatch = require('../../hooks/configure-add-remove-patch');
 const restrictToUserType = require('../../hooks/restrict-to-user-type');
+const restrictToUsers = require('../../hooks/restrict-to-users');
 const usernameToUser = require('../../hooks/username-to-user');
 
 module.exports = {
   before: {
     all: [ authenticate('jwt') ],
-    find: [],
-    get: [],
+    find: [ disallow('external') ],
+    get: [ restrictToUsers({ strategy: 'id' }) ],
     create: [ disallow('external') ],
     update: [ disallow() ],
     patch: [

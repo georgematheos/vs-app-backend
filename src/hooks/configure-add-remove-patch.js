@@ -30,6 +30,7 @@ const REQUIRED_OPTIONS_FIELDS = [ // the following fields MUST be inluded in the
 ];
 
 const errors = require('feathers-errors');
+const restrictToUsers = require('./restrict-to-users');
 
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {
@@ -69,6 +70,8 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
         // check that this is owner of the list
         // (or the operatee, if they are allowed to perform the add operation),
         // and deny access if it isn't
+        // NOTE: this could be done with the restrict-to-users hook, but setting it up is not much simpler
+        // than just performing the check here
         if (!((hook.params.user.username === ownerUsername) ||
         (options.operateeMayPerformAdd && hook.params.user.username === operateeUsername))) {
           throw new errors.NotAuthenticated('only a user with the username `' + ownerUsername + ((options.operateeMayPerformAdd) ? ('` or `' + operateeUsername) : '') + '` may perform this action');

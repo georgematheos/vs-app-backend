@@ -1,19 +1,14 @@
 const { authenticate } = require('feathers-authentication').hooks;
+const restrictToUsers = require('../../hooks/restrict-to-users');
 const usernameToUser = require('../../hooks/username-to-user');
 
-const errors = require('feathers-errors');
-
+// NOTE: currently, we don't have to worry about anything except the get method
+// because the others are not implemented
 module.exports = {
   before: {
     all: [ authenticate('jwt') ],
     find: [],
-    get: [
-      // make sure the correct user is authenticated
-      hook => {
-        if (hook.id !== hook.params.user.username)
-        throw new errors.NotAuthenticated('only the user with username `' + hook.id + '` may make this request');
-      }
-    ],
+    get: [ restrictToUsers({ strategy: 'id' }) ],
     create: [],
     update: [],
     patch: [],
