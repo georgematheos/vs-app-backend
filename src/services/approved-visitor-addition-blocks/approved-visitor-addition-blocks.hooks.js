@@ -5,12 +5,19 @@ const configureAddRemovePatch = require('../../hooks/configure-add-remove-patch'
 const restrictToUserType = require('../../hooks/restrict-to-user-type');
 const restrictToUsers = require('../../hooks/restrict-to-users');
 const usernameToUser = require('../../hooks/username-to-user');
+const createDocIfNeeded = require('../../hooks/create-doc-if-needed');
 
 module.exports = {
   before: {
     all: [ authenticate('jwt') ],
     find: [ disallow('external') ],
-    get: [ restrictToUsers({ strategy: 'id' }) ],
+    get: [
+      restrictToUsers({ strategy: 'id' }),
+      createDocIfNeeded(
+      { blockerUsername: { strategy: 'id' } },
+      { blockees: { strategy: 'included', value: [] } }
+    )
+ ],
     create: [ disallow('external') ],
     update: [ disallow() ],
     patch: [

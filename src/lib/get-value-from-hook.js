@@ -17,7 +17,6 @@ const VALID_STRATEGY_VALUES = [
 const errors = require('feathers-errors');
 
 function getValueFromHook(specifier, hook) {
-  console.log(specifier);
   let val;
   switch (specifier.strategy) {
     case 'id':
@@ -31,7 +30,7 @@ function getValueFromHook(specifier, hook) {
       break;
     default:
       // if the strategy isn't recognized, throw an error
-      throw new errors.GeneralError('Server-side error: the strategy `' + usernameSpecifier.strategy + '` passed into a hook is not recognized.');
+      throw new errors.GeneralError('Server-side error: the strategy `' + specifier.strategy + '` passed into a hook is not recognized.');
   }
   return val;
 }
