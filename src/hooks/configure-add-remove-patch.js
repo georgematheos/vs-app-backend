@@ -29,7 +29,6 @@ const REQUIRED_OPTIONS_FIELDS = [ // the following fields MUST be inluded in the
 ];
 
 const errors = require('feathers-errors');
-const restrictToUsers = require('./restrict-to-users');
 
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {
