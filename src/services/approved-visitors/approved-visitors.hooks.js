@@ -21,7 +21,6 @@ module.exports = {
         isDayStudent: false
       }),
       configureAddRemovePatch({
-        serviceName: 'approved-visitors',
         addOp: 'addApprovedVisitor',
         removeOp: 'removeApprovedVisitor',
         ownerUsernameFieldName: 'listOwnerUsername',

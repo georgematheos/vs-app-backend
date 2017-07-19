@@ -17,7 +17,6 @@
 */
 
 const REQUIRED_OPTIONS_FIELDS = [ // the following fields MUST be inluded in the options object
-  'serviceName', // the name of the service this hook is on
   'addOp', // the value of `op` for the add operation
   'removeOp', // the value of `op` for the remove operation
   'ownerUsernameFieldName', // the name of the field for the owner's username
@@ -56,7 +55,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
 
     const ownerUsername = hook.id;
     const operateeUsername = hook.data[options.operateeUsernameFieldName];
-    const service = hook.app.service(options.serviceName);
+    const service = hook.service;
 
     // note in the hook who the operator and operatee are so future hooks can use this data
     hook.params.ownerUsername = ownerUsername;

@@ -18,7 +18,6 @@ module.exports = {
       isStudent: true
     }),
     configureAddRemovePatch({
-      serviceName: 'approved-visitor-addition-blocks',
       addOp: 'addBlock',
       removeOp: 'removeBlock',
       ownerUsernameFieldName: 'blockerUsername',
