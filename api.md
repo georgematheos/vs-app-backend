@@ -115,8 +115,7 @@ feathersRestClient.authenticate({
 ##### Successful response status code: `200`
 
 ##### Response body (JSON):
-* `accessToken`: A JWT valid for the user.
-* `expiration`: The date and time when the token expires
+* `accessToken`: A JWT valid for the user. The payload sent with it will include a field `exp` containing the time the token expires (as [Unix time](https://en.wikipedia.org/wiki/Unix_time)).
 * `user`: A [user object](#userObject) with information about the user.
 
 ---
