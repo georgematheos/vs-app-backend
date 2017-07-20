@@ -21,7 +21,8 @@ module.exports = {
     create: [ disallow('external') ],
     update: [ disallow() ],
     patch: [
-      restrictToUserType({ // only students may add or remove approved visitors
+      // only students may add or remove approved visitors
+      restrictToUserType({
       isStudent: true
     }),
     configureAddRemovePatch({

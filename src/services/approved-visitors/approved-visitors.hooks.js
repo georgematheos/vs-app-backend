@@ -23,7 +23,8 @@ module.exports = {
     create: [ disallow('external') ],
     update: [ disallow() ],
     patch: [
-      restrictToUserType({ // only boarding students may add or remove approved visitors
+      // only boarding students may add or remove approved visitors
+      restrictToUserType({
         isStudent: true,
         isDayStudent: false
       }),
