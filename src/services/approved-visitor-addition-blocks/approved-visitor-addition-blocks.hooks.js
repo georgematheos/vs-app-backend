@@ -33,7 +33,9 @@ module.exports = {
       ownerDescription: 'the blocker',
       operateeDescription: 'a blockee',
       operateeMayPerformAdd: false,
-      operateeMayPerformRemove: false
+      operateeMayPerformRemove: false,
+      // only boarding students may be blocked (since only they may add approved visitors)
+      validOperateeTypes: [{ isStudent: true, isDayStudent: false }]
     })
   ],
     remove: [ disallow() ]

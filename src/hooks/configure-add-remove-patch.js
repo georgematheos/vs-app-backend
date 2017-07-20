@@ -28,7 +28,15 @@ const REQUIRED_OPTIONS_FIELDS = [ // the following fields MUST be inluded in the
   'operateeMayPerformRemove' // a boolean; true if the operatee may remove themself from this list
 ];
 
+const OPTIONAL_OPTIONS_FIELDS = [ // these fields MAY be included in the options object, but do not have to
+  // an array of validType objects (see `src/lib/user-is-valid-type`)
+  // if this field is included, this hook will only allow users who are of one of the types
+  // specified to be added to the list as an operatee
+  'validOperateeTypes'
+];
+
 const errors = require('feathers-errors');
+const userIsValidType = require('../lib/user-is-valid-type');
 
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {
@@ -106,7 +114,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
 
           return hook;
         })
-        /* make sure operateeUsername is valid for some user (who is a student) */
+        /* make sure operateeUsername is valid for some user (who is a valid type, if valid types are specified) */
         .then(hook => {
           const users = hook.app.service('/users');
           return users.find({ query: { username: operateeUsername } })
@@ -115,9 +123,18 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
             if (results.total === 0) {
               throw new errors.NotFound('no user with the username `' + operateeUsername + '` was found');
             }
-            // if the user found isn't a student
-            if (!results.data[0].isStudent) {
-              throw new errors.Forbidden('the user with the username `' + operateeUsername + '` may not be added as ' + options.operateeDescription + ' because they are not a student');
+
+            // if only certain types of users may be operatees, make sure this user is a valid type
+            if (options.validOperateeTypes) {
+              // if this field is included but not an array, throw descriptive error
+              if (options.validOperateeTypes.constructor !== Array) {
+                throw new errors.GeneralError('Server-side error: the validOperateeTypes option passed to the configure-add-remove-patch hook must be an array.');
+              }
+
+              // if the user isn't a valid type, throw an error
+              if (!userIsValidType(results.data[0], options.validOperateeTypes)) {
+                throw new errors.Forbidden('the user with the username `' + operateeUsername + '` may not be added as ' + options.operateeDescription + ' because they are not of a valid type.');
+              }
             }
 
             return hook;

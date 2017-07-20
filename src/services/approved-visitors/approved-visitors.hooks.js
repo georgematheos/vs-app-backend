@@ -36,7 +36,9 @@ module.exports = {
         ownerDescription: 'the list owner',
         operateeDescription: 'an approved visitor',
         operateeMayPerformAdd: false,
-        operateeMayPerformRemove: true
+        operateeMayPerformRemove: true,
+        // only students may be approved visitors
+        validOperateeTypes: [{ isStudent: true }]
       }),
       preventBlockedApprovedVisitorAddition()
     ],
