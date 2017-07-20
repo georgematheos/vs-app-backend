@@ -117,7 +117,7 @@ feathersRestClient.authenticate({
 ##### Response body (JSON):
 * `accessToken`: A JWT valid for the user.
 * `expiration`: The date and time when the token expires
-* `user`: A [user object](#user object) with information about the user.
+* `user`: A [user object](#userObject) with information about the user.
 
 ---
 
