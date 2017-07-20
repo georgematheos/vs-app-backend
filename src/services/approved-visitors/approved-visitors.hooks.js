@@ -1,5 +1,5 @@
 const { authenticate } = require('feathers-authentication').hooks;
-const { disallow, discard } = require('feathers-hooks-common');
+const { disallow, discard, iff } = require('feathers-hooks-common');
 
 const configureAddRemovePatch = require('../../hooks/configure-add-remove-patch');
 const restrictToUserType = require('../../hooks/restrict-to-user-type');
@@ -60,7 +60,11 @@ module.exports = {
     ],
     create: [],
     update: [],
-    patch: [],
+    patch: [
+      // if the operatee is making this request, don't send back the approved visitors list
+      iff( hook => hook.params.user.username === hook.params.operateeUsername,
+        discard('approvedVisitors') )
+      ],
     remove: []
   },
 
