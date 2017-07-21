@@ -2,9 +2,8 @@ const { authenticate } = require('feathers-authentication').hooks;
 const { disallow, discard, iff } = require('feathers-hooks-common');
 
 const configureAddRemovePatch = require('../../hooks/configure-add-remove-patch');
-const restrictToUserType = require('../../hooks/restrict-to-user-type');
+const restrictTo = require('../../hooks/restrict-to');
 const usernameToUser = require('../../hooks/username-to-user');
-const restrictToUsers = require('../../hooks/restrict-to-users');
 const createDocIfNeeded = require('../../hooks/create-doc-if-needed');
 
 const preventBlockedApprovedVisitorAddition = require('../../hooks/prevent-blocked-approved-visitor-addition');
@@ -14,7 +13,8 @@ module.exports = {
     all: [ authenticate('jwt') ],
     find: [ disallow('external') ],
     get: [
-      restrictToUsers({ strategy: 'id' }),
+      // make sure this user is permitted to access this list
+      restrictTo({ username: { strategy: 'id' }} ),
       createDocIfNeeded(
       { listOwnerUsername: { strategy: 'id' } },
       { approvedVisitors: { strategy: 'included', value: [] } }
@@ -24,7 +24,7 @@ module.exports = {
     update: [ disallow() ],
     patch: [
       // only boarding students may add or remove approved visitors
-      restrictToUserType({
+      restrictTo({
         isStudent: true,
         isDayStudent: false
       }),

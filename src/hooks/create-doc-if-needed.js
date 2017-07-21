@@ -26,7 +26,7 @@ module.exports = function (queryObj, additionalFieldsObj) { // eslint-disable-li
     // set values in queryObj using value specifiers
     for (let fieldName in queryObj) {
       if (queryObj.hasOwnProperty(fieldName)) {
-        queryObj[fieldName] = getValueFromHook(queryObj[fieldName], hook);
+        queryObj[fieldName] = getValueFromHook(hook, queryObj[fieldName]);
       }
     }
 
@@ -39,7 +39,7 @@ module.exports = function (queryObj, additionalFieldsObj) { // eslint-disable-li
         // so get values from value specifiers for this object
         for (let fieldName in additionalFieldsObj) {
           if (additionalFieldsObj.hasOwnProperty(fieldName)) {
-            additionalFieldsObj[fieldName] = getValueFromHook(additionalFieldsObj[fieldName], hook);
+            additionalFieldsObj[fieldName] = getValueFromHook(hook, additionalFieldsObj[fieldName]);
           }
         }
 

@@ -1,5 +1,5 @@
 const { authenticate } = require('feathers-authentication').hooks;
-const restrictToUsers = require('../../hooks/restrict-to-users');
+const restrictTo = require('../../hooks/restrict-to');
 const usernameToUser = require('../../hooks/username-to-user');
 
 // NOTE: currently, we don't have to worry about anything except the get method
@@ -8,7 +8,7 @@ module.exports = {
   before: {
     all: [ authenticate('jwt') ],
     find: [],
-    get: [ restrictToUsers({ strategy: 'id' }) ],
+    get: [ restrictTo({ username: { strategy: 'id' } }) ],
     create: [],
     update: [],
     patch: [],

@@ -2,8 +2,7 @@ const { authenticate } = require('feathers-authentication').hooks;
 const { disallow, discard } = require('feathers-hooks-common');
 
 const configureAddRemovePatch = require('../../hooks/configure-add-remove-patch');
-const restrictToUserType = require('../../hooks/restrict-to-user-type');
-const restrictToUsers = require('../../hooks/restrict-to-users');
+const restrictTo = require('../../hooks/restrict-to');
 const usernameToUser = require('../../hooks/username-to-user');
 const createDocIfNeeded = require('../../hooks/create-doc-if-needed');
 
@@ -12,7 +11,7 @@ module.exports = {
     all: [ authenticate('jwt') ],
     find: [ disallow('external') ],
     get: [
-      restrictToUsers({ strategy: 'id' }),
+      restrictTo({ username: { strategy: 'id' } }),
       createDocIfNeeded(
       { blockerUsername: { strategy: 'id' } },
       { blockees: { strategy: 'included', value: [] } }
@@ -22,7 +21,7 @@ module.exports = {
     update: [ disallow() ],
     patch: [
       // only students may add or remove approved visitors
-      restrictToUserType({
+      restrictTo({
       isStudent: true
     }),
     configureAddRemovePatch({

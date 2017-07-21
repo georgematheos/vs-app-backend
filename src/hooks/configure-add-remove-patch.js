@@ -26,14 +26,14 @@ const REQUIRED_OPTIONS_FIELDS = [ // the following fields MUST be inluded in the
 ];
 
 const OPTIONAL_OPTIONS_FIELDS = [ // these fields MAY be included in the options object, but do not have to
-  // an array of validType objects (see `src/lib/user-is-valid-type`)
-  // if this field is included, this hook will only allow users who are of one of the types
-  // specified to be added to the list as an operatee
+  // an array of query objects (see `src/lib/matches-query`)
+  // if this field is included, this hook will only allow users who
+  // match one of the specified query objects to be added to the list as an operatee
   'validOperateeTypes'
 ];
 
 const errors = require('feathers-errors');
-const userIsValidType = require('../lib/user-is-valid-type');
+const matchesQuery = require('../lib/matches-query');
 
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {
@@ -128,8 +128,8 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
                 throw new errors.GeneralError('Server-side error: the validOperateeTypes option passed to the configure-add-remove-patch hook must be an array.');
               }
 
-              // if the user isn't a valid type, throw an error
-              if (!userIsValidType(results.data[0], options.validOperateeTypes)) {
+              // if the user isn't a of a valid type, throw an error
+              if (!matchesQuery(results.data[0], ...options.validOperateeTypes)) {
                 throw new errors.Forbidden('the user with the username `' + operateeUsername + '` may not be added as ' + options.operateeDescription + ' because they are not of a valid type.');
               }
             }
