@@ -1,12 +1,12 @@
 const assert = require('assert');
-const restrictAuthentication = require('../../src/hooks/restrict-authentication');
+const preventBlockedApprovedVisitorAddition = require('../../src/hooks/prevent-blocked-approved-visitor-addition');
 
-describe('\'restrict-authentication\' hook', () => {
+describe('\'prevent-blocked-approved-visitor-addition\' hook', () => {
   it('runs the hook', () => {
     // A mock hook object
     const mock = {};
     // Initialize our hook with no options
-    const hook = restrictAuthentication();
+    const hook = preventBlockedApprovedVisitorAddition();
 
     // Run the hook function (which returns a promise)
     // and compare the resulting hook object

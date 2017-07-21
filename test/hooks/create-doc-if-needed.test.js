@@ -1,12 +1,12 @@
 const assert = require('assert');
-const restrictBlockedApprovedVisitorAddition = require('../../src/hooks/restrict-blocked-approved-visitor-addition');
+const createDocIfNeeded = require('../../src/hooks/create-doc-if-needed');
 
-describe('\'restrict-blocked-approved-visitor-addition\' hook', () => {
+describe('\'create-doc-if-needed\' hook', () => {
   it('runs the hook', () => {
     // A mock hook object
     const mock = {};
     // Initialize our hook with no options
-    const hook = restrictBlockedApprovedVisitorAddition();
+    const hook = createDocIfNeeded();
 
     // Run the hook function (which returns a promise)
     // and compare the resulting hook object

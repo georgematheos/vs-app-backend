@@ -1,12 +1,12 @@
 const assert = require('assert');
-const restrictToUserType = require('../../src/hooks/restrict-to-user-type');
+const configureAddRemovePatch = require('../../src/hooks/configure-add-remove-patch');
 
-describe('\'restrictToUserType\' hook', () => {
+describe('\'configure-add-remove-patch\' hook', () => {
   it('runs the hook', () => {
     // A mock hook object
     const mock = {};
     // Initialize our hook with no options
-    const hook = restrictToUserType();
+    const hook = configureAddRemovePatch();
 
     // Run the hook function (which returns a promise)
     // and compare the resulting hook object

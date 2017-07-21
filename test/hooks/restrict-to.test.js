@@ -1,12 +1,12 @@
 const assert = require('assert');
-const configureApprovedVisitorsPatch = require('../../src/hooks/configure-approved-visitors-patch');
+const restrictTo = require('../../src/hooks/restrict-to');
 
-describe('\'configure-approved-visitors-patch\' hook', () => {
+describe('\'restrict-to\' hook', () => {
   it('runs the hook', () => {
     // A mock hook object
     const mock = {};
     // Initialize our hook with no options
-    const hook = configureApprovedVisitorsPatch();
+    const hook = restrictTo();
 
     // Run the hook function (which returns a promise)
     // and compare the resulting hook object
