@@ -1,7 +1,7 @@
-#### Note:
-A [google drive document](https://docs.google.com/document/d/1AZlMTdyBrJAG-9qV4d5XjEoWY8OIUEbOgibg2oFzDnI/edit?usp=sharing) currently contains the official API.  This document is a new draft of the API that I (George) am working on that I believe will be better in the long run than the previous version.
+# Visitations App Server API
+This document contains the official API for the visitations app server.
 
----
+It is fairly final at this point, but still subject to change if the developers feel it is important.
 
 ## Table of Contents
 
@@ -622,6 +622,9 @@ feathersRestClient.service('vs-restrictions').remove(':usernameOfStudent', {}) /
 ---
 
 ## <a name="websocketsApi"></a>Websockets API
+
+NOTE that this section is less final than the REST section, and is relatively likely to change.
+
 Websockets is another technique for having the server and client communicate.  While REST only allows the client to initiate communication, making requests for the server to respond to, Websockets allows either the client or server to initiate communication.  Thus, it is useful for notifications, so the server can send information to the client when a notification occurs, without the client first making a request.
 
 As with REST, feathers provides a client-side framework for Websockets.  Its configuration is quite simple and described in the “Changing the HTML for Feathers client WebSocket calls“ section of the following webpage: https://docs.feathersjs.com/guides/step-by-step/basic-feathers/socket-client.html.  As noted at the beginning of the REST API, there is a more modular way of including feathers files that is a better design paradigm.
