@@ -2,9 +2,11 @@ const { authenticate } = require('feathers-authentication').hooks;
 const { disallow, discard, iff } = require('feathers-hooks-common');
 
 const configureAddRemovePatch = require('../../hooks/configure-add-remove-patch');
+const ensureUserValidity = require('../../hooks/ensure-user-validity');
 const restrictTo = require('../../hooks/restrict-to');
 const usernameToUser = require('../../hooks/username-to-user');
 const createDocIfNeeded = require('../../hooks/create-doc-if-needed');
+const checkQueryMatch = require('../../lib/check-query-match');
 
 const preventBlockedApprovedVisitorAddition = require('../../hooks/prevent-blocked-approved-visitor-addition');
 
@@ -13,10 +15,15 @@ module.exports = {
     all: [ authenticate('jwt') ],
     find: [ disallow('external') ],
     get: [
+      // make sure the user whose approved visitors we're getting is a boarding student
+      ensureUserValidity( { strategy: 'user', username: { strategy: 'id' } },
+      { isStudent: true, isDayStudent: false }
+     ),
+     // make sure the authenticated user is permitted to access this list
       restrictTo(
         { username: { strategy: 'id' }, isStudent: true, isDayStudent: false }, // a boarding student may view their own approved visitors
         { isStudent: false, // a faculty member may view users in their dorm's approved visitors
-          dormitory: { strategy: 'userField', username: { strategy: 'id' }, field: 'dormitory' }
+          dormitory: { strategy: 'user', username: { strategy: 'id' }, fieldName: 'dormitory' }
         },
         { isDean: true } // a dean may view any user's approved visitors
       ),
@@ -29,10 +36,7 @@ module.exports = {
     update: [ disallow() ],
     patch: [
       // only boarding students may add or remove approved visitors
-      restrictTo({
-        isStudent: true,
-        isDayStudent: false
-      }),
+      restrictTo({ isStudent: true, isDayStudent: false }),
       configureAddRemovePatch({
         addOp: 'addApprovedVisitor',
         removeOp: 'removeApprovedVisitor',

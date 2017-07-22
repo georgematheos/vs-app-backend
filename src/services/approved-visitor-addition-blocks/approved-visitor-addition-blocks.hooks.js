@@ -11,7 +11,11 @@ module.exports = {
     all: [ authenticate('jwt') ],
     find: [ disallow('external') ],
     get: [
-      // make sure this user is permitted to access this list
+      // make sure the user whose approved visitor blocks we're getting is a student
+      ensureUserValidity( { strategy: 'user', username: { strategy: 'id' } },
+      { isStudent: true }
+     ),
+      // make sure the authenticated user is permitted to access this list
       restrictTo(
         { username: { strategy: 'id' }, isStudent: true }, // a student may view their own approved visitor blocks
         { isDean: true } // a dean may view any user's approved visitor blocks
@@ -25,22 +29,20 @@ module.exports = {
     update: [ disallow() ],
     patch: [
       // only students may add or remove approved visitors
-      restrictTo({
-      isStudent: true
-    }),
-    configureAddRemovePatch({
-      addOp: 'addBlock',
-      removeOp: 'removeBlock',
-      ownerUsernameFieldName: 'blockerUsername',
-      operateeUsernameFieldName: 'blockeeUsername',
-      operateeListFieldName: 'blockees',
-      ownerDescription: 'the blocker',
-      operateeDescription: 'a blockee',
-      operateeMayPerformAdd: false,
-      operateeMayPerformRemove: false,
-      // only boarding students may be blocked (since only they may add approved visitors)
-      validOperateeTypes: [{ isStudent: true, isDayStudent: false }]
-    })
+      restrictTo({ isStudent: true }),
+      configureAddRemovePatch({
+        addOp: 'addBlock',
+        removeOp: 'removeBlock',
+        ownerUsernameFieldName: 'blockerUsername',
+        operateeUsernameFieldName: 'blockeeUsername',
+        operateeListFieldName: 'blockees',
+        ownerDescription: 'the blocker',
+        operateeDescription: 'a blockee',
+        operateeMayPerformAdd: false,
+        operateeMayPerformRemove: false,
+        // only boarding students may be blocked (since only they may add approved visitors)
+        validOperateeTypes: [{ isStudent: true, isDayStudent: false }]
+      })
   ],
     remove: [ disallow() ]
   },

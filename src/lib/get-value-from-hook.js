@@ -17,10 +17,16 @@ const VALID_STRATEGY_VALUES = [
   'data', // The hook.data contains the value
   // Another parameter, called `fieldName`, must be included specifying the field within hook.data that contains the value.
 
-  'userField', // The value can be found by retrieving a user object and taking the value of one of its fields
-  // Two other parameters must be included:
+  'params', // The hook.params contains the value.
+  // Another parameter, called `fieldName`, must be included specifying the field within hook.params that contains the value.
+
+  'user', // The value can be found by retrieving a user object and either returning the whole thing, or just the value of one of its vield
+  // Another parameters must be included:
   // `username` - the user's username; this should be set to another valid specifier
-  // `field` - the name of the field from the user to access
+  // And the following parameter MAY be included:
+  // `fieldName` - If this is included, only the value of one field for this user will be returned.  This should be set to the name of that field.
+
+  'authenticated user', // The value is the user object of the user who is currently authenticated
 
   'included' // The value is included in this object.
   // Another parameter, called `value`, must be included, containing the value.
@@ -42,7 +48,11 @@ function getValueFromHook(hook, specifier) {
       return Promise.resolve(hook.id);
     case 'data':
       return Promise.resolve(hook.data[specifier.fieldName]);
-    case 'userField':
+    case 'params':
+      return Promise.resolve(hook.params[specifier.fieldName]);
+    case 'authenticated user':
+      return Promise.resolve(hook.params.user);
+    case 'user':
       // query into users object using the provided username
       return getValueFromHook(hook, specifier.username)
       .then(username => hook.app.service('/users').find({ query: { username } }))
@@ -53,7 +63,12 @@ function getValueFromHook(hook, specifier) {
           return undefined;
         }
 
-        // return the value on the user object with the given field
+        // if no fieldName is included, we're supposed to just return the whole user object
+        if (!specifier.fieldName) {
+          return results.data[0];
+        }
+
+        // if we get here, we are supposed to return a specific field, so do so
         return getValueFromHook(hook, specifier.field)
         .then(fieldName => results.data[0][fieldName]);
       });
