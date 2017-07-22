@@ -129,8 +129,8 @@ This initiates a Vs session.  If the visitor who sends the request is an approve
 This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for the person specified in the request body as by `visitorUsername`.
 
 ##### Request body (JSON):
-* `visitorUsername`: The username of the visitor initiating Vs.
-* `hostUsername`: The username of the host the visitor is initiating Vs with.
+* `visitorUsername`: The username of the visitor initiating Vs.  Must be a student's username.
+* `hostUsername`: The username of the host the visitor is initiating Vs with.  Must be a boarding student's username.
 
 ##### Feathers command:
 ```javascript
@@ -257,10 +257,10 @@ feathersRestClient.service('visitations').patch(':visitationsID', { // fill in r
     GET /api/visitations-requests/
 Returns information about any Vs requests that have been sent to the user specified by `hostUsername` in the request parameters.
 
-This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for the user specified by `hostUsername` in the request parameters.
+This must include a valid JWT in the header labeled `x-auth-token`.  This JWT must be valid for the user specified by `hostUsername` in the request parameters.
 
 ##### Request parameters (inline URL query):
-* `hostUsername`: the username of the host who would like to see their requests
+* `hostUsername`: The username of the host who would like to see their requests.  Must be a boarding student.
 
 ##### Feathers command:
 ```javascript
@@ -290,6 +290,8 @@ feathersRestClient.service('visitations-requests').find({ query: {
 
 Responds to and then deletes the visitations request with the id specified by `:id` in the URL.
 
+This must include a valid JWT (javascript web token) in the header labeled x-auth-token. This JWT must be valid for the user who visitations request to be responded to is for.
+
 ##### Request parameters (inline URL query):
 * `acceptRequest`: A boolean.  If included and `true`,  the visitations request will be accepted and Vs will begin.  If not included or `false`, the visitations request will be denied and Vs will NOT begin.
 
@@ -313,21 +315,21 @@ feathersRestClient.service('visitations-requests').remove(':visitationsRequestID
 ---
 
 #### <a name="blockVsRequestsFromAUser"></a>Block Vs requests from a user
-    POST /api/vs-request-block
+    PATCH /api/vs-request-blocks/:blockerUsername
+    
+##### Request Body (JSON):
+* `op`: "addBlock",
+* `blockeeUsername`: The username of the person to block from sending a visitations request to the user with the username `:blockerUsername`.
 
-Prevents a user from sending Vs requests to the user who issues this request.  This restriction can be removed by the user who creates it.
+Prevents a user (with the username `blockeeUsername`) from sending Vs requests to the user  with the username `:blockerUsername`.  This restriction can be removed by the user who creates it.
 
-This must include a valid JWT (javascript web token) in the header labeled x-auth-token. This JWT must be valid for the user specified by `hostUsername` in the request body.
-
-##### Request body (JSON):
-* `hostUsername`: The username of the host who is restricting another student from sending them Vs requests.
-* `visitorUsername`: The username of the user who is being restricted from sending the host Vs requests.
+This must include a valid JWT (javascript web token) in the header labeled x-auth-token. This JWT must be valid for the user specified by `hostUsername` in the request body.  Also note that both the blockee must be a student, and the blocker must be a boarding student.
 
 ##### Feathers command:
 ```javascript
-feathersRestClient.service('vs-request-block').create({
-	hostUsername: `:hostUsername`, // fill in correct usernames
-  visitorUsername: `:visitorUsername`
+feathersRestClient.service('vs-request-block').patch(':blockerUsername', {
+  op: 'addBlock',
+	blockeeUsername: ':blockeeUsername' // fill in real values
 }).then(results => {
     // do something with the response if request is successful
 })
@@ -336,19 +338,27 @@ feathersRestClient.service('vs-request-block').create({
 });
 ```
 
-##### Successful response status code: `201`
+##### Successful response status code: `200`
 
 ---
 
 #### <a name="removeVsRequestBlock"></a>Remove Vs request block
-    DELETE /api/vs-request-block/:hostUsername/:visitorUsername
-Removes a Vs request block that the user specified by `:hostUsername` placed upon `:visitorUsername`.
+    PATCH /api/vs-request-blocks/:blockerUsername
+    
+##### Request Body (JSON):
+* `op`: "removeBlock",
+* `blockeeUsername`: the username of the person to block from sending a visitations request to the user with the username `:blockerUsername`
 
-This must include a valid JWT (javascript web token) in the header labeled x-auth-token. This JWT must be valid for the user specified by `:hostUsername` in the URL.
+Removes a block placed by the user with username `:blockerUsername` on the user with username `blockeeUsername` that prevented the blockee from sending the blocker vs requests.
+
+This must include a valid JWT (javascript web token) in the header labeled x-auth-token. This JWT must be valid for the user specified by `:blockerUsername` in the URL.  Also note that both the blockee must be a student, and the blocker must be a boarding student.
 
 ##### Feathers command:
 ```javascript
-feathersRestClient.service('vs-request-block').remove(':hostUsername/:visitorUsername', {}).then(results => { // fill in real usernames
+feathersRestClient.service('vs-request-block').patch(':blockerUsername', {
+  op: 'removeBlock',
+	blockeeUsername: ':blockeeUsername' // fill in real values
+}).then(results => {
     // do something with the response if request is successful
 })
 .catch(err => {
@@ -356,9 +366,7 @@ feathersRestClient.service('vs-request-block').remove(':hostUsername/:visitorUse
 });
 ```
 
-##### Successful response status code: `204`
-
----
+##### Successful response status code: `200`
 
 ### <a name="approvedVisitors"></a>Approved Visitors
 
@@ -371,7 +379,7 @@ feathersRestClient.service('vs-request-block').remove(':hostUsername/:visitorUse
 
 Adds an approved visitor for the user specified by `:listOwnerUsername` in the URL.
 
-This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for the user specified in the url by `:listOwnerUsername`.
+This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for the user specified in the url by `:listOwnerUsername`. Also note that the approved visitor must be a student, and the list owner must be a boarding student.
 
 #### Feathers command:
 ```javascript
@@ -398,7 +406,7 @@ feathersRestClient.service('approved-visitors').patch(':listOwnerUsername', { //
 * `op`: "removeApprovedVisitor" - The operation to perform is to remove an approved visitor.
 * `approvedVisitorUsername` - This is the username of the user who we would like to remove from the list.  The server will handle the logic of removing this user.
 
-Removes an approved visitor from the approved visitors list of a user specified by `:listOwnerUsername` in the URL.
+Removes an approved visitor from the approved visitors list of a user specified by `:listOwnerUsername` in the URL.  Also note that the approved visitor must be a student, and the list owner must be a boarding student.
 
 This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for either the user specified by `:listOwnerUsername` in the URL or the user specified by `approvedVisitorUsername` in the request body.
 
@@ -426,7 +434,11 @@ feathersRestClient.service('approved-visitors').patch(':listOwnerUsername', { //
 
 Returns a list of the approved visitors of a user specified by `:listOwnerUsername` in the URL.
 
-This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for the user specified by `:listOwnerUsername` in the URL.
+This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for any of the following people:
+* The user specified by `:listOwnerUsername`.
+* A dean.
+* A faculty member affiliated with the same dormitory as the user specified by `:listOwnerUsername`.
+Also note that the user specified by `:listOwnerUsername` must be a boarding student.
 
 ##### Feathers command:
 ```javascript
@@ -452,7 +464,7 @@ feathersRestClient.service('approved-visitors').get(':listOwnerUsername', {}) //
     GET /api/host-approvers/:approvedVisitorUsername
 Returns information about all users for whom the user sending this request is an approved visitor.
 
-This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for the user specified by `:approvedVisitorUsername` in the URL.
+This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for the user specified by `:approvedVisitorUsername` in the URL, or for a dean.  Note that the user specified by `:approvedVisitorUsername` must be a student.
 
 ##### Feathers command:
 ```javascript
@@ -482,7 +494,7 @@ feathersRestClient.service('host-approvers').get(':approvedVisitorUsername', {})
 
 Prevents a user from attempting to add the user who issues this command to their approved visitors list.  This restriction can be removed by the user who creates it.
 
-This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for the user specified by `:blockerUsername` in the URL.
+This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for the user specified by `:blockerUsername` in the URL.  Also note that the blocker must be a student, and the blockee must be a boarding student.
 
 ##### Feathers command:
 ```javascript
@@ -511,7 +523,7 @@ feathersRestClient.service('approved-visitor-addition-blocks').PATCH(':blockerUs
 
 Removes a ban which the user specified by `:blockerUsername` in the URL had put on another user, specified by `blockeeUsername` in the request body.  This ban had prevented the list owner from adding the other user as an approved visitor, and this command will remove that ban.
 
-This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for the user specified by `:blockerUsername` in the url.
+This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for the user specified by `:blockerUsername` in the url.  Note that the blocker must be a student, and the blockee must be a boarding student.
 
 ##### Feathers command:
 ```javascript
@@ -535,7 +547,7 @@ feathersRestClient.service('approved-visitor-addition-blocks').patch(':blockerUs
 
 Returns info on all the users the user specified by `:blockerUsername` in the URL has added as an approved visitor.
 
-This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for the user specified by `:blockerUsername` in the url.
+This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for the user specified by `:blockerUsername` in the url, or for a dean.  Note that the user specified by `:blockerUsername` must be a student.
 
 #### Feathers command:
 ```javascript
@@ -560,7 +572,7 @@ feathersRestClient.service('approved-visitor-addition-blocks').get(':blockerUser
 	 PUT /api/vs-restrictions/:username
 Applies Vs restrictions to the student specified by `:username` in the URL.
 
-This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for a faculty member affiliated with the dorm of the student to be put on Vs restrictions, or a dean.
+This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for a faculty member affiliated with the dorm of the student to be put on Vs restrictions, or a dean.  Also note that the user specified by `:username` must be a student.
 
 ##### Response body (JSON):
 Optional.
@@ -568,7 +580,7 @@ Optional.
 
 ##### Feathers command:
 ```javascript
-feathersRestClient.service('vs-restrictions').update(':usernameOfStudent', { // fillin real username
+feathersRestClient.service('vs-restrictions').update(':usernameOfStudent', { // fill in real username
   endTime: // an ISO date
 })
 .then(results => {
@@ -585,7 +597,7 @@ feathersRestClient.service('vs-restrictions').update(':usernameOfStudent', { // 
 #### <a name="removeAUserFromVsRestrictions"></a>Remove a user from Vs restrictions
 
 	 DELETE /api/vs-restrictions/:username
-Removes Vs restrictions from the student specified by `:username` in the URL.
+Removes Vs restrictions from the student specified by `:username` in the URL.  This user must currently be on Vs restrictions for this to have any effect.
 
 This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for a faculty member affiliated with the dorm of the student to be put on Vs restrictions, or a dean.
 
