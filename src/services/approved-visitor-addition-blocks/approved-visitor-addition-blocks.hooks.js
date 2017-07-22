@@ -3,6 +3,7 @@ const { disallow, discard } = require('feathers-hooks-common');
 
 const configureAddRemovePatch = require('../../hooks/configure-add-remove-patch');
 const restrictTo = require('../../hooks/restrict-to');
+const ensureUserValidity = require('../../hooks/ensure-user-validity');
 const usernameToUser = require('../../hooks/username-to-user');
 const createDocIfNeeded = require('../../hooks/create-doc-if-needed');
 
