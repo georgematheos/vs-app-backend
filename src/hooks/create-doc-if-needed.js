@@ -23,31 +23,46 @@ module.exports = function (queryObj, additionalFieldsObj) { // eslint-disable-li
     }
     additionalFieldsObj = additionalFieldsObj || [];
 
+    // when we get use getValueFromHook on queryObj and additionalFieldsObj fields, store values in these objects
+    let newQueryObj = {}, newAdditionalFieldsObj = {};
+
+    let promises = []; // collect our promises in this array
     // set values in queryObj using value specifiers
     for (let fieldName in queryObj) {
       if (queryObj.hasOwnProperty(fieldName)) {
-        queryObj[fieldName] = getValueFromHook(hook, queryObj[fieldName]);
+        promises.push(getValueFromHook(hook, queryObj[fieldName])
+        .then(value => { newQueryObj[fieldName] = value; } )); // update query object with the real value
       }
     }
 
-    // see if the queried list exists
-    return hook.service.find({ query: queryObj })
+    // after all getValueFromHook promsies resolve:
+    return Promise.all(promises)
+    // use the query to search the service for a document
+    .then(() => hook.service.find({ query: newQueryObj }))
     .then(results => {
       // if no list exists, create one
       if (results.total === 0) {
         // now we know that we're gonna have to use the additionalFieldsObj,
         // so get values from value specifiers for this object
+        promises = []; // we'll have to collect promises again, so empty this array
+
+        // for each field in additionalFieldsObj, get its actual value; collect promises to do this
         for (let fieldName in additionalFieldsObj) {
           if (additionalFieldsObj.hasOwnProperty(fieldName)) {
-            additionalFieldsObj[fieldName] = getValueFromHook(hook, additionalFieldsObj[fieldName]);
+            promises.push(getValueFromHook(hook, additionalFieldsObj[fieldName])
+            .then(value => {
+              newAdditionalFieldsObj[fieldName] = value; }));
           }
         }
 
-        return hook.service.create(Object.assign({}, additionalFieldsObj, queryObj))
-        .then(() => hook);
+        // once all these promises resolve
+        return Promise.all(promises)
+        .then(() => {
+          // create a new document
+          return hook.service.create(Object.assign({}, newAdditionalFieldsObj, newQueryObj));
+        })
+        .then(results => hook); // make sure to return the hook object
       }
-
-      return hook;
     });
   };
 };

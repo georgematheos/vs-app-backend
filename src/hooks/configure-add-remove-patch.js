@@ -26,14 +26,14 @@ const REQUIRED_OPTIONS_FIELDS = [ // the following fields MUST be inluded in the
 ];
 
 const OPTIONAL_OPTIONS_FIELDS = [ // these fields MAY be included in the options object, but do not have to
-  // an array of query objects (see `src/lib/matches-query`)
+  // an array of query objects (see `src/lib/check-query-match`)
   // if this field is included, this hook will only allow users who
   // match one of the specified query objects to be added to the list as an operatee
   'validOperateeTypes'
 ];
 
 const errors = require('feathers-errors');
-const matchesQuery = require('../lib/matches-query');
+const checkQueryMatch = require('../lib/check-query-match');
 
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {
@@ -129,12 +129,15 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
               }
 
               // if the user isn't a of a valid type, throw an error
-              if (!matchesQuery(results.data[0], ...options.validOperateeTypes)) {
-                throw new errors.Forbidden('the user with the username `' + operateeUsername + '` may not be added as ' + options.operateeDescription + ' because they are not of a valid type.');
-              }
+              return checkQueryMatch(hook, results.data[0], ...options.validOperateeTypes)
+              .then(userIsValid => {
+                if (!userIsValid) {
+                  throw new errors.Forbidden('the user with the username `' + operateeUsername + '` may not be added as ' + options.operateeDescription + ' because they are not of a valid type.');
+                }
+                // make sure to return the hook
+                return hook;
+              })
             }
-
-            return hook;
           });
         })
         /* create a new list if necessary */

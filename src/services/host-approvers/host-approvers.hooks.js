@@ -18,7 +18,12 @@ module.exports = {
   after: {
     all: [],
     find: [],
-    get: [ usernameToUser({
+    get: [
+      restrictTo(
+        { username: { strategy: 'id' }, isStudent: true }, // a student may view their own host approvers
+        { isDean: true } // a dean may view any user's approved visitors
+      ),
+      usernameToUser({
       fieldName: 'approvedVisitorUsername',
       newFieldName: 'approvedVisitor'
     },

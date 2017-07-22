@@ -13,8 +13,13 @@ module.exports = {
     all: [ authenticate('jwt') ],
     find: [ disallow('external') ],
     get: [
-      // make sure this user is permitted to access this list
-      restrictTo({ username: { strategy: 'id' }} ),
+      restrictTo(
+        { username: { strategy: 'id' }, isStudent: true, isDayStudent: false }, // a boarding student may view their own approved visitors
+        { isStudent: false, // a faculty member may view users in their dorm's approved visitors
+          dormitory: { strategy: 'userField', username: { strategy: 'id' }, field: 'dormitory' }
+        },
+        { isDean: true } // a dean may view any user's approved visitors
+      ),
       createDocIfNeeded(
       { listOwnerUsername: { strategy: 'id' } },
       { approvedVisitors: { strategy: 'included', value: [] } }

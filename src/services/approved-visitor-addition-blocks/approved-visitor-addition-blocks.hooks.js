@@ -11,7 +11,11 @@ module.exports = {
     all: [ authenticate('jwt') ],
     find: [ disallow('external') ],
     get: [
-      restrictTo({ username: { strategy: 'id' } }),
+      // make sure this user is permitted to access this list
+      restrictTo(
+        { username: { strategy: 'id' }, isStudent: true }, // a student may view their own approved visitor blocks
+        { isDean: true } // a dean may view any user's approved visitor blocks
+      ),
       createDocIfNeeded(
       { blockerUsername: { strategy: 'id' } },
       { blockees: { strategy: 'included', value: [] } }

@@ -23,7 +23,6 @@ module.exports = function (...fields) { // eslint-disable-line no-unused-vars
 
     let promises = []; // all the promises from searching the users database (we'll add to this later)
     const users = hook.app.service('/users');
-
     for (let field of fields) {
       let oldFieldName = field.fieldName;
       let newFieldName = field.newFieldName || field.fieldName;
