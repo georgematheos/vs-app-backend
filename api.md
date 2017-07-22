@@ -486,6 +486,7 @@ feathersRestClient.service('host-approvers').get(':approvedVisitorUsername', {})
 ##### Successful response status code: `200`
 
 ##### Response body:
+* `approvedVisitor`: A [user object](#userObject) for the user who is an approved visitor for the users in the `hostApprovers` array (the user issuing this request)
 * `hostApprovers`: An array of [user objects](#userObject) representing the hosts for whom the request issuer is an approved visitor.
 
 ---
