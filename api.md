@@ -76,7 +76,7 @@ const feathersRestClient = feathers()
     POST /api/authenticate
 Authenticates a user and returns a valid JWT if successful.
 
-Request Body:
+Request Body (JSON):
 Must include a json that includes the following:
 * `username`
 * `password`
@@ -282,7 +282,7 @@ feathersRestClient.service('visitations-requests').find({ query: {
 
 ##### Successful response status code: `200`
 
-##### Response body:
+##### Response body (JSON):
 * `visitations-requests`: An array of visitations requests objects, each of which contains the following fields:
   * `id`: A unique identifier for the visitations request.
   * `timeRequestIssued`: The date and time (ISO) when the request was issued by the visitor.
@@ -378,7 +378,7 @@ feathersRestClient.service('vs-request-block').patch(':blockerUsername', {
 #### <a name="addAnApprovedVisitor"></a>Add an approved visitor
     PATCH /api/approved-visitors/:listOwnerUsername
 
-##### Request body
+##### Request body (JSON):
 * `op`: "addApprovedVisitor" - The operation to perform is to add an approved visitor.
 * `approvedVisitorUsername`: The username of the user to be made an approved visitor.
 
@@ -407,7 +407,7 @@ feathersRestClient.service('approved-visitors').patch(':listOwnerUsername', { //
 #### <a name="removeAnApprovedVisitor"></a>Remove an approved visitor
   	PATCH /api/approved-visitors/:listOwnerUsername
 
-##### Request body
+##### Request body (JSON):
 * `op`: "removeApprovedVisitor" - The operation to perform is to remove an approved visitor.
 * `approvedVisitorUsername` - This is the username of the user who we would like to remove from the list.  The server will handle the logic of removing this user.
 
@@ -461,7 +461,7 @@ feathersRestClient.service('approved-visitors').get(':listOwnerUsername', {}) //
 
 ##### Successful response status code: `200`
 
-##### Response body:
+##### Response body (JSON):
 * `listOwner`: A [user object](#userObject) for the user who has added the other users as approved visitors.
 * `approvedVisitors`: An array of [user objects](#userObject) representing the approved visitors.  These objects do not contain the field `roomNumber`.
 
@@ -487,7 +487,7 @@ feathersRestClient.service('host-approvers').get(':approvedVisitorUsername', {})
 
 ##### Successful response status code: `200`
 
-##### Response body:
+##### Response body (JSON):
 * `approvedVisitor`: A [user object](#userObject) for the user who is an approved visitor for the users in the `hostApprovers` array (the user issuing this request)
 * `hostApprovers`: An array of [user objects](#userObject) representing the hosts for whom the request issuer is an approved visitor.
 
@@ -496,7 +496,7 @@ feathersRestClient.service('host-approvers').get(':approvedVisitorUsername', {})
 #### <a name="blockApprovedVisitorAddition"></a>Block approved visitor addition
 	 PATCH /api/approved-visitor-addition-blocks/:blockerUsername
 
-##### Request Body:
+##### Request Body (JSON):
 * `op`: "addBlock" - The operation to perform is to add a block. In other words, to make it so a user is blocked from adding them as an approved visitor.
 * `blockeeUsername`: The username of the person to block (to prevent from attempting to add the person specified by `:blockerUsername` in the URL as an approved visitor).
 
@@ -525,7 +525,7 @@ feathersRestClient.service('approved-visitor-addition-blocks').PATCH(':blockerUs
 #### <a name="removeABlockOnApprovedVisitorAddition"></a>Remove a block on approved visitor addition
 	 PATCH /api/approved-visitor-addition-blocks/:blockerUsername
 
-#### Request Body:
+#### Request Body (JSON):
 * `op`: "removeBlock" - the operation to perform is to remove a block on approved visitor addition the request issuer had previously created
 * `blockeeUsername`: the username of the user to unblock
 
@@ -570,7 +570,7 @@ feathersRestClient.service('approved-visitor-addition-blocks').get(':blockerUser
 
 ##### Successful response status code: `200`
 
-##### Response body
+##### Response body (JSON):
 * `blocker`: A [user object](#userObject) for the user who has blocked these users.
 * `blockees`: An array of [user objects](#userObject), one for each user who is blocked.
 
@@ -584,7 +584,7 @@ Applies Vs restrictions to the student specified by `:username` in the URL.
 
 This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for a faculty member affiliated with the dorm of the student to be put on Vs restrictions, or a dean.  Also note that the user specified by `:username` must be a student.
 
-##### Response body (JSON):
+##### Request body (JSON):
 Optional.
 * `endTime`: An ISO date. The date and time when the Vs restrictions should end, and the user should be allowed to get Vs again.  If this value is not included, restrictions will remain until a faculty member or dean removes the restriction.
 
