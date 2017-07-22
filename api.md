@@ -432,6 +432,8 @@ feathersRestClient.service('approved-visitors').patch(':listOwnerUsername', { //
 
 ```
 
+##### Successful response status code: `200`
+
 ---
 
 #### <a name="viewApprovedVisitors"></a>View approved visitors
@@ -565,6 +567,8 @@ feathersRestClient.service('approved-visitor-addition-blocks').get(':blockerUser
     // do something with error if request is unsuccessful
 });
 ```
+
+##### Successful response status code: `200`
 
 ##### Response body
 * `blocker`: A [user object](#userObject) for the user who has blocked these users.
