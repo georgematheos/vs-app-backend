@@ -11,13 +11,13 @@ A [google drive document](https://docs.google.com/document/d/1AZlMTdyBrJAG-9qV4d
   * [Authentication](#authentication)
     * [Authenticate user](#authenticateUser)
   * [Visitations](#visitations)
-    * [Get visitations](#getVisitations)
+    * [Get/join visitations](#getJoinVisitations)
     * [View visitations data](#viewVisitationsData)
     * [Remove visitor from visitations](#removeVisitorFromVisitations)
     * [End Vs session](#endVsSession)
   * [Visitations requests](#visitationsRequests)
     * [View visitations requests](#viewVisitationsRequests)
-    * [Respond to visitations request](#respondToVisitationsRequest)
+    * [Respond to or delete visitations request](#respondToOrDeleteVisitationsRequest)
     * [Block Vs requests from a user](#blockVsRequestsFromAUser)
     * [Remove Vs request block](#removeVsRequestBlock)
   * [Approved Visitors](#approvedVisitors)
@@ -122,9 +122,9 @@ feathersRestClient.authenticate({
 
 ### <a name="visitations"></a>Visitations
 
-#### <a name="getVisitations"></a>Get visitations
+#### <a name="getJoinVisitations"></a>Get/join visitations
     POST /api/visitations/
-This initiates a Vs session.  If the visitor who sends the request is an approved visitor of the host, this will begin Vs.  If the visitor is not an approved visitor, this will send a request to the host asking for approval of the Vs.
+A user who would like to visit another's room during visitations should send this request.  If the visitor is an approved visitor for the specified host, this command will create a [visitations session](#visitationSessionTerm) with the visitor being the only visitor, or, if visitations are already in progress in the host's room, will add the visitor to that [visitations session](#visitationSessionTerm).  If the visitor is not an approved visitor, this will send a request to the host asking for permission for that user to join Vs.  If the host grants permission, a [visitations session](#visitationSessionTerm) will be started if none is currently in progress, or the visitor will be added to the one currently in progress, if one exists.
 
 This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for the person specified in the request body as by `visitorUsername`.
 
@@ -146,8 +146,9 @@ feathersRestClient.service('visitations').create({
 ```
 
 ##### Successful response status code:
-* `201` if the visitor is an approved visitor and Vs have begun
-* `202` if the visitor is not an approved visitor, and a request has been sent to the host so they can approve the Vs
+* `200` if the visitor is an approved visitor and is added to a Vs session which is currently in progress
+* `201` if the visitor is an approved visitor and a new Vs session starts with that person as visitor
+* `202` if the visitor is not an approved visitor, and a request has been sent to the host
 
 ---
 
@@ -200,7 +201,7 @@ feathersRestClient.service('current-vs').find({ query: {
 
 ##### Request body
 * `op`: "removeVisitor" - The operation to perform is to remove a visitor.
-* `visitorUsername`: This is the username of the visitor to remove from the [visitations session](#visitationsSessionTerm).
+* `visitorUsername`: This is the username of the visitor to remove from the [visitations session](#visitationsSessionTerm).  This user must currently be part of the visitations session.
 
 Removes the specified visitor from a [visitations session](#visitationSessionType).  If this is the last/only visitor in the Vs session, the Vs session will end.
 
@@ -253,14 +254,18 @@ feathersRestClient.service('visitations').patch(':visitationsID', { // fill in r
 
 ### <a name="visitationsRequests"></a>Visitations requests
 
+Note that any visitations request which has not been responded to will be automatically deleted after 10 minutes have passed since the request's creation.  A user may always issue another Vs request if one expires before it is responded to.
+
 #### <a name="viewVisitationsRequests"></a>View visitations requests
     GET /api/visitations-requests/
-Returns information about any Vs requests that have been sent to the user specified by `hostUsername` in the request parameters.
+Returns information about any Vs requests that have been sent to the user specified by `hostUsername` in the request parameters, or that have been sent by the user specified by `visitorUsername` in the request parameters.
 
-This must include a valid JWT in the header labeled `x-auth-token`.  This JWT must be valid for the user specified by `hostUsername` in the request parameters.
+This must include a valid JWT in the header labeled `x-auth-token`.  This JWT must be valid for the user specified by `hostUsername` or `visitorUsername` in the request parameters.
 
 ##### Request parameters (inline URL query):
-* `hostUsername`: The username of the host who would like to see their requests.  Must be a boarding student.
+EXACTLY ONE OF THE FOLLOWING FIELDS SHOULD BE INCLUDED (NOT BOTH):
+* `hostUsername`: The username of the host who would like to see Vs requests which have been sent to them.  Must be a boarding student.
+* `visitorUsername`: The username of a user who would like to see Vs requests which they have sent to others.  Must be a student.
 
 ##### Feathers command:
 ```javascript
@@ -285,15 +290,15 @@ feathersRestClient.service('visitations-requests').find({ query: {
 
 ---
 
-#### <a name="respondToVisitationsRequest"></a>Respond to visitations request
+#### <a name="respondToOrDeleteVisitationsRequest"></a>Respond to or delete visitations request
     DELETE /api/visitations-request/:id
 
-Responds to and then deletes the visitations request with the id specified by `:id` in the URL.
+If this is sent by the person who issued this visitations request, this command deletes the visitations request with the id specified by `:id` in the URL.  If it is sent by the user who received this visitations request, this responds to the request, and then deletes it.
 
-This must include a valid JWT (javascript web token) in the header labeled x-auth-token. This JWT must be valid for the user who visitations request to be responded to is for.
+This must include a valid JWT (javascript web token) in the header labeled x-auth-token. This JWT must be valid for the user who issued the visitations request (in which case this will delete the Vs request without further consequences), or for the user who received the Vs request, in which case the Vs request will either be accepted or denied.
 
 ##### Request parameters (inline URL query):
-* `acceptRequest`: A boolean.  If included and `true`,  the visitations request will be accepted and Vs will begin.  If not included or `false`, the visitations request will be denied and Vs will NOT begin.
+* `acceptRequest`: A boolean.  If included and `true`,  the visitations request will be accepted and Vs will begin.  If not included or `false`, the visitations request will be denied and Vs will NOT begin.  This parameter should only be included if the user issuing the command is the person who RECEIVED the Vs request, and will be ignored otherwise.
 
 
 ##### Feathers command:
