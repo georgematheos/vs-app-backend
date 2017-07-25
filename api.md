@@ -170,8 +170,8 @@ All fields are optional.
 * `dormitory`: A string which is the name of a dormitory. If included, only Vs which occurred in this dormitory will be returned.
 * `hostUsername`: A string which is a student's username.  If included, only Vs whom the user specified by this username hosted will be returned.
 * `visitorUsername`: A string which is a student's username.  If included, only Vs in which the user specified by this username was a visitor will be returned.
-* `earliestStartTime`: An ISO date.  If this field is included, only Vs which began at or after this time will be retrieved.
-* `latestStartTime`: An ISO date.  If this field is included, only Vs which began at or before this time will be retrieved.
+* `earliestStartTime`: A date and time, expressed as milliseconds since Jan. 1, 1970.  If this field is included, only Vs which began at or after this time will be retrieved.
+* `latestStartTime`: A date and time, expressed as milliseconds since Jan. 1, 1970.  If this field is included, only Vs which began at or before this time will be retrieved.
 * `maxResults`: An integer. The maximum number of results to return.  If not included, the server will return 50 results by default, in reverse chronological order by start time.  The cap for this value is 250 (in other words, if `maxResults` is greater than 250, the server will act as though it is 250).
 * `firstResultNumber`: The number of the first result which should be returned. If not included, the server will default to returning items starting with result 1.  (For example, if 50 results are returned per request, and you want to retrieve results 51-100, this field should have the value of 51.)
 
@@ -586,12 +586,12 @@ This must include a valid JWT (javascript web token) in the header labeled `x-au
 
 ##### Request body (JSON):
 Optional.
-* `endTime`: An ISO date. The date and time when the Vs restrictions should end, and the user should be allowed to get Vs again.  If this value is not included, restrictions will remain until a faculty member or dean removes the restriction.
+* `endTime`: A date and time, expressed as milliseconds since Jan. 1, 1970. The date and time when the Vs restrictions should end, and the user should be allowed to get Vs again.  If this value is not included, restrictions will remain until a faculty member or dean removes the restriction.
 
 ##### Feathers command:
 ```javascript
 feathersRestClient.service('vs-restrictions').update(':usernameOfStudent', { // fill in real username
-  endTime: // an ISO date
+  endTime: // A date and time, expressed as milliseconds since Jan. 1, 1970.
 })
 .then(results => {
     // do something with the response if request is successful
@@ -725,13 +725,13 @@ This is an object containing information about a [visitations session](#visitati
 
 ##### Fields:
 * `id`: A unique identifier for the [visitations session](#visitationSessionType).
-* `startTime`: The time when the Vs session started (ie. when the first visitor joined Vs) (in the form of an ISO date)
-* `endTime`: The time when the Vs session ended (ie. when the last visitor left Vs) (in the form of an ISO date) (If the Vs haven't ended, this will be null or not included).
+* `startTime`: The time when the Vs session started (ie. when the first visitor joined Vs) (in the form of milliseconds since Jan. 1, 1970)
+* `endTime`: The time when the Vs session ended (ie. when the last visitor left Vs) (in the form of milliseconds since Jan. 1, 1970) (If the Vs haven't ended, this will be null or not included).
 - `ongoing`: A boolean.  True if the Vs are currently occurring, false otherwise.
 * `host`: A [user object](#userObject) containing information about the host of the Vs session.  Note that the dorm and room number info for this object is the room and dorm in which the Vs are occurring.
 * `visitors`: An array of [user objects](#userObject), each containing information about a visitor in the Vs session.  The field `roomNumber` is not included for any user object in this array.  Each object in the array, however, has the following additional fields:
-  * `timeJoinedVs`: An ISO date. The time when this visitor joined the Vs session.
-  * `timeLeftVs`: An ISO date. The time when this visitor left the Vs session.  If the visitor hasn't left, this field will be null.
+  * `timeJoinedVs`: A date and time expressed as milliseconds since Jan. 1, 1970. The time when this visitor joined the Vs session.
+  * `timeLeftVs`: A date and time expressed as milliseconds since Jan. 1, 1970. The time when this visitor left the Vs session.  If the visitor hasn't left, this field will be null.
   * `approvedVisitor`: A boolean.  Whether this student is an approved visitor of the host.
 
 ## <a name="termDefinitions"></a>Term definitions
