@@ -3,6 +3,8 @@ const { disallow } = require('feathers-hooks-common');
 
 const formatVisitationsDocCreation = require('../../hooks/format-visitations-doc-creation');
 
+const formatViewVisitations = require('../../hooks/format-view-visitations');
+
 module.exports = {
   before: {
     all: [ authenticate('jwt') ],
@@ -16,7 +18,7 @@ module.exports = {
 
   after: {
     all: [],
-    find: [],
+    find: [formatViewVisitations()],
     get: [],
     create: [],
     update: [],
