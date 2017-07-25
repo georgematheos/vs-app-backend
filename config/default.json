@@ -32,5 +32,6 @@
       "passwordField": "password"
     }
   },
-  "nedb": "../data"
+  "nedb": "../data",
+  "mongodb": "mongodb://localhost:27017/vs-app-backend"
 }
