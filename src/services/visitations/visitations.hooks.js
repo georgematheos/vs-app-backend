@@ -1,12 +1,14 @@
 const { authenticate } = require('feathers-authentication').hooks;
 const { disallow } = require('feathers-hooks-common');
 
+const formatVisitationsDocCreation = require('../../hooks/format-visitations-doc-creation');
+
 module.exports = {
   before: {
     all: [ authenticate('jwt') ],
     find: [],
     get: [ disallow() ],
-    create: [],
+    create: [ formatVisitationsDocCreation() ],
     update: [ disallow() ],
     patch: [],
     remove: [ disallow() ]
