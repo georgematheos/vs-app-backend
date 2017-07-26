@@ -33,5 +33,8 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
       }
       delete hook.params.query.latestStartTime;
     }
+
+    // order the search results in reverse chronological order by start time
+    hook.params.query.$sort = { startTime: -1 }
   };
 };
