@@ -11,14 +11,6 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
     const users = hook.app.service('/users');
     const approvedVisitors = hook.app.service('/approved-visitors');
 
-    // replace field `total` with field `resultsFound`
-    hook.result.resultsFound = hook.result.total;
-    delete hook.result.total;
-
-    // delete these fields relating to pagination
-    delete hook.result.limit;
-    delete hook.result.skip;
-
     let visitationsSessions = hook.result.data;
     delete hook.result.data;
     let updatedVisitationsSessions = []; // as we reformat vs sessions, we'll put them in this array

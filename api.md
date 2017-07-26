@@ -172,8 +172,8 @@ All fields are optional.
 * `visitorUsername`: A string which is a student's username.  If included, only Vs in which the user specified by this username was a visitor will be returned.
 * `earliestStartTime`: A date and time, expressed as milliseconds since Jan. 1, 1970.  If this field is included, only Vs which began at or after this time will be retrieved.
 * `latestStartTime`: A date and time, expressed as milliseconds since Jan. 1, 1970.  If this field is included, only Vs which began at or before this time will be retrieved.
-* `maxResults`: An integer. The maximum number of results to return.  If not included, the server will return 50 results by default, in reverse chronological order by start time.  The cap for this value is 250 (in other words, if `maxResults` is greater than 250, the server will act as though it is 250).
-* `firstResultNumber`: The number of the first result which should be returned. If not included, the server will default to returning items starting with result 1.  (For example, if 50 results are returned per request, and you want to retrieve results 51-100, this field should have the value of 51.)
+* `$limit`: An integer. The maximum number of results to return.  If not included, the server will return 50 results by default, in reverse chronological order by start time.  The cap for this value is 250 (in other words, if `$limit` is greater than 250, the server will act as though it is 250).
+* `$skip`: The number of results to skip before the first returned value. If not included, this value defaults to 0.  (For example, if 50 results are returned per request, and you want to retrieve results 51-100, this field should have the value of 50.)
 
 ##### Feathers command:
 ```javascript
@@ -191,7 +191,9 @@ feathersRestClient.service('current-vs').find({ query: {
 ```
 
 ##### Response body (JSON):
-* `resultsFound`: The number of results found which matched the search criteria (which may be more than the number of results returned in this request. For example, if there are 60 results that match criteria, but `maxResults` was set to 20 in the request, only 20 results will be sent by the server, but `resultsFound` will have a value of 60).
+* `total`: The number of results found which matched the search criteria (which may be more than the number of results returned in this request. For example, if there are 60 results that match criteria, but `$limit` was set to 20 in the request, only 20 results will be sent by the server, but `total` will have a value of 60).
+* `skip`: The number of results that were skipped before the first Vs session returned.
+* `limit`: The upper limit to the number of results that this request could return.
 * `visitations`: An array of [visitations objects](#visitationsObject), representing the [visitations sessions](#visitationsSessionTerm) which match the search criteria.
 
 ---
