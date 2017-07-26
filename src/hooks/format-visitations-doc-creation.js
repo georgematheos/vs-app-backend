@@ -6,6 +6,8 @@
 * must be created, in which there is currently only one visitor.
 */
 
+const errors = require('feathers-errors');
+
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {
     const currentTime = (new Date()).getTime(); // the time this request is being processed
@@ -24,6 +26,18 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
     hook.data.startTime = currentTime; // Vs are starting right now
     hook.data.endTime = null; // Vs haven't ended yet
     hook.data.ongoing = true; // Vs haven't ended yet
+
+    // store dormitory on the object
+    return hook.app.service('/users').find({ query: { username: hook.data.hostUsername } })
+    .then(results => {
+      if (results.total === 0) {
+        throw new errors.GeneralError('The user with username `' + hook.data.hostUsername + '` cannot be found.  This problem should have been addressed before it reached this hook (the format-visitations-doc-creation hook).');
+      };
+
+      hook.data.dormitory = results.data[0].dormitory;
+
+      return hook;
+    });
 
   };
 };

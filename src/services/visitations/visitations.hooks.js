@@ -5,10 +5,12 @@ const formatVisitationsDocCreation = require('../../hooks/format-visitations-doc
 
 const formatViewVisitations = require('../../hooks/format-view-visitations');
 
+const formatViewVisitationsQuery = require('../../hooks/format-view-visitations-query');
+
 module.exports = {
   before: {
     all: [ authenticate('jwt') ],
-    find: [],
+    find: [formatViewVisitationsQuery()],
     get: [ disallow() ],
     create: [ formatVisitationsDocCreation() ],
     update: [ disallow() ],

@@ -43,4 +43,5 @@ Visitations objects are stored in a MongoDB as documents with the following fiel
 * `startTime`: milliseconds since Jan. 1, 1970 (the time the Vs session began)
 * `endTime:` milliseconds since Jan. 1, 1970 (the time the Vs session ended), or null, if Vs session has not yet ended
 * `ongoing`: boolean (true if the Vs session has not ended, false if it has)
+* `dormitory`: string
 * `_id`

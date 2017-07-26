@@ -4,7 +4,6 @@
 */
 
 const errors = require('feathers-errors');
-const usernameToUser = require('./username-to-user');
 
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {
@@ -20,6 +19,9 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
       // the id should be returned in an `id` field, not a `_id` field
       session.id = session._id;
       delete session._id;
+
+      // the dormitory will be included on the host object, so no need to send it separately
+      delete session.dormitory;
 
       let userPromises = []; // promises for host and visitor object retrieval
       let visitors = []; // we'll collect the visitor user objects in this array
