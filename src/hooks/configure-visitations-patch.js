@@ -71,7 +71,6 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
 
           // if we are removing the last visitor, end the Vs session
           if (removingLastVisitor) {
-            console.log('::: SHOULD BE ENDED :::');
             configureVsSessionEnding();
           }
 
@@ -99,7 +98,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
           let visitorsList = result.visitors; // the list of visitors
 
           // make a new visitors object for the user we will add to the visitors list
-          return createVisitorObject(hook.data.visitorUsername, currentTime)
+          return createVisitorObject(hook.data.visitorUsername, result.hostUsername, currentTime, hook)
           .then(visitorObj => {
             visitorsList.push(visitorObj); // add this visitor to the list
 

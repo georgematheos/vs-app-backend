@@ -54,15 +54,9 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
 
           visitor.timeJoinedVs = visitorData.timeJoinedVs;
           visitor.timeLeftVs = visitorData.timeLeftVs;
+          visitor.isApprovedVisitor = visitorData.isApprovedVisitor;
 
-          return approvedVisitors.find({ query: { hostUsername: session.hostUsername, approvedVisitors: visitor.username } })
-          .then(results => {
-            // set the isApprovedVisitor field to true if there is a result that matches this query,
-            // since that would mean the visitor IS an approved visitor of the host's
-            visitor.isApprovedVisitor = (results.total > 0);
-
-            visitors.push(visitor); // add this visitor to the array we're creating
-          });
+          visitors.push(visitor);
         }));
       }
 

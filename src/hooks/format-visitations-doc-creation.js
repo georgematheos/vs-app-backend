@@ -13,6 +13,10 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {
     const currentTime = (new Date()).getTime(); // the time this request is being processed
 
+    if (!hook.data.visitorUsername || !hook.data.hostUsername) {
+      throw new errors.Unprocessable('A visitorUsername and hostUsername must be provided with the request.');
+    }
+
     /* First, format the info about the users in the Vs session */
     // we'll store the host solely as their username
     // so we don't have to do anything to the hostUsername field on the hook data
@@ -20,7 +24,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
     // we'll store the visitor in an array, where each visitor will be stored in an object
     // that can be created using this function
     // right now, there is only one visitor, so just add an object for them
-    return createVisitorObject(hook.data.visitorUsername, currentTime)
+    return createVisitorObject(hook.data.visitorUsername, hook.data.hostUsername, currentTime, hook)
     .then(visitorObj => {
       // add this object in an array to the data, and delete the username
       hook.data.visitors = [ visitorObj ];
