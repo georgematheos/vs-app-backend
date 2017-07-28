@@ -2,21 +2,36 @@ const { authenticate } = require('feathers-authentication').hooks;
 const { disallow, iff, isProvider } = require('feathers-hooks-common');
 
 const formatVisitationsDocCreation = require('../../hooks/format-visitations-doc-creation');
-
 const formatViewVisitations = require('../../hooks/format-view-visitations');
-
 const formatViewVisitationsQuery = require('../../hooks/format-view-visitations-query');
-
 const configureCreateVisitations = require('../../hooks/configure-create-visitations');
-
 const configureVisitationsPatch = require('../../hooks/configure-visitations-patch');
+const ensureUserValidity = require('../../hooks/ensure-user-validity');
+const restrictTo = require('../../hooks/restrict-to');
 
 module.exports = {
   before: {
     all: [ authenticate('jwt') ],
     find: [ formatViewVisitationsQuery() ],
     get: [ disallow('external') ],
-    create: [ configureCreateVisitations(), formatVisitationsDocCreation() ],
+    create: [
+      // make sure the visitor is the one making this request
+      restrictTo(
+        { username: { strategy: 'data', fieldName: 'visitorUsername' } }
+      ),
+      // make sure the visitor is a student
+      ensureUserValidity(
+        { strategy: 'user', username: { strategy: 'data', fieldName: 'visitorUsername' } },
+        { isStudent: true }
+      ),
+      // make sure the host is a boarding student
+      ensureUserValidity(
+        { strategy: 'user', username: { strategy: 'data', fieldName: 'hostUsername' } },
+        { isStudent: true, isDayStudent: false }
+      ),
+      configureCreateVisitations(),
+      formatVisitationsDocCreation()
+    ],
     update: [ disallow() ],
     patch: [ configureVisitationsPatch() ],
     remove: [ disallow() ]
