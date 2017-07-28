@@ -9,14 +9,16 @@ const formatViewVisitationsQuery = require('../../hooks/format-view-visitations-
 
 const configureCreateVisitations = require('../../hooks/configure-create-visitations');
 
+const configureVisitationsPatch = require('../../hooks/configure-visitations-patch');
+
 module.exports = {
   before: {
     all: [ authenticate('jwt') ],
     find: [ formatViewVisitationsQuery() ],
-    get: [ disallow() ],
+    get: [ disallow('external') ],
     create: [ configureCreateVisitations(), formatVisitationsDocCreation() ],
     update: [ disallow() ],
-    patch: [],
+    patch: [ configureVisitationsPatch() ],
     remove: [ disallow() ]
   },
 
