@@ -22,8 +22,8 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
     // right now, there is only one visitor, so just add an object for them
     return createVisitorObject(hook.data.visitorUsername, currentTime)
     .then(visitorObj => {
-      // add this object to the data, and delete the username
-      hook.data.visitors = visitorObj;
+      // add this object in an array to the data, and delete the username
+      hook.data.visitors = [ visitorObj ];
       delete hook.data.visitorUsername;
 
       // store start time and end time

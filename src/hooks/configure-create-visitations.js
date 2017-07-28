@@ -73,14 +73,19 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
     // check if the host is currently hosting a Vs session
     .then(() => visitations.find({ query: {
       onlyShowCurrent: true,
-      hostUsername: hook.data.hostUsername,
-      $limit: 0
+      hostUsername: hook.data.hostUsername
     }}))
     .then(results => {
       // if the host is currently hosting a Vs session
       if (results.total > 0) {
-        // TODO: add the visitor to the currently onging Vs session
-        throw new errors.NotImplemented('NOT IMPLEMENTED: add visitor to an ongoing Vs session');
+        return hook.service.patch(results.data[0]._id, {
+          op: 'addVisitor',
+          visitorUsername: hook.data.visitorUsername
+        })
+        .then(result => {
+          hook.result = result; // set the result here; don't proceed with POST request
+          return hook;
+        });
       }
     })
     // Since, if we get here, the visitor is an approved visitor of the host, and the
