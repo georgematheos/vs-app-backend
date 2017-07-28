@@ -14,13 +14,23 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
     // check if the visitor is already in a vs session as a visitor
     return visitations.find({ query: {
       onlyShowCurrent: true,
-      visitorUsername: hook.data.visitorUsername,
-      $limit: 0 // don't actually return the data; we just care whether a doc matches this query
+      visitorUsername: hook.data.visitorUsername
     }})
     .then(results => {
-      // throw an error if this search returns results, since it means the user IS currently a visitor
+      // if the search returns results, meaning the visitor is or was part of a currently
+      // ongoing Vs sesison, check whether this user has already left the Vs session
       if (results.total > 0) {
-        throw new errors.Forbidden('The user with the username `' + hook.data.visitorUsername + '` is currently a visitor in a visitations session, and may not join another as a visitor until they exit it.');
+        // find the data for this visitor
+        for (let visitorData of results.data[0].visitors) {
+          if (visitorData.username === hook.data.visitorUsername) {
+            // if the visitor hasn't left Vs, they can't join since they're already part of it,
+            // so throw an error
+            if (visitorData.timeLeftVs === null) {
+              throw new errors.Forbidden('The user with the username `' + hook.data.visitorUsername + '` is currently a visitor in a visitations session, and may not join another as a visitor until they exit it.');
+            }
+            break; // now that we've found the visitor, no need to continue with the loop
+          }
+        }
       }
     })
     // check if this visitor is already in a vs session as a host
@@ -59,7 +69,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
     .then(() => approvedVisitors.find({ query: {
       listOwnerUsername: hook.data.hostUsername,
       approvedVisitors: hook.data.visitorUsername,
-      $limit: 0
+      $limit: 0 // don't actually return the data; we just care whether a doc matches this query
     }}))
     .then(results => {
       // if the visitor is not an approved visitor, create a visitations request
