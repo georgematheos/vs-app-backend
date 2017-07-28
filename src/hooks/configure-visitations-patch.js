@@ -33,7 +33,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
             // if this isn't the visitor to remove
             if (oldVisitorData.username !== hook.data.visitorUsername) {
               // if this visitor hasn't left yet, we ARE NOT removing the last visitor
-              if (!oldVisitorData.endTime) {
+              if (!oldVisitorData.timeLeftVs) {
                 removingLastVisitor = false;
               }
             }
@@ -65,18 +65,13 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
             throw new errors.NotFound('The user with the username `' + hook.data.visitorUsername + '` was not a visitor in this Vs session, and thus cannot be removed as a visitor.');
           }
 
-          // if there is only one visitor there (and it's the one we're removing),
-          // we ARE removing the last visitor
-          if (newVisitorsData.length === 1) {
-            removingLastVisitor = true;
-          }
-
           // now format the hook data as is necessary for the patch request
           hook.data = {};
           hook.data.visitors = newVisitorsData;
 
           // if we are removing the last visitor, end the Vs session
           if (removingLastVisitor) {
+            console.log('::: SHOULD BE ENDED :::');
             configureVsSessionEnding();
           }
 
