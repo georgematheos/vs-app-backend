@@ -7,6 +7,7 @@
 */
 
 const errors = require('feathers-errors');
+const createVisitorObject = require('../lib/create-visitor-object');
 
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {
@@ -17,18 +18,22 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
     // so we don't have to do anything to the hostUsername field on the hook data
 
     // we'll store the visitor in an array, where each visitor will be stored in an object
-    // that contains username, timeJoinedVs, and timeLeftVs
-    // right now, there is only one visitor
-    hook.data.visitors = [ { username: hook.data.visitorUsername, timeJoinedVs: currentTime, timeLeftVs: null } ];
-    delete hook.data.visitorUsername;
+    // that can be created using this function
+    // right now, there is only one visitor, so just add an object for them
+    return createVisitorObject(hook.data.visitorUsername, currentTime)
+    .then(visitorObj => {
+      // add this object to the data, and delete the username
+      hook.data.visitors = visitorObj;
+      delete hook.data.visitorUsername;
 
-    // store start time and end time
-    hook.data.startTime = currentTime; // Vs are starting right now
-    hook.data.endTime = null; // Vs haven't ended yet
-    hook.data.ongoing = true; // Vs haven't ended yet
+      // store start time and end time
+      hook.data.startTime = currentTime; // Vs are starting right now
+      hook.data.endTime = null; // Vs haven't ended yet
+      hook.data.ongoing = true; // Vs haven't ended yet
 
-    // store dormitory on the object
-    return hook.app.service('/users').find({ query: { username: hook.data.hostUsername } })
+    })
+    // store dormitory on the object (we'll need to get it from the host's user info)
+    .then(() => hook.app.service('/users').find({ query: { username: hook.data.hostUsername } }))
     .then(results => {
       if (results.total === 0) {
         throw new errors.GeneralError('The user with username `' + hook.data.hostUsername + '` cannot be found.  This problem should have been addressed before it reached this hook (the format-visitations-doc-creation hook).');

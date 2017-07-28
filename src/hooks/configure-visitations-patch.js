@@ -4,6 +4,7 @@
 */
 
 const errors = require('feathers-errors');
+const createVisitorObject = require('../lib/create-visitor-object');
 
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {
@@ -80,6 +81,37 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
           }
 
           return hook;
+        });
+
+      case 'addVisitor':
+        // only internal server requests may do this, so throw error if this is an extrenal request
+        if (hook.params.provider) {
+          throw new errors.Forbidden('Visitors may not be added by a patch request (unless it is an internal server request). Perhaps use the `POST /api/visitations` command instead.');
+        }
+
+        if (!hook.data.visitorUsername) {
+          throw new errors.Unprocessable('A visitorUsername was not included with the request to add a visitor to a Vs session. This error is being thrown from the configure-visitations-patch hook.');
+        }
+
+        // get the Vs info so we can get the current visitors
+        return hook.service.get(hook.id, {})
+        .then(result => {
+          // make sure this Vs session isn't over yet
+          if (!result.ongoing) {
+            throw new errors.Forbidden('This visitations session has already ended, and a visitor may not be added to a completed Vs session.');
+          }
+
+          let visitorsList = result.visitors; // the list of visitors
+
+          // make a new visitors object for the user we will add to the visitors list
+          return createVisitorObject(hook.data.visitorUsername, currentTime)
+          .then(visitorObj => {
+            visitorsList.push(visitorObj); // add this visitor to the list
+
+            // format patch request properly
+            hook.data = {};
+            hook.data.visitors = visitorsList;
+          });
         });
 
       case 'endVisitations':
