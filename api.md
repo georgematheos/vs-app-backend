@@ -20,6 +20,7 @@ It is fairly final at this point, but still subject to change if the developers 
     * [Respond to or delete visitations request](#respondToOrDeleteVisitationsRequest)
     * [Block Vs requests from a user](#blockVsRequestsFromAUser)
     * [Remove Vs request block](#removeVsRequestBlock)
+    * [View Vs request blocks you created](#viewVsRequestBlocksYouCreated)
   * [Approved Visitors](#approvedVisitors)
     * [Add an approved visitor](#addAnApprovedVisitor)
     * [Remove an approved visitor](#removeAnApprovedVisitor)
