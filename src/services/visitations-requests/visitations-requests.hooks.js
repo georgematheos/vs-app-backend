@@ -5,16 +5,18 @@ const configureViewVisitationsRequestsQuery = require('../../hooks/configure-vie
 
 const formatViewVisitationsRequests = require('../../hooks/format-view-visitations-requests');
 
+const configureRemoveVisitationsRequest = require('../../hooks/configure-remove-visitations-request');
+
 module.exports = {
   before: {
     all: [ authenticate('jwt') ],
     // run some checks and configuration before the request, if this is an external request
     find: [ iff(isProvider('external'), configureViewVisitationsRequestsQuery()) ],
-    get: [ disallow() ],
+    get: [ disallow('external') ],
     create: [ disallow('external') ],
     update: [ disallow() ],
     patch: [ disallow() ],
-    remove: []
+    remove: [ iff(isProvider('external'), configureRemoveVisitationsRequest()) ]
   },
 
   after: {
