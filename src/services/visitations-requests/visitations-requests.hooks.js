@@ -3,6 +3,8 @@ const { disallow, iff, isProvider } = require('feathers-hooks-common');
 
 const configureViewVisitationsRequestsQuery = require('../../hooks/configure-view-visitations-requests-query');
 
+const formatViewVisitationsRequests = require('../../hooks/format-view-visitations-requests');
+
 module.exports = {
   before: {
     all: [ authenticate('jwt') ],
@@ -17,7 +19,7 @@ module.exports = {
 
   after: {
     all: [],
-    find: [],
+    find: [ iff(isProvider('external'), formatViewVisitationsRequests()) ],
     get: [],
     create: [],
     update: [],

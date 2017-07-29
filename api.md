@@ -288,6 +288,7 @@ feathersRestClient.service('visitations-requests').find({ query: {
 * `visitations-requests`: An array of visitations requests objects, each of which contains the following fields:
   * `id`: A unique identifier for the visitations request.
   * `timeRequestIssued`: The date and time (ISO) when the request was issued by the visitor.
+  * `host`: A [user object](#userObject) containing information about the user to whom this Vs request was sent.
   * `visitor`: A [user object](#userObject) containing information about the user who issued the Vs request.  Does not contain the field `roomNumber.`
 
 ---
