@@ -5,6 +5,7 @@
 
 const errors = require('feathers-errors');
 const createVisitorObject = require('../lib/create-visitor-object');
+const restrictTo = require('./restrict-to');
 
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {
@@ -25,8 +26,18 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
         let visitorToRemoveFound = false; // assume we won't find the user to remove until we do
         let visitorCurrentlyInVs = false; // assume the visitor has already left Vs until proven otherwise
 
-        // get the info on this Vs session
+        // now, enter a chain of promises
+        // start by getting the info on this Vs session
         return hook.service.get(hook.id, {})
+        // quickly check to make sure either the visitor or host is trying to remove the visitor, otherwise throw an error
+        .then(result => {
+          return restrictTo(
+            { username: hook.data.visitorUsername },
+            { username: result.hostUsername }
+          )(hook)
+          .then(() => result); // make sure to return the result we found earlier; we still need it
+        })
+        // now, the logic for actually formatting everything
         .then(result => {
           let newVisitorsData = []; // we'll recollect the visitors data to format it as needed for the PATCH
           for (let oldVisitorData of result.visitors) {
@@ -58,11 +69,13 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
           }
 
           // handle a couple of error cases
+          if (!visitorToRemoveFound) {
+            throw new errors.NotFound('The user with the username `' + hook.data.visitorUsername + '` was and is not a visitor in this Vs session, and thus cannot be removed as a visitor.');
+          }
+          // if the following is true, the previous if was true also, so this second check must
+          // come second, since otherwise the first one would never be reached
           if (!visitorCurrentlyInVs) {
             throw new errors.Unprocessable('This user with the username `' + hook.data.visitorUsername + '` has already left the Vs session, and has not returned, so they cannot be removed.');
-          }
-          if (!visitorToRemoveFound) {
-            throw new errors.NotFound('The user with the username `' + hook.data.visitorUsername + '` was not a visitor in this Vs session, and thus cannot be removed as a visitor.');
           }
 
           // now format the hook data as is necessary for the patch request
@@ -111,6 +124,12 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
       case 'endVisitations':
         // get this vs session's info
         return hook.service.get(hook.id, {})
+        // throw an error if anyone but the host is trying to perform this request
+        .then(result => {
+          return restrictTo({ username: result.hostUsername })(hook)
+          .then(() => result); // make sure to return the result; we'll need it again
+        })
+        // now perform the rest of the logic for configuring this request
         .then(result => {
           let newVisitorsData = [];
           // for each visitor, if they haven't left, note that they are leaving now
