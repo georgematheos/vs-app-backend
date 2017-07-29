@@ -9,6 +9,7 @@ const errors = require('feathers-errors');
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {
     const approvedVisitors = hook.app.service('/approved-visitors');
+    const visitationsRequests = hook.app.service('/visitations-requests');
     const visitations = hook.service;
 
     if (!hook.data.visitorUsername || !hook.data.hostUsername) {
@@ -72,6 +73,26 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
       }
       // if we get to here, no errors have been thrown, and it is not a problem for this user to
       // become a visitor because of their involvement in other vs sessions
+    })
+    // check if this visitor has sent any Vs requests that are still present
+    .then(() => visitationsRequests.find({ query: {
+      visitorUsername: hook.data.visitorUsername
+    }}))
+    .then(results => {
+      let promises = [];
+      for (let result of results.data) {
+        // if this request is for a different host, they can't get Vs with someone else, so throw an error
+        if (result.hostUsername !== hook.data.hostUsername) {
+          throw new errors.Forbidden('The user with the username `' + hook.data.visitorUsername +'` has already sent a visitations request to a user, and may not get visitations with another user until this request has been deleted.');
+        }
+        else {
+          // if this request is for the same host, remove the request, and it will either be replaced
+          // with a new one, or if the visitor is now an approved visitor, Vs will just start
+          promises.push(visitationsRequests.remove(result._id, {}));
+        }
+      }
+      return Promise.all(promises)
+      .then(() => hook);
     })
     // now check if this visitor is an approved visitor for the host
     .then(() => approvedVisitors.find({ query: {
