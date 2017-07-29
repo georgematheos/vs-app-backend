@@ -95,30 +95,39 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
       .then(() => hook);
     })
     // now check if this visitor is an approved visitor for the host
-    .then(() => approvedVisitors.find({ query: {
-      listOwnerUsername: hook.data.hostUsername,
-      approvedVisitors: hook.data.visitorUsername,
-      $limit: 0 // don't actually return the data; we just care whether a doc matches this query
-    }}))
-    .then(results => {
-      // if the visitor is not an approved visitor, create a visitations request
-      if (results.total === 0) {
-        return hook.app.service('/visitations-requests').create({
-          timeRequestIssued: (new Date()).getTime(),
-          visitorUsername: hook.data.visitorUsername,
-          hostUsername: hook.data.hostUsername
-        })
-        .then(result => {
-          // set the result here; don't proceed with POST /api/visitations
-          hook.result = {
-            message: 'A visitations request was created.',
-            visitationsRequestDocument: result
-          };
-          return hook;
-        });
-      }
+    .then(() => {
+      // if this is an internal server request, the user can join Vs regardless of whether
+      // they are an approved visitor, so proceed to next .then function
+      if (!hook.params.provider) {  console.log('THE PROVIDER IS INTERNAL'); return; }
+
+      // if this is an external server request, the user can join Vs ONLY IF THEY ARE AN
+      // APPROVED VISITOR
+      // check whether they are
+      return approvedVisitors.find({ query: {
+        listOwnerUsername: hook.data.hostUsername,
+        approvedVisitors: hook.data.visitorUsername,
+        $limit: 0 // don't actually return the data; we just care whether a doc matches this query
+      }})
+      .then(results => {
+        // if the visitor is not an approved visitor, create a visitations request
+        if (results.total === 0) {
+          return hook.app.service('/visitations-requests').create({
+            timeRequestIssued: (new Date()).getTime(),
+            visitorUsername: hook.data.visitorUsername,
+            hostUsername: hook.data.hostUsername
+          })
+          .then(result => {
+            // set the result here; don't proceed with POST /api/visitations
+            hook.result = {
+              message: 'A visitations request was created.',
+              visitationsRequestDocument: result
+            };
+            return hook;
+          });
+        }
+      });
     })
-    // if the visitor IS an approved visitor, we don't need to make a request,
+    // if we get here, we don't need to make a request,
     // and we can just create a vs session, or add them to a session if one is ongoing
     // check if the host is currently hosting a Vs session
     .then(() => visitations.find({ query: {

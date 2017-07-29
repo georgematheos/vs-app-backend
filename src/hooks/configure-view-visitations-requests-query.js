@@ -20,6 +20,6 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
     const username = hook.params.query.hostUsername || hook.params.query.visitorUsername;
 
     // make sure the authenticated user is the one whose requests are being looked at
-    return restrictTo({ username })(hook); // TODO: TEST ALL THIS STUFF
+    return restrictTo({ username })(hook);
   };
 };

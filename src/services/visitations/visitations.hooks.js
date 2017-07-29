@@ -17,9 +17,9 @@ module.exports = {
     get: [ disallow('external') ],
     create: [
       // make sure the visitor is the one making this request
-      restrictTo(
+      iff(isProvider('external'), restrictTo(
         { username: { strategy: 'data', fieldName: 'visitorUsername' } }
-      ),
+      )),
       // make sure the visitor is a student
       ensureUserValidity(
         { strategy: 'user', username: { strategy: 'data', fieldName: 'visitorUsername' } },
