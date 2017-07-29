@@ -45,3 +45,10 @@ Visitations objects are stored in a MongoDB as documents with the following fiel
 * `ongoing`: boolean (true if the Vs session has not ended, false if it has)
 * `dormitory`: string
 * `_id`
+
+### visitations-requests
+Visitation request objects are stored in a MongoDB as documents with the following fields:
+* `timeRequestIssued`: milliseconds since Jan. 1, 1970 (the time the request was issued)
+* `visitorUsername`: string (the username of the visitor who issued the request)
+* `hostUsername`: string (the username of the host the visitor is requesting to get Vs with)
+* `_id`
