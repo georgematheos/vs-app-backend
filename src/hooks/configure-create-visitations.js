@@ -82,8 +82,19 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
     .then(results => {
       // if the visitor is not an approved visitor, create a visitations request
       if (results.total === 0) {
-        // TODO: create a visitations request
-        throw new errors.NotImplemented('NOT IMPLEMENTED: create a visitations request');
+        return hook.app.service('/visitations-requests').create({
+          timeRequestIssued: (new Date()).getTime(),
+          visitorUsername: hook.data.visitorUsername,
+          hostUsername: hook.data.hostUsername
+        })
+        .then(result => {
+          // set the result here; don't proceed with POST /api/visitations
+          hook.result = {
+            message: 'A visitations request was created.',
+            visitationsRequestDocument: result
+          };
+          return hook;
+        });
       }
     })
     // if the visitor IS an approved visitor, we don't need to make a request,
