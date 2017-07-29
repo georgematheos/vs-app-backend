@@ -11,9 +11,17 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
     const approvedVisitors = hook.app.service('/approved-visitors');
     const visitations = hook.service;
 
+    if (!hook.data.visitorUsername || !hook.data.hostUsername) {
+      throw new errors.BadRequest('A visitorUsername and hostUsername field must be provided in the request body.');
+    }
+
+    if (hook.data.visitorUsername === hook.data.hostUsername) {
+      throw new errors.Forbidden('A user may not get Vs with themselves.');
+    }
+
     // check if the visitor is already in a vs session as a visitor
     return visitations.find({ query: {
-      onlyShowCurrent: true,
+      ongoing: true,
       visitorUsername: hook.data.visitorUsername
     }})
     .then(results => {
@@ -22,7 +30,6 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
       if (results.total > 0) {
         // find the data for this visitor
         for (let visitorData of results.data[0].visitors) {
-          console.log(visitorData);
           if (visitorData.username === hook.data.visitorUsername) {
             // if the visitor hasn't left Vs, they can't join since they're already part of it,
             // so throw an error
@@ -36,7 +43,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
     })
     // check if this visitor is already in a vs session as a host
     .then(() => visitations.find({ query: {
-      onlyShowCurrent: true,
+      ongoing: true,
       hostUsername: hook.data.visitorUsername
     }}))
     .then(results => {
@@ -83,7 +90,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
     // and we can just create a vs session, or add them to a session if one is ongoing
     // check if the host is currently hosting a Vs session
     .then(() => visitations.find({ query: {
-      onlyShowCurrent: true,
+      ongoing: true,
       hostUsername: hook.data.hostUsername
     }}))
     .then(results => {

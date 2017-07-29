@@ -12,7 +12,8 @@ const restrictTo = require('../../hooks/restrict-to');
 module.exports = {
   before: {
     all: [ authenticate('jwt') ],
-    find: [ formatViewVisitationsQuery() ],
+    // format the query if this is an external request, but not if it's an internal one
+    find: [ iff(isProvider('external'), formatViewVisitationsQuery()) ],
     get: [ disallow('external') ],
     create: [
       // make sure the visitor is the one making this request

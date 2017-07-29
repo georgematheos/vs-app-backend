@@ -23,6 +23,11 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
       // the dormitory will be included on the host object, so no need to send it separately
       delete session.dormitory;
 
+      // we will remove any visitor data if in the hook obj params we have noted that visitor data has to be removed
+      // when the authenticated user isn't host, and that user is also not host for this Vs session
+      let removeNonAuthenticatedVisitors = hook.params.removeVisitorDataIfNotHost && session.hostUsername !== hook.params.user.username;
+      let visitorInfoNotReturned = false; // assume all visitor data will be returned; change if any is
+
       let userPromises = []; // promises for host and visitor object retrieval
       let visitors = []; // we'll collect the visitor user objects in this array
 
@@ -40,6 +45,13 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
       }));
 
       for (let visitorData of session.visitors) {
+        // if we're supposed to remove not authenticted visitors, and this isn't an authenticated user,
+        // continue the loop and don't add this person to the list
+        if (removeNonAuthenticatedVisitors && visitorData.username !== hook.params.user.username) {
+          visitorInfoNotReturned = true; // note that we are not including some of the visitor info
+          continue;
+        }
+
         userPromises.push(users.find({ query: { username: visitorData.username }})
         .then(results => {
           if (results.total === 0) {
@@ -62,6 +74,9 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
 
       sessionPromises.push(Promise.all(userPromises)
       .then(() => {
+        // store on this object whether information was removed
+        session.visitorDataRemoved = visitorInfoNotReturned;
+
         // replace the results visitors object (which contains usernames) with the one we created
         // which contains user objects
         session.visitors = visitors;

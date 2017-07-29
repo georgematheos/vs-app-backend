@@ -731,6 +731,7 @@ This is an object containing information about a [visitations session](#visitati
 * `endTime`: The time when the Vs session ended (ie. when the last visitor left Vs) (in the form of milliseconds since Jan. 1, 1970) (If the Vs haven't ended, this will be null or not included).
 - `ongoing`: A boolean.  True if the Vs are currently occurring, false otherwise.
 * `host`: A [user object](#userObject) containing information about the host of the Vs session.  Note that the dorm and room number info for this object is the room and dorm in which the Vs are occurring.
+* `visitorDataRemoved`: A boolean, which may or may not be included. If this field is included and true, it means that information about other visitors who were part of the Vs session was removed before the data was sent to this user, since the user does not have authorization to view the information.  If false or not included, this did not happen.
 * `visitors`: An array of [user objects](#userObject), each containing information about a visitor in the Vs session.  The field `roomNumber` is not included for any user object in this array.  Each object in the array, however, has the following additional fields:
   * `timeJoinedVs`: A date and time expressed as milliseconds since Jan. 1, 1970. The time when this visitor joined the Vs session.
   * `timeLeftVs`: A date and time expressed as milliseconds since Jan. 1, 1970. The time when this visitor left the Vs session.  If the visitor hasn't left, this field will be null.
