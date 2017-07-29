@@ -7,13 +7,15 @@ const formatViewVisitationsRequests = require('../../hooks/format-view-visitatio
 
 const configureRemoveVisitationsRequest = require('../../hooks/configure-remove-visitations-request');
 
+const preventBlockedVsRequestCreation = require('../../hooks/prevent-blocked-vs-request-creation');
+
 module.exports = {
   before: {
     all: [ authenticate('jwt') ],
     // run some checks and configuration before the request, if this is an external request
     find: [ iff(isProvider('external'), configureViewVisitationsRequestsQuery()) ],
     get: [ disallow('external') ],
-    create: [ disallow('external') ],
+    create: [ disallow('external'), preventBlockedVsRequestCreation() ],
     update: [ disallow() ],
     patch: [ disallow() ],
     remove: [ iff(isProvider('external'), configureRemoveVisitationsRequest()) ]

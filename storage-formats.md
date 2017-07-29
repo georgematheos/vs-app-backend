@@ -52,3 +52,6 @@ Visitation request objects are stored in a MongoDB as documents with the followi
 * `visitorUsername`: string (the username of the visitor who issued the request)
 * `hostUsername`: string (the username of the host the visitor is requesting to get Vs with)
 * `_id`
+
+### vs-request-blocks
+Vs request blocks are stored in the exact same format as approved-visitor-addition-blocks.

@@ -7,7 +7,12 @@ module.exports = function () {
   const app = this;
   const paginate = app.get('paginate');
   const mongoClient = app.get('mongoClient');
-  const options = { paginate };
+  const options = {
+    // we use the username of the blocker
+    // as the unique identifier for an vs request block info doc
+    id: 'blockerUsername',
+    paginate
+  };
 
   // Initialize our service with any options it requires
   app.use('/vs-request-blocks', createService(options));

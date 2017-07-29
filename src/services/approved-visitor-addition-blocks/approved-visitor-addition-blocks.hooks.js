@@ -29,7 +29,7 @@ module.exports = {
     create: [ disallow('external') ],
     update: [ disallow() ],
     patch: [
-      // only students may add or remove approved visitors
+      // only students may add or remove approved visitors addition blocks
       restrictTo({ isStudent: true }),
       configureAddRemovePatch({
         addOp: 'addBlock',
