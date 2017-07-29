@@ -3,6 +3,7 @@ const approvedVisitors = require('./approved-visitors/approved-visitors.service.
 const approvedVisitorAdditionBlocks = require('./approved-visitor-addition-blocks/approved-visitor-addition-blocks.service.js');
 const hostApprovers = require('./host-approvers/host-approvers.service.js');
 const visitations = require('./visitations/visitations.service.js');
+const visitationsRequests = require('./visitations-requests/visitations-requests.service.js');
 module.exports = function () {
   const app = this; // eslint-disable-line no-unused-vars
   app.configure(users);
@@ -10,4 +11,5 @@ module.exports = function () {
   app.configure(approvedVisitorAdditionBlocks);
   app.configure(hostApprovers);
   app.configure(visitations);
+  app.configure(visitationsRequests);
 };
