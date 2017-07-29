@@ -23,7 +23,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
     // check if the visitor is already in a vs session as a visitor
     return visitations.find({ query: {
       ongoing: true,
-      visitorUsername: hook.data.visitorUsername
+      visitors: { $elemMatch: { username: hook.data.visitorUsername } }
     }})
     .then(results => {
       // if the search returns results, meaning the visitor is or was part of a currently
