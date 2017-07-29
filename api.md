@@ -27,7 +27,7 @@ It is fairly final at this point, but still subject to change if the developers 
     * [View users for whom one is an approved visitor](#viewUsersForWhomOneIsAnApprovedVisitor)
     * [Block approved visitor addition](#blockApprovedVisitorAddition)
     * [Remove a block on approved visitor addition](#removeABlockOnApprovedVisitorAddition)
-    * [View Vs addition blocks you created](#viewVsAdditionBlocksYouCreated)
+    * [View approved visitor addition blocks you created](#viewApprovedVisitorAdditionBlocksYouCreated)
   * [Vs Restrictions](#vsRestrictions)
     * [Put a user on Vs restrictions](#putAUserOnVsRestrictions)
     * [Remove a user from Vs restrictions](#removeAUserFromVsRestrictions)
@@ -376,6 +376,34 @@ feathersRestClient.service('vs-request-block').patch(':blockerUsername', {
 
 ##### Successful response status code: `200`
 
+---
+
+#### <a name="viewVsRequestBlocksYouCreated"></a>View Vs request blocks you created
+    GET /api/vs-request-blocks/:blockerUsername
+
+Returns info on all the users the user specified by `:blockerUsername` in the URL has blocked from making Vs requests to them.
+
+This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for the user specified by `:blockerUsername` in the url, or for a dean.  Note that the user specified by `:blockerUsername` must be a student.
+
+#### Feathers command:
+```javascript
+feathersRestClient.service('vs-request-blocks').get(':blockerUsername', {}) // fill in real username
+.then(results => {
+    // do something with the response if request is successful
+})
+.catch(err => {
+    // do something with error if request is unsuccessful
+});
+```
+
+##### Successful response status code: `200`
+
+##### Response body (JSON):
+* `blocker`: A [user object](#userObject) for the user who has blocked these users.
+* `blockees`: An array of [user objects](#userObject), one for each user who is blocked.
+
+---
+
 ### <a name="approvedVisitors"></a>Approved Visitors
 
 #### <a name="addAnApprovedVisitor"></a>Add an approved visitor
@@ -553,10 +581,10 @@ feathersRestClient.service('approved-visitor-addition-blocks').patch(':blockerUs
 ##### Successful response status code: `200`
 
 ---
-#### <a name="viewVsAdditionBlocksYouCreated"></a>View Vs addition blocks you created
+#### <a name="viewApprovedVisitorAdditionBlocksYouCreated"></a>View approved visitor addition blocks you created
     GET /api/approved-visitor-addition-blocks/:blockerUsername
 
-Returns info on all the users the user specified by `:blockerUsername` in the URL has added as an approved visitor.
+Returns info on all the users the user specified by `:blockerUsername` in the URL has blocked from adding themself as an approved visitor.
 
 This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for the user specified by `:blockerUsername` in the url, or for a dean.  Note that the user specified by `:blockerUsername` must be a student.
 
