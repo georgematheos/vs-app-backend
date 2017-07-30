@@ -22,25 +22,24 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
     }
 
     // check if the visitor is on vs restriction
-    return visitationsRestrictions.get(hook.data.visitorUsername, { $limit: 0 })
-    .then(() => { // if vs restictions found, throw error since the user can't get vs
-      throw new errors.Forbidden('The user listed as visitor, with the username `' + hook.data.visitorUsername + '`, is on Vs restrictions, and cannot get Vs.');
-    })
-    // if error, make sure it's a not found (meaning the user isn't on Vs)
-    .catch(err => {
-      // if this isn't a 404 error, it shouldn't happen, so throw it
-      if (err.code !== 404) { throw err; }
-      // if this is a 404 not found, it just means the user isn't on vs restrictions, so proceed
-      return;
+    return visitationsRestrictions.find({ query: {
+      username: hook.data.visitorUsername,
+      $limit: 0
+    } })
+    .then(results => {
+      if (results.total > 0) { // if vs restictions found, throw error since the user can't get vs
+        throw new errors.Forbidden('The user listed as visitor, with the username `' + hook.data.visitorUsername + '`, is on Vs restrictions, and cannot get Vs.');
+      }
     })
     // check if the host is on vs restrictions; same logic as for visitor, more or less
-    .then(() => visitationsRestrictions.get(hook.data.hostUsername, { $limit: 0 }))
-    .then(() => {
-      throw new errors.Forbidden('The user listed as host, with the username `' + hook.data.hostUsername + '`, is on Vs restrictions, and cannot get Vs.');
-    })
-    .catch(err => {
-      if (err.code !== 404) { throw err; }
-      return;
+    .then(() => visitationsRestrictions.find({ query: {
+      username: hook.data.hostUsername,
+      $limit: 0
+    } }))
+    .then(results => {
+      if (results.total > 0) {
+        throw new errors.Forbidden('The user listed as host, with the username `' + hook.data.hostUsername + '`, is on Vs restrictions, and cannot get Vs.');
+      }
     })
     // check if the visitor is already in a vs session as a visitor
     .then(() => visitations.find({ query: {

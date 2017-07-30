@@ -22,15 +22,10 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
 
       // if it is a student, check if the user is on vs restrictions
       promises.push(hook.app.service('/visitations-restrictions')
-      .get(users[i].username, { $limit: 0 })
-      .then(() => {
+      .find({ query: { username: users[i].username, $limit: 0 } })
+      .then(results => {
         // if on vs restrictions, make note
-        users[i].currentlyOnvisitationsRestrictions = true;
-      })
-      .catch(err => {
-        if (err.code !== 404) { throw err; }
-        // if not on vs restrictions, make note
-        users[i].currentlyOnvisitationsRestrictions = false;
+        users[i].currentlyOnvisitationsRestrictions = results.total > 0;
       }));
     }
 

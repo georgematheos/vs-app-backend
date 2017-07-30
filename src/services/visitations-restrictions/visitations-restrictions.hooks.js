@@ -1,5 +1,5 @@
 const { authenticate } = require('feathers-authentication').hooks;
-const { disallow, discard } = require('feathers-hooks-common');
+const { disallow, discard, iff, isProvider } = require('feathers-hooks-common');
 
 const configurePutvisitationsRestrictions = require('../../hooks/configure-put-visitations-restrictions');
 
@@ -10,9 +10,9 @@ const configureViewvisitationsRestrictionsQuery = require('../../hooks/configure
 const restrictTo = require('../../hooks/restrict-to');
 
 module.exports = {
-  before: {
+    before: {
     all: [ authenticate('jwt') ],
-    find: [ configureViewvisitationsRestrictionsQuery() ],
+    find: [ iff(isProvider('external'), configureViewvisitationsRestrictionsQuery()) ],
     get: [ disallow('external') ],
     create: [ disallow('external') ],
     // for update method, restrictTo and ensureUserValidity hooks are within configure hook to

@@ -20,7 +20,7 @@ module.exports = {
   },
 
   after: {
-    all: [ changeFieldName('_id', 'id') ],
+    all: [ iff(isProvider('external'), changeFieldName('_id', 'id')) ],
     find: [ iff(isProvider('external'), formatViewVisitationsRequests()) ],
     get: [],
     create: [],

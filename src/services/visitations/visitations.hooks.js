@@ -40,7 +40,7 @@ module.exports = {
   },
 
   after: {
-    all: [ changeFieldName('_id', 'id') ],
+    all: [ iff(isProvider('external'), changeFieldName('_id', 'id')) ],
     // if this is request is NOT coming from within the server, format the visitations objects as specified by the API
     find: [ iff(isProvider('external'), formatViewVisitations()) ],
     get: [],
