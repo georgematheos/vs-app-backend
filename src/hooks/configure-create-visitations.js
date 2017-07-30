@@ -10,6 +10,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {
     const approvedVisitors = hook.app.service('/approved-visitors');
     const visitationsRequests = hook.app.service('/visitations-requests');
+    const vsRestrictions = hook.app.service('/vs-restrictions');
     const visitations = hook.service;
 
     if (!hook.data.visitorUsername || !hook.data.hostUsername) {
@@ -20,11 +21,32 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
       throw new errors.Forbidden('A user may not get Vs with themselves.');
     }
 
+    // check if the visitor is on vs restriction
+    return vsRestrictions.get(hook.data.visitorUsername, { $limit: 0 })
+    .then(() => { // if vs restictions found, throw error since the user can't get vs
+      throw new errors.Forbidden('The user listed as visitor, with the username `' + hook.data.visitorUsername + '`, is on Vs restrictions, and cannot get Vs.');
+    })
+    // if error, make sure it's a not found (meaning the user isn't on Vs)
+    .catch(err => {
+      // if this isn't a 404 error, it shouldn't happen, so throw it
+      if (err.code !== 404) { throw err; }
+      // if this is a 404 not found, it just means the user isn't on vs restrictions, so proceed
+      return;
+    })
+    // check if the host is on vs restrictions; same logic as for visitor, more or less
+    .then(() => vsRestrictions.get(hook.data.hostUsername, { $limit: 0 }))
+    .then(() => {
+      throw new errors.Forbidden('The user listed as host, with the username `' + hook.data.hostUsername + '`, is on Vs restrictions, and cannot get Vs.');
+    })
+    .catch(err => {
+      if (err.code !== 404) { throw err; }
+      return;
+    })
     // check if the visitor is already in a vs session as a visitor
-    return visitations.find({ query: {
+    .then(() => visitations.find({ query: {
       ongoing: true,
       visitors: { $elemMatch: { username: hook.data.visitorUsername } }
-    }})
+    }}))
     .then(results => {
       // if the search returns results, meaning the visitor is or was part of a currently
       // ongoing Vs sesison, check whether this user has already left the Vs session
