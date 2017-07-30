@@ -41,6 +41,7 @@ It is fairly final at this point, but still subject to change if the developers 
   * [User Object](#userObject)
   * [Visitations Object](#visitationsObject)
 * [Term Definitions](#termDefinitions)
+  * [Standard pagination interface](#standardPaginationInterfaceTerm)
   * [Visitations Session](#visitationsSessionTerm)
 
 ---
@@ -165,6 +166,7 @@ The request will only return information about visitations that the user (determ
 * Faculty members may view all information about visitations which occurred in the dorm they are affiliated with.
 * Deans may view all information about all visitations.
 
+This request uses the [standard pagination interface](#standardPaginationInterfaceTerm).
 
 ##### Request parameters (inline URL query):
 All fields are optional.
@@ -174,8 +176,6 @@ All fields are optional.
 * `visitorUsername`: A string which is a student's username.  If included, only Vs in which the user specified by this username was a visitor will be returned.
 * `earliestStartTime`: A date and time, expressed as milliseconds since Jan. 1, 1970.  If this field is included, only Vs which began at or after this time will be retrieved.
 * `latestStartTime`: A date and time, expressed as milliseconds since Jan. 1, 1970.  If this field is included, only Vs which began at or before this time will be retrieved.
-* `$limit`: An integer. The maximum number of results to return.  If not included, the server will return 50 results by default, in reverse chronological order by start time.  The cap for this value is 250 (in other words, if `$limit` is greater than 250, the server will act as though it is 250).
-* `$skip`: The number of results to skip before the first returned value. If not included, this value defaults to 0.  (For example, if 50 results are returned per request, and you want to retrieve results 51-100, this field should have the value of 50.)
 
 ##### Feathers command:
 ```javascript
@@ -193,9 +193,6 @@ feathersRestClient.service('current-vs').find({ query: {
 ```
 
 ##### Response body (JSON):
-* `total`: The number of results found which matched the search criteria (which may be more than the number of results returned in this request. For example, if there are 60 results that match criteria, but `$limit` was set to 20 in the request, only 20 results will be sent by the server, but `total` will have a value of 60).
-* `skip`: The number of results that were skipped before the first Vs session returned.
-* `limit`: The upper limit to the number of results that this request could return.
 * `visitations`: An array of [visitations objects](#visitationsObject), representing the [visitations sessions](#visitationsSessionTerm) which match the search criteria.
 
 ---
@@ -265,6 +262,8 @@ Note that any visitations request which has not been responded to will be automa
 Returns information about any Vs requests that have been sent to the user specified by `hostUsername` in the request parameters, or that have been sent by the user specified by `visitorUsername` in the request parameters.
 
 This must include a valid JWT in the header labeled `x-auth-token`.  This JWT must be valid for the user specified by `hostUsername` or `visitorUsername` in the request parameters.
+
+This request uses the [standard pagination interface](#standardPaginationInterfaceTerm).
 
 ##### Request parameters (inline URL query):
 EXACTLY ONE OF THE FOLLOWING FIELDS SHOULD BE INCLUDED (NOT BOTH):
@@ -645,6 +644,8 @@ Returns info on users who are on Vs restrictions.
 
 This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for a student (in which case only vs restrictions for that student will be returned), a faculty member affiliated with a dorm (in which case only vs restrictions for students in that dorm will be returned), or a dean (in which case all vs restrictions may be returned).
 
+This request uses the [standard pagination interface](#standardPaginationInterfaceTerm).
+
 ##### Request parameters (inline URL query) (optional):
 * `username`: If included, this will only return restrictions for the user with the username specified here. Will be ignored if a student is making the request.
 * `dormitory`: If included, this will only return restrictions on people in the specified dorm. Will be ignored if a non-dean faculty member is making the request.
@@ -800,6 +801,32 @@ This is an object containing information about a [visitations session](#visitati
 
 ## <a name="termDefinitions"></a>Term definitions
 This section contains definitions of a few terms used in the API.
+
+#### <a name="standardPaginationInterfaceTerm"></a>Standard pagination interface
+Pagination refers to sending data to the client in "pages", rather than all at once.
+For example, if there are 200 database entries that could be returned, rather than sending 200
+entries, the server may send only 20 at each request the client makes, with the client
+having the ability to choose which entry to start at, so in 10 requests, the client could view
+all the data.
+
+The [standard pagination interface](#standardPaginationInterfaceTerm) is the standard syntax used 
+in this app for pagination.  Note that this is the pagination interface that feathers uses by
+default.  Each method that uses this pagination and this interface makes note of it in its section
+of this document.
+
+Here is how it works:
+
+On the URL query for this method (in addition to any other query parameters), the following
+fields may be included:
+* `$limit`: The maximum number of documents to be returned at once.  The default for this is 10.  The maximum value it may have is 100; if this is set to a greater number, it will default to 100.  (Pro tip: if you just want to see if a document exists, but don't care about its contents, use `$limit=0` to decrease the amount of data sent by the server.)
+* `$skip`: The number of documents to skip before the first returned result.  (For example, if this is set to 10, the first result returned will be the 11th one found.)  Defaults to 0.
+
+On the returned JSON file, the following fields will be included in addition to any others
+specified on the specific method:
+* `limit`: The value used as the limit of the number of documents to send to the client.
+* `skip`: The number of documents skipped before the first one sent to the client.
+* `total`: The total number of documents which matched the query.  If this is greater than `limit`, not all have been sent.
+* Another field will also be included with an array of documents of some sort.
 
 #### <a name="visitationsSessionTerm"></a>Visitations Session
 A visitations session is a continuous, uninterrupted period during which Vs are occurring in an individual's room.  The same visitor does not have to be getting Vs for the whole time, as long as (an)other visitor(s) joins the Vs before the first visitor leaves.  The Vs session ends once all visitors have left the room, and at that point, a new Vs session begins the next time a visitor begins to get Vs in the room.
