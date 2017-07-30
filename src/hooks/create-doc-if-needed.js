@@ -59,7 +59,7 @@ module.exports = function (queryObj, additionalFieldsObj) { // eslint-disable-li
         return Promise.all(promises)
         .then(() => {
           // create a new document
-          return hook.service.create(Object.assign({}, newAdditionalFieldsObj, newQueryObj, { $limit: 0 }));
+          return hook.service.create(Object.assign({}, newAdditionalFieldsObj, newQueryObj));
         })
         .then(results => hook); // make sure to return the hook object
       }
