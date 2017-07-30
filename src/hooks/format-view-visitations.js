@@ -16,10 +16,6 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
     let sessionPromises = []; // promises from loop over Vs sessions
 
     for (let session of visitationsSessions) {
-      // the id should be returned in an `id` field, not a `_id` field
-      session.id = session._id;
-      delete session._id;
-
       // the dormitory will be included on the host object, so no need to send it separately
       delete session.dormitory;
 

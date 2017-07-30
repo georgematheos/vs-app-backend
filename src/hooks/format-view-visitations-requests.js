@@ -17,9 +17,6 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
 
     // for each vs request
     for (let request of hook.result['visitations-requests']) {
-      // use "id", not "_id"
-      request.id = request._id;
-      delete request._id;
 
       // replace hostUsername with host user object
       promises.push(users.find({ query: { username: request.hostUsername } })

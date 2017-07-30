@@ -1,5 +1,5 @@
 const { authenticate } = require('feathers-authentication').hooks;
-const { disallow } = require('feathers-hooks-common');
+const { disallow, discard } = require('feathers-hooks-common');
 
 const configurePutVsRestrictions = require('../../hooks/configure-put-vs-restrictions');
 
@@ -29,7 +29,7 @@ module.exports = {
   },
 
   after: {
-    all: [],
+    all: [ discard('_id') ],
     find: [ formatViewVsRestrictions() ],
     get: [],
     create: [],

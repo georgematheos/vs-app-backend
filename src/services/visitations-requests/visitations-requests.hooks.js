@@ -2,12 +2,10 @@ const { authenticate } = require('feathers-authentication').hooks;
 const { disallow, iff, isProvider } = require('feathers-hooks-common');
 
 const configureViewVisitationsRequestsQuery = require('../../hooks/configure-view-visitations-requests-query');
-
 const formatViewVisitationsRequests = require('../../hooks/format-view-visitations-requests');
-
 const configureRemoveVisitationsRequest = require('../../hooks/configure-remove-visitations-request');
-
 const preventBlockedVsRequestCreation = require('../../hooks/prevent-blocked-vs-request-creation');
+const changeFieldName = require('../../hooks/change-field-name');
 
 module.exports = {
   before: {
@@ -22,7 +20,7 @@ module.exports = {
   },
 
   after: {
-    all: [],
+    all: [ changeFieldName('_id', 'id') ],
     find: [ iff(isProvider('external'), formatViewVisitationsRequests()) ],
     get: [],
     create: [],

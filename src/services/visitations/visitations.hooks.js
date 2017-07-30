@@ -8,6 +8,7 @@ const configureCreateVisitations = require('../../hooks/configure-create-visitat
 const configureVisitationsPatch = require('../../hooks/configure-visitations-patch');
 const ensureUserValidity = require('../../hooks/ensure-user-validity');
 const restrictTo = require('../../hooks/restrict-to');
+const changeFieldName = require('../../hooks/change-field-name');
 
 module.exports = {
   before: {
@@ -39,7 +40,7 @@ module.exports = {
   },
 
   after: {
-    all: [],
+    all: [ changeFieldName('_id', 'id') ],
     // if this is request is NOT coming from within the server, format the visitations objects as specified by the API
     find: [ iff(isProvider('external'), formatViewVisitations()) ],
     get: [],
