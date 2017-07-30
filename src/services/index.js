@@ -5,6 +5,7 @@ const hostApprovers = require('./host-approvers/host-approvers.service.js');
 const visitations = require('./visitations/visitations.service.js');
 const visitationsRequests = require('./visitations-requests/visitations-requests.service.js');
 const vsRequestBlocks = require('./vs-request-blocks/vs-request-blocks.service.js');
+const vsRestrictions = require('./vs-restrictions/vs-restrictions.service.js');
 module.exports = function () {
   const app = this; // eslint-disable-line no-unused-vars
   app.configure(users);
@@ -14,4 +15,5 @@ module.exports = function () {
   app.configure(visitations);
   app.configure(visitationsRequests);
   app.configure(vsRequestBlocks);
+  app.configure(vsRestrictions);
 };
