@@ -9,7 +9,7 @@ const errors = require('feathers-errors');
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {
     // check if the host has blocked the visitor from sending them vs requests
-    return hook.app.service('vs-request-blocks').find({ query: {
+    return hook.app.service('visitations-request-blocks').find({ query: {
       blockerUsername: hook.data.hostUsername,
       blockees: hook.data.visitorUsername,
       $limit: 0

@@ -1,6 +1,6 @@
 /**
-* configure-view-vs-restrictions-query
-* Configures the query properly for a find vs-restrictions request.
+* configure-view-visitations-restrictions-query
+* Configures the query properly for a find visitations-restrictions request.
 */
 
 const errors = require('feathers-errors');

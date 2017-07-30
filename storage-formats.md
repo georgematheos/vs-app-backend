@@ -53,10 +53,10 @@ Visitation request objects are stored in a MongoDB as documents with the followi
 * `hostUsername`: string (the username of the host the visitor is requesting to get Vs with)
 * `_id`
 
-### vs-request-blocks
+### visitations-request-blocks
 Vs request blocks are stored in the exact same format as approved-visitor-addition-blocks.
 
-### vs-restrictions
+### visitations-restrictions
 Vs restrictions objects are stored in a MongoDB as documents with the following fields:
 * `username`: string (the username of a user who is on Vs restrictions)
 * `dormitory`: string (the dorm of the user who is on Vs restrictions [null if day student])

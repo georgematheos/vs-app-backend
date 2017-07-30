@@ -1,7 +1,7 @@
-// Initializes the `vs-request-blocks` service on path `/vs-request-blocks`
+// Initializes the `visitations-request-blocks` service on path `/visitations-request-blocks`
 const createService = require('feathers-mongodb');
-const hooks = require('./vs-request-blocks.hooks');
-const filters = require('./vs-request-blocks.filters');
+const hooks = require('./visitations-request-blocks.hooks');
+const filters = require('./visitations-request-blocks.filters');
 
 module.exports = function () {
   const app = this;
@@ -15,13 +15,13 @@ module.exports = function () {
   };
 
   // Initialize our service with any options it requires
-  app.use('/vs-request-blocks', createService(options));
+  app.use('/visitations-request-blocks', createService(options));
 
   // Get our initialized service so that we can register hooks and filters
-  const service = app.service('vs-request-blocks');
+  const service = app.service('visitations-request-blocks');
 
   mongoClient.then(db => {
-    service.Model = db.collection('vs-request-blocks');
+    service.Model = db.collection('visitations-request-blocks');
   });
 
   service.hooks(hooks);

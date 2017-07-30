@@ -1,7 +1,7 @@
 /**
 * format-view-users
 * Formats users objects after a get or find request.
-* Currently, all this hook does is add the field currentlyOnVsRestrictions to the result.
+* Currently, all this hook does is add the field currentlyOnvisitationsRestrictions to the result.
 */
 
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
@@ -16,21 +16,21 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
       // if this user isn't a student, this field has no meaningful value, so set it to null,
       // and don't make any db queries; just continue to next user
       if (!users[i].isStudent) {
-        users[i].currentlyOnVsRestrictions = null;
+        users[i].currentlyOnvisitationsRestrictions = null;
         continue;
       }
 
       // if it is a student, check if the user is on vs restrictions
-      promises.push(hook.app.service('/vs-restrictions')
+      promises.push(hook.app.service('/visitations-restrictions')
       .get(users[i].username, { $limit: 0 })
       .then(() => {
         // if on vs restrictions, make note
-        users[i].currentlyOnVsRestrictions = true;
+        users[i].currentlyOnvisitationsRestrictions = true;
       })
       .catch(err => {
         if (err.code !== 404) { throw err; }
         // if not on vs restrictions, make note
-        users[i].currentlyOnVsRestrictions = false;
+        users[i].currentlyOnvisitationsRestrictions = false;
       }));
     }
 

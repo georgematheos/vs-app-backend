@@ -1,5 +1,5 @@
 /**
-* configure-put-vs-restrictions
+* configure-put-visitations-restrictions
 * Configures a PUT request to the vs restrictions service.
 */
 

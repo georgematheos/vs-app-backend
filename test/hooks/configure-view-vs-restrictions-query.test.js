@@ -1,12 +1,12 @@
 const assert = require('assert');
-const configureViewVsRestrictionsQuery = require('../../src/hooks/configure-view-vs-restrictions-query');
+const configureViewvisitationsRestrictionsQuery = require('../../src/hooks/configure-view-visitations-restrictions-query');
 
-describe('\'configure-view-vs-restrictions-query\' hook', () => {
+describe('\'configure-view-visitations-restrictions-query\' hook', () => {
   it('runs the hook', () => {
     // A mock hook object
     const mock = {};
     // Initialize our hook with no options
-    const hook = configureViewVsRestrictionsQuery();
+    const hook = configureViewvisitationsRestrictionsQuery();
 
     // Run the hook function (which returns a promise)
     // and compare the resulting hook object

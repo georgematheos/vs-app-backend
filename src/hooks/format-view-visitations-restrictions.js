@@ -1,6 +1,6 @@
 /**
-* format-view-vs-restrictions
-* Formats the results of a find vs-restrictions request.
+* format-view-visitations-restrictions
+* Formats the results of a find visitations-restrictions request.
 */
 
 const errors = require('feathers-errors');

@@ -10,7 +10,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {
     const approvedVisitors = hook.app.service('/approved-visitors');
     const visitationsRequests = hook.app.service('/visitations-requests');
-    const vsRestrictions = hook.app.service('/vs-restrictions');
+    const visitationsRestrictions = hook.app.service('/visitations-restrictions');
     const visitations = hook.service;
 
     if (!hook.data.visitorUsername || !hook.data.hostUsername) {
@@ -22,7 +22,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
     }
 
     // check if the visitor is on vs restriction
-    return vsRestrictions.get(hook.data.visitorUsername, { $limit: 0 })
+    return visitationsRestrictions.get(hook.data.visitorUsername, { $limit: 0 })
     .then(() => { // if vs restictions found, throw error since the user can't get vs
       throw new errors.Forbidden('The user listed as visitor, with the username `' + hook.data.visitorUsername + '`, is on Vs restrictions, and cannot get Vs.');
     })
@@ -34,7 +34,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
       return;
     })
     // check if the host is on vs restrictions; same logic as for visitor, more or less
-    .then(() => vsRestrictions.get(hook.data.hostUsername, { $limit: 0 }))
+    .then(() => visitationsRestrictions.get(hook.data.hostUsername, { $limit: 0 }))
     .then(() => {
       throw new errors.Forbidden('The user listed as host, with the username `' + hook.data.hostUsername + '`, is on Vs restrictions, and cannot get Vs.');
     })

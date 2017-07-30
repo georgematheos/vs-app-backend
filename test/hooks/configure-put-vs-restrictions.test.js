@@ -1,12 +1,12 @@
 const assert = require('assert');
-const configurePutVsRestrictions = require('../../src/hooks/configure-put-vs-restrictions');
+const configurePutvisitationsRestrictions = require('../../src/hooks/configure-put-visitations-restrictions');
 
-describe('\'configure-put-vs-restrictions\' hook', () => {
+describe('\'configure-put-visitations-restrictions\' hook', () => {
   it('runs the hook', () => {
     // A mock hook object
     const mock = {};
     // Initialize our hook with no options
-    const hook = configurePutVsRestrictions();
+    const hook = configurePutvisitationsRestrictions();
 
     // Run the hook function (which returns a promise)
     // and compare the resulting hook object

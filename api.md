@@ -20,7 +20,7 @@ It is fairly final at this point, but still subject to change if the developers 
     * [Respond to or delete visitations request](#respondToOrDeleteVisitationsRequest)
     * [Block Vs requests from a user](#blockVsRequestsFromAUser)
     * [Remove Vs request block](#removeVsRequestBlock)
-    * [View Vs request blocks you created](#viewVsRequestBlocksYouCreated)
+    * [View Vs request blocks you created](#viewvisitationsRequestBlocksYouCreated)
   * [Approved Visitors](#approvedVisitors)
     * [Add an approved visitor](#addAnApprovedVisitor)
     * [Remove an approved visitor](#removeAnApprovedVisitor)
@@ -29,10 +29,10 @@ It is fairly final at this point, but still subject to change if the developers 
     * [Block approved visitor addition](#blockApprovedVisitorAddition)
     * [Remove a block on approved visitor addition](#removeABlockOnApprovedVisitorAddition)
     * [View approved visitor addition blocks you created](#viewApprovedVisitorAdditionBlocksYouCreated)
-  * [Vs Restrictions](#vsRestrictions)
-    * [Put a user on Vs restrictions](#putAUserOnVsRestrictions)
+  * [Vs Restrictions](#visitationsRestrictions)
+    * [Put a user on Vs restrictions](#putAUserOnvisitationsRestrictions)
     * [View Users on Vs Restrictions](#viewUsersOnVsRescrictions)
-    * [Remove a user from Vs restrictions](#removeAUserFromVsRestrictions)
+    * [Remove a user from Vs restrictions](#removeAUserFromvisitationsRestrictions)
 * [Websockets API](#websocketsApi)
   * [Notification for Vs request](#notificationForVsRequest)
   * [Notification for Vs beginning in dorm](#notificationForVsBeginningInDorm)
@@ -324,7 +324,7 @@ feathersRestClient.service('visitations-requests').remove(':visitationsRequestID
 ---
 
 #### <a name="blockVsRequestsFromAUser"></a>Block Vs requests from a user
-    PATCH /api/vs-request-blocks/:blockerUsername
+    PATCH /api/visitations-request-blocks/:blockerUsername
     
 ##### Request Body (JSON):
 * `op`: "addBlock",
@@ -352,7 +352,7 @@ feathersRestClient.service('vs-request-block').patch(':blockerUsername', {
 ---
 
 #### <a name="removeVsRequestBlock"></a>Remove Vs request block
-    PATCH /api/vs-request-blocks/:blockerUsername
+    PATCH /api/visitations-request-blocks/:blockerUsername
     
 ##### Request Body (JSON):
 * `op`: "removeBlock",
@@ -379,8 +379,8 @@ feathersRestClient.service('vs-request-block').patch(':blockerUsername', {
 
 ---
 
-#### <a name="viewVsRequestBlocksYouCreated"></a>View Vs request blocks you created
-    GET /api/vs-request-blocks/:blockerUsername
+#### <a name="viewvisitationsRequestBlocksYouCreated"></a>View Vs request blocks you created
+    GET /api/visitations-request-blocks/:blockerUsername
 
 Returns info on all the users the user specified by `:blockerUsername` in the URL has blocked from making Vs requests to them.
 
@@ -388,7 +388,7 @@ This must include a valid JWT (javascript web token) in the header labeled `x-au
 
 #### Feathers command:
 ```javascript
-feathersRestClient.service('vs-request-blocks').get(':blockerUsername', {}) // fill in real username
+feathersRestClient.service('visitations-request-blocks').get(':blockerUsername', {}) // fill in real username
 .then(results => {
     // do something with the response if request is successful
 })
@@ -608,10 +608,10 @@ feathersRestClient.service('approved-visitor-addition-blocks').get(':blockerUser
 
 ---
 
-### <a name="vsRestrictions"></a>Vs Restrictions
+### <a name="visitationsRestrictions"></a>Vs Restrictions
 
-#### <a name="putAUserOnVsRestrictions"></a>Put a user on Vs restrictions
-	 PUT /api/vs-restrictions/:username
+#### <a name="putAUserOnvisitationsRestrictions"></a>Put a user on Vs restrictions
+	 PUT /api/visitations-restrictions/:username
 Applies Vs restrictions to the student specified by `:username` in the URL.
 
 This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for a faculty member affiliated with the dorm of the student to be put on Vs restrictions, or a dean.  Also note that the user specified by `:username` must be a student.
@@ -622,7 +622,7 @@ Optional.
 
 ##### Feathers command:
 ```javascript
-feathersRestClient.service('vs-restrictions').update(':usernameOfStudent', { // fill in real username
+feathersRestClient.service('visitations-restrictions').update(':usernameOfStudent', { // fill in real username
   endTime: // A date and time, expressed as milliseconds since Jan. 1, 1970.
 })
 .then(results => {
@@ -639,7 +639,7 @@ feathersRestClient.service('vs-restrictions').update(':usernameOfStudent', { // 
 
 #### <a name="viewUsersOnVsRescrictions"></a>View users on Vs restrictions
     
-    GET /api/vs-restrictions
+    GET /api/visitations-restrictions
 Returns info on users who are on Vs restrictions.
 
 This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for a student (in which case only vs restrictions for that student will be returned), a faculty member affiliated with a dorm (in which case only vs restrictions for students in that dorm will be returned), or a dean (in which case all vs restrictions may be returned).
@@ -652,7 +652,7 @@ This request uses the [standard pagination interface](#standardPaginationInterfa
 
 #### Feathers command:
 ```javascript
-feathersRestClient.service('vs-restrictions').find({}) // optionally put a query
+feathersRestClient.service('visitations-restrictions').find({}) // optionally put a query
 .then(results => {
     // do something with the response if request is successful
 })
@@ -668,16 +668,16 @@ feathersRestClient.service('vs-restrictions').find({}) // optionally put a query
 
 ---
 
-#### <a name="removeAUserFromVsRestrictions"></a>Remove a user from Vs restrictions
+#### <a name="removeAUserFromvisitationsRestrictions"></a>Remove a user from Vs restrictions
 
-	 DELETE /api/vs-restrictions/:username
+	 DELETE /api/visitations-restrictions/:username
 Removes Vs restrictions from the student specified by `:username` in the URL.  This user must currently be on Vs restrictions for this to have any effect.
 
 This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for a faculty member affiliated with the dorm of the student to be put on Vs restrictions, or a dean.
 
 #### Feathers command:
 ```javascript
-feathersRestClient.service('vs-restrictions').remove(':usernameOfStudent', {}) // fill in real username
+feathersRestClient.service('visitations-restrictions').remove(':usernameOfStudent', {}) // fill in real username
 .then(results => {
     // do something with the response if request is successful
 })
@@ -781,7 +781,7 @@ This is an object containing user information.
 * `graduationYear`: The year the student is scheduled to graduate Exeter. (field null or not included for faculty)
 * `dormitory`: The dormitory a student or faculty member is affiliated with (field null or not included for users without dorm affiliation).
 * `roomNumber`: The student's (or faculty, if the faculty lives in a dorm) room number (field null or not included for day students or faculty who do not live in a dorm).  Field may not be included.
-* `currentlyOnVsRestrictions`: A boolean. True if the user is on vs restrictions when the user object is sent, false if the user is not on vs restrictions at that time.  This will be null if the user is not a student.
+* `currentlyOnvisitationsRestrictions`: A boolean. True if the user is on vs restrictions when the user object is sent, false if the user is not on vs restrictions at that time.  This will be null if the user is not a student.
 
 
 #### <a name="visitationsObject"></a>Visitations Object
