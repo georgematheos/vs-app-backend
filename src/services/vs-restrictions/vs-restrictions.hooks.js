@@ -3,10 +3,14 @@ const { disallow } = require('feathers-hooks-common');
 
 const configurePutVsRestrictions = require('../../hooks/configure-put-vs-restrictions');
 
+const formatViewVsRestrictions = require('../../hooks/format-view-vs-restrictions');
+
+const configureViewVsRestrictionsQuery = require('../../hooks/configure-view-vs-restrictions-query');
+
 module.exports = {
   before: {
     all: [ authenticate('jwt') ],
-    find: [],
+    find: [ configureViewVsRestrictionsQuery() ],
     get: [ disallow('external') ],
     create: [ disallow('external') ],
     // for update method, restrictTo and ensureUserValidity hooks are within configure hook to
@@ -18,7 +22,7 @@ module.exports = {
 
   after: {
     all: [],
-    find: [],
+    find: [ formatViewVsRestrictions() ],
     get: [],
     create: [],
     update: [],

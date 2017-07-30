@@ -643,11 +643,11 @@ feathersRestClient.service('vs-restrictions').update(':usernameOfStudent', { // 
     GET /api/vs-restrictions
 Returns info on users who are on Vs restrictions.
 
-This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for a faculty member affiliated with a dorm (in which case only vs restrictions for students in that dorm will be returned), or a dean (in which case all vs restrictions may be returned).
+This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for a student (in which case only vs restrictions for that student will be returned), a faculty member affiliated with a dorm (in which case only vs restrictions for students in that dorm will be returned), or a dean (in which case all vs restrictions may be returned).
 
 ##### Request parameters (inline URL query) (optional):
-* `username`: If included, this will only return restrictions for the user with the username specified here
-* `dormitory`: If included, this will only return restrictions on people in the specified dorm.
+* `username`: If included, this will only return restrictions for the user with the username specified here. Will be ignored if a student is making the request.
+* `dormitory`: If included, this will only return restrictions on people in the specified dorm. Will be ignored if a non-dean faculty member is making the request.
 
 #### Feathers command:
 ```javascript
