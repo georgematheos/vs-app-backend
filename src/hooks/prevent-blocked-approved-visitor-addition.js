@@ -13,12 +13,12 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
     // this hook should only be run if the operation is 'add', so if it isn't just return the hook object
     if (hook.params.op !== 'add') { return hook; }
 
-    // check the approved visitor block list for the operatee
+    // check if there is an approved visitor block list for this user with this person as blockee
     return hook.app.service('/approved-visitor-addition-blocks')
-    .find({ query: { blockerUsername: hook.params.operateeUsername } })
+    .find({ query: { blockerUsername: hook.params.operateeUsername, blockees: hook.params.ownerUsername, $limit: 0 } })
     .then(results => {
-      // if this user has a block list, and it includes the operator, throw an error
-      if (results.total !== 0 && results.data[0].blockees.includes(hook.params.ownerUsername)) {
+      // if this query returned results, the user is blocked, so throw an error
+      if (results.total !== 0) {
         throw new errors.Forbidden('The user with the username `' + hook.params.operateeUsername + '` has blocked the user with the username `' + hook.params.ownerUsername + '` from adding them as an approved visitor.');
       }
 

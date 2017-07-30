@@ -38,7 +38,7 @@ module.exports = function (queryObj, additionalFieldsObj) { // eslint-disable-li
     // after all getValueFromHook promsies resolve:
     return Promise.all(promises)
     // use the query to search the service for a document
-    .then(() => hook.service.find({ query: newQueryObj }))
+    .then(() => hook.service.find({ query: Object.assign({}, newQueryObj, { $limit: 0 }) }))
     .then(results => {
       // if no list exists, create one
       if (results.total === 0) {
@@ -59,7 +59,7 @@ module.exports = function (queryObj, additionalFieldsObj) { // eslint-disable-li
         return Promise.all(promises)
         .then(() => {
           // create a new document
-          return hook.service.create(Object.assign({}, newAdditionalFieldsObj, newQueryObj));
+          return hook.service.create(Object.assign({}, newAdditionalFieldsObj, newQueryObj, { $limit: 0 }));
         })
         .then(results => hook); // make sure to return the hook object
       }
