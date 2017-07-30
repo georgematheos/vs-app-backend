@@ -31,6 +31,7 @@ It is fairly final at this point, but still subject to change if the developers 
     * [View approved visitor addition blocks you created](#viewApprovedVisitorAdditionBlocksYouCreated)
   * [Vs Restrictions](#vsRestrictions)
     * [Put a user on Vs restrictions](#putAUserOnVsRestrictions)
+    * [View Users on Vs Restrictions](#viewUsersOnVsRescrictions)
     * [Remove a user from Vs restrictions](#removeAUserFromVsRestrictions)
 * [Websockets API](#websocketsApi)
   * [Notification for Vs request](#notificationForVsRequest)
@@ -636,6 +637,36 @@ feathersRestClient.service('vs-restrictions').update(':usernameOfStudent', { // 
 ##### Successful response status code: `201`
 
 ---
+
+#### <a name="viewUsersOnVsRescrictions"></a>View users on Vs restrictions
+    
+    GET /api/vs-restrictions
+Returns info on users who are on Vs restrictions.
+
+This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for a faculty member affiliated with a dorm (in which case only vs restrictions for students in that dorm will be returned), or a dean (in which case all vs restrictions may be returned).
+
+##### Request parameters (inline URL query) (optional):
+* `username`: If included, this will only return restrictions for the user with the username specified here
+* `dormitory`: If included, this will only return restrictions on people in the specified dorm.
+
+#### Feathers command:
+```javascript
+feathersRestClient.service('vs-restrictions').find({}) // optionally put a query
+.then(results => {
+    // do something with the response if request is successful
+})
+.catch(err => {
+    // do something with error if request is unsuccessful
+});
+```
+
+##### Successful response status code: `200`
+
+##### Response body (JSON):
+* `restrictedUsers`: an array of [user objects](#userObject), one for each user on Vs restrictions who matched the query
+
+---
+
 #### <a name="removeAUserFromVsRestrictions"></a>Remove a user from Vs restrictions
 
 	 DELETE /api/vs-restrictions/:username

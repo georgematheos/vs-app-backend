@@ -59,4 +59,5 @@ Vs request blocks are stored in the exact same format as approved-visitor-additi
 ### vs-restrictions
 Vs restrictions objects are stored in a MongoDB as documents with the following fields:
 * `username`: string (the username of a user who is on Vs restrictions)
+* `dormitory`: string (the dorm of the user who is on Vs restrictions [null if day student])
 * `_id`
