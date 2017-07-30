@@ -32,7 +32,7 @@ module.exports = function (oldFieldName, newFieldName, dataName = 'data') { // e
       hook.result[dataName] = objs;
     }
     else {
-      hook.result = objs;
+      hook.result = objs[0];
     }
 
     return hook;
