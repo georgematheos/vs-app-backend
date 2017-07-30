@@ -9,14 +9,14 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {
     const users = hook.app.service('/users');
 
-    // rename `data` field to `visitations-requests`
-    hook.result['visitations-requests'] = hook.result.data;
+    // rename `data` field to `visitationsRequests`
+    hook.result.visitationsRequests = hook.result.data;
     delete hook.result.data;
 
     let promises = [];
 
     // for each vs request
-    for (let request of hook.result['visitations-requests']) {
+    for (let request of hook.result.visitationsRequests) {
 
       // replace hostUsername with host user object
       promises.push(users.find({ query: { username: request.hostUsername } })
