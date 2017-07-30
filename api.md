@@ -779,8 +779,8 @@ This is an object containing user information.
 * `profileImageURL`: a url linking to an image of the user
 * `graduationYear`: The year the student is scheduled to graduate Exeter. (field null or not included for faculty)
 * `dormitory`: The dormitory a student or faculty member is affiliated with (field null or not included for users without dorm affiliation).
-Only
 * `roomNumber`: The student's (or faculty, if the faculty lives in a dorm) room number (field null or not included for day students or faculty who do not live in a dorm).  Field may not be included.
+* `currentlyOnVsRestrictions`: A boolean. True if the user is on vs restrictions when the user object is sent, false if the user is not on vs restrictions at that time.  This will be null if the user is not a student.
 
 
 #### <a name="visitationsObject"></a>Visitations Object

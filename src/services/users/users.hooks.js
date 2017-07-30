@@ -11,6 +11,8 @@ const restrict = [
   })
 ];
 
+const formatViewUsers = require('../../hooks/format-view-users');
+
 module.exports = {
   before: {
     all: [ commonHooks.disallow('external') ], // don't allow access to this service except by server
@@ -29,8 +31,8 @@ module.exports = {
         commonHooks.discard('password')
       )
     ],
-    find: [],
-    get: [],
+    find: [formatViewUsers()],
+    get: [formatViewUsers()],
     create: [],
     update: [],
     patch: [],
