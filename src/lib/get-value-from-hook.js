@@ -69,7 +69,7 @@ function getValueFromHook(hook, specifier) {
         }
 
         // if we get here, we are supposed to return a specific field, so do so
-        return getValueFromHook(hook, specifier.field)
+        return getValueFromHook(hook, specifier.fieldName)
         .then(fieldName => results.data[0][fieldName]);
       });
     case 'included':
