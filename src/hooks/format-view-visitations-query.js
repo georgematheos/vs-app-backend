@@ -3,6 +3,8 @@
 * This hook formats the query before a request to view visitations objects.
 */
 
+const errors = require('feathers-errors');
+
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {
     // if this property is true, data for visitors other than the authenticated user is removed
