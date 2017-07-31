@@ -109,7 +109,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
         else {
           // if this request is for the same host, remove the request, and it will either be replaced
           // with a new one, or if the visitor is now an approved visitor, Vs will just start
-          promises.push(visitationsRequests.remove(result._id, {}));
+          promises.push(visitationsRequests.remove(result.id, {}));
         }
       }
       return Promise.all(promises)
@@ -140,7 +140,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
           .then(result => {
             // set the result here; don't proceed with POST /api/visitations
             hook.result = {
-              message: 'A visitations request was created.',
+              $actionPerformed: 'visitations request created', // what this request ended up doing
               visitationsRequestDocument: result
             };
             return hook;
@@ -158,12 +158,14 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
     .then(results => {
       // if the host is currently hosting a Vs session
       if (results.total > 0) {
-        return hook.service.patch(results.data[0]._id, {
+        return hook.service.patch(results.data[0].id, {
           op: 'addVisitor',
           visitorUsername: hook.data.visitorUsername
         })
         .then(result => {
           hook.result = result; // set the result here; don't proceed with POST request
+          // the action performed in the end was that the visitor joined a vs session
+          hook.result.$actionPerformed = 'visitations session joined';
           return hook;
         });
       }

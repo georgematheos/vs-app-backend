@@ -40,11 +40,16 @@ module.exports = {
   },
 
   after: {
-    all: [ iff(isProvider('external'), changeFieldName('_id', 'id')) ],
+    all: [ changeFieldName('_id', 'id') ],
     // if this is request is NOT coming from within the server, format the visitations objects as specified by the API
     find: [ iff(isProvider('external'), formatViewVisitations()) ],
     get: [],
-    create: [],
+    // if the actionPerformed field hasn't already been set on the result, we created a vs
+    // session, so make 'visitations session created' its value
+    create: [ hook => {
+      hook.result.$actionPerformed = hook.result.$actionPerformed || 'visitations session created';
+      return hook;
+    } ],
     update: [],
     patch: [],
     remove: []

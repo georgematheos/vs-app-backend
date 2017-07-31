@@ -115,7 +115,7 @@ feathersRestClient.authenticate({
 });
 ```
 
-##### Successful response status code: `200`
+##### Successful response status code: `201`
 
 ##### Response body (JSON):
 * `accessToken`: A JWT valid for the user. The payload sent with it will include a field `exp` containing the time the token expires (as [Unix time](https://en.wikipedia.org/wiki/Unix_time)).
@@ -148,10 +148,12 @@ feathersRestClient.service('visitations').create({
 });
 ```
 
-##### Successful response status code:
-* `200` if the visitor is an approved visitor and is added to a Vs session which is currently in progress
-* `201` if the visitor is an approved visitor and a new Vs session starts with that person as visitor
-* `202` if the visitor is not an approved visitor, and a request has been sent to the host
+##### Successful response status code: `201`
+
+A successful response body will contain a field called `$actionPerformed`.  This field will have one of the following values:
+* `visitations session created` - a new visitations session has been created
+* `visitations session joined` - the visitor has been added to an ongoing visitations session
+* `visitations request created` - a visitations request has been sent to the specified host
 
 ---
 
@@ -192,6 +194,8 @@ feathersRestClient.service('current-vs').find({ query: {
 });
 ```
 
+##### Successful response status code: `200`
+
 ##### Response body (JSON):
 * `visitations`: An array of [visitations objects](#visitationsObject), representing the [visitations sessions](#visitationsSessionTerm) which match the search criteria.
 
@@ -208,8 +212,6 @@ Removes the specified visitor from a [visitations session](#visitationSessionTyp
 
 This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for either the visitor who is being removed or for the host of the Vs session the visitor is being removed from.
 
-##### Successful response status code: `200`
-
 ##### Feathers command:
 ```javascript
 feathersRestClient.service('visitations').patch(':visitationsId', { // fill in real ID
@@ -223,6 +225,8 @@ feathersRestClient.service('visitations').patch(':visitationsId', { // fill in r
     // do something with error if request is unsuccessful
 });
 ```
+
+##### Successful response status code: `200`
 
 ---
 
@@ -317,9 +321,13 @@ feathersRestClient.service('visitations-requests').remove(':visitationsRequestID
 });
 ```
 
-##### Successful response status code:
-* If visitations request is accepted (and Vs begin): `200` (or `201`, if this is the first visitor in a Vs session, and so a Vs session is created).  Also, a visitations object will be sent with information about the Vs session.
-* If the visitations request is denied: `204`
+##### Successful response status code: `200`
+
+A successful response body will contain a field called `$actionPerformed`.  This field will have one of the following values:
+* `visitations session created` - the request was accepted and a visitations session was created with the host and the visitor in it
+* `visitations session joined` - the request was accepted and the visitor who had issued the request has joined the current vs session the host is in
+* `visitations request deleted` - the request was deleted and no visitations sessions have been created or changed
+
 
 ---
 
@@ -432,7 +440,7 @@ feathersRestClient.service('approved-visitors').patch(':listOwnerUsername', { //
 });
 ```
 
-##### Successful response status code: `200`.
+##### Successful response status code: `200`
 
 ---
 
@@ -633,7 +641,7 @@ feathersRestClient.service('visitations-restrictions').update(':usernameOfStuden
 });
 ```
 
-##### Successful response status code: `201`
+##### Successful response status code: `200`
 
 ---
 
@@ -686,7 +694,7 @@ feathersRestClient.service('visitations-restrictions').remove(':usernameOfStuden
 });
 ```
 
-##### Successful response status code: `204`
+##### Successful response status code: `200`
 
 ---
 

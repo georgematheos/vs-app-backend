@@ -8,6 +8,7 @@ const errors = require('feathers-errors');
 
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {
+    console.log(hook.id);
     // get the vs request to be removed
     return hook.service.get(hook.id, {})
     .then(result => {
@@ -34,8 +35,8 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
           hostUsername: result.hostUsername,
           visitorUsername: result.visitorUsername
         }).then(results => {
-           // don't continue with the delete request; instead just return the result of this visitor
-           // joining Vs
+           // don't continue with the delete request; instead just return the result of this
+           // visitor joining Vs
           hook.result = results;
           return hook;
         });

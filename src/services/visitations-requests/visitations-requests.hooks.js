@@ -20,13 +20,18 @@ module.exports = {
   },
 
   after: {
-    all: [ iff(isProvider('external'), changeFieldName('_id', 'id')) ],
+    all: [ changeFieldName('_id', 'id') ],
     find: [ iff(isProvider('external'), formatViewVisitationsRequests()) ],
     get: [],
     create: [],
     update: [],
     patch: [],
-    remove: []
+    // if the actionPerformed hasn't been set, it means all we did was delete the request,
+    // so communicate this using that field
+    remove: [ hook => {
+      hook.result.$actionPerformed = hook.result.$actionPerformed || 'visitations request deleted';
+      return hook;
+    } ]
   },
 
   error: {
