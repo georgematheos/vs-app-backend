@@ -67,13 +67,14 @@ This service is only for use by the server.  It is used to store data about even
 be completed at a specific time, such as automatically deleting a visitations request.
 
 Each timed event information object is stored in a MongoDB as a document with the following fields:
-* `actionType`: integer. This is a number that specifies the type of action to perform.  It has a limited number of valid values.
+* `type`: integer. This is a number that specifies the type of action to perform.  It has a limited number of valid values.
+* `time`: milliseconds since Jan. 1, 1970 (the time the event should occur)
 * `_id`
 
-All valid values for `actionType` are listed below, along with a description of what type of action
+All valid values for `type` are listed below, along with a description of what type of action
 they specify:
 * `1` - This refers to the action of performing a request to one of the services on the feathers API 
-server.  This is currently the only supported value for `actionType`.  If this is the value chosen, the timed event information object should also contain the following fields:
+server.  This is currently the only supported value for `type`.  If this is the value chosen, the timed event information object should also contain the following fields:
   * `service`: string (the name of the service using which an operation should be performed)
   * `method`: string (the name of the method that should be performed on this service)
   * `parameters`: array (this is a list of the parameters that should be passed into the request.
