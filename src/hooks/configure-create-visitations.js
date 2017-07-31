@@ -5,6 +5,7 @@
 */
 
 const errors = require('feathers-errors');
+const { visitationsCurrentlyAllowed } = require('../lib/visitations-scheduling');
 
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {
@@ -39,6 +40,12 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
     .then(results => {
       if (results.total > 0) {
         throw new errors.Forbidden('The user listed as host, with the username `' + hook.data.hostUsername + '`, is on Vs restrictions, and cannot get Vs.');
+      }
+    })
+    // check whether vs are currently allowed
+    .then(() => {
+      if (!visitationsCurrentlyAllowed()) {
+        throw new errors.Forbidden('Visitations are not currently allowed.');
       }
     })
     // check if the visitor is already in a vs session as a visitor
