@@ -119,7 +119,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
     .then(() => {
       // if this is an internal server request, the user can join Vs regardless of whether
       // they are an approved visitor, so proceed to next .then function
-      if (!hook.params.provider) {  console.log('THE PROVIDER IS INTERNAL'); return; }
+      if (!hook.params.provider) { return; }
 
       // if this is an external server request, the user can join Vs ONLY IF THEY ARE AN
       // APPROVED VISITOR
