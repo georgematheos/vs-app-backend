@@ -61,3 +61,21 @@ Vs restrictions objects are stored in a MongoDB as documents with the following 
 * `username`: string (the username of a user who is on Vs restrictions)
 * `dormitory`: string (the dorm of the user who is on Vs restrictions [null if day student])
 * `_id`
+
+### timed-events
+This service is only for use by the server.  It is used to store data about events that have to
+be completed at a specific time, such as automatically deleting a visitations request.
+
+Each timed event information object is stored in a MongoDB as a document with the following fields:
+* `actionType`: integer. This is a number that specifies the type of action to perform.  It has a limited number of valid values.
+* `_id`
+
+All valid values for `actionType` are listed below, along with a description of what type of action
+they specify:
+* `1` - This refers to the action of performing a request to one of the services on the feathers API 
+server.  This is currently the only supported value for `actionType`.  If this is the value chosen, the timed event information object should also contain the following fields:
+  * `service`: string (the name of the service using which an operation should be performed)
+  * `method`: string (the name of the method that should be performed on this service)
+  * `parameters`: array (this is a list of the parameters that should be passed into the request.
+    For example, if a GET request is being performed, the array could look like this:
+    `[id, params]`. If it is a create request, it could look like this: `[data]`.)
