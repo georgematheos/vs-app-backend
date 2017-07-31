@@ -12,7 +12,8 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
     const tenMinutes = 10 * millisecondsInMinute; // milliseconds in 10 minutes
     const currentTime = (new Date()).getTime(); // current time
 
-    const eventTime = currentTime + tenMinutes; // the event should occur in 10 minutes
+    // TODO: make this 10 mins
+    const eventTime = currentTime + 10000; // the event should occur in 10 seconds
 
     // save info object for deleting Vs request after fixed amount of time
     return hook.app.service('/timed-events')

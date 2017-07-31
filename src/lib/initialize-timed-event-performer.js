@@ -3,7 +3,7 @@
 * Given information about a timed event, this function sets a javascript timer that will
 * perform the action which must occur for the time it must occur.
 * The function takes two parameters.
-* The first is the app object.
+* The first is the api app object.
 * The second is the timedEvent object, which should be formatted as specified in
 * `storage-formats.md`, including an _id field.
 */
@@ -23,7 +23,7 @@ function initializeTimedEventPerformer(app, timedEvent) {
           console.log(results);
         })
         // delete the timed event info object
-        .then(() => app.service('/timed-events').remove(timedEvent._id))
+        .then(() => app.service('/timed-events').remove(timedEvent._id, {}))
         .then(results => {
           console.log('Results of deleting the timed event information object with id ' + timedEvent._id + ':');
           console.log(results);
@@ -40,7 +40,12 @@ function initializeTimedEventPerformer(app, timedEvent) {
   }
 
   const currentTime = (new Date()).getTime();
-  const millisecondsUntilEvent = timedEvent.time - currentTime;
+  let millisecondsUntilEvent = timedEvent.time - currentTime;
+
+  // if this event was supposed to have already happened, set it to happen right now
+  if (millisecondsUntilEvent < 0) {
+    millisecondsUntilEvent = 0;
+  };
 
   setTimeout(functionToPerform, millisecondsUntilEvent);
 }

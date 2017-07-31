@@ -3,6 +3,8 @@ const createService = require('feathers-mongodb');
 const hooks = require('./timed-events.hooks');
 const filters = require('./timed-events.filters');
 
+const initializeAllTimedEventPerformers = require('../../lib/initialize-all-timed-event-performers');
+
 module.exports = function () {
   const app = this;
   const paginate = app.get('paginate');
@@ -15,13 +17,22 @@ module.exports = function () {
   // Get our initialized service so that we can register hooks and filters
   const service = app.service('timed-events');
 
-  mongoClient.then(db => {
-    service.Model = db.collection('timed-events');
-  });
-
-  service.hooks(hooks);
+  // collect all the promises for setting up this service, so we know when it is ready to be used
+  let serviceSetupPromises = [
+    mongoClient.then(db => {
+      service.Model = db.collection('timed-events');
+    }),
+    service.hooks(hooks)
+  ];
 
   if (service.filter) {
-    service.filter(filters);
+    serviceSetupPromises.push(service.filter(filters));
   }
+
+  // once the service is set up, set up all the timed events that are stored to be run at the right
+  // time
+  Promise.all(serviceSetupPromises)
+  .then(() => {
+    initializeAllTimedEventPerformers(app);
+  });
 };

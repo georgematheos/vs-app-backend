@@ -8,7 +8,6 @@ const errors = require('feathers-errors');
 
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {
-    console.log(hook.id);
     // get the vs request to be removed
     return hook.service.get(hook.id, {})
     .then(result => {
