@@ -124,8 +124,12 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
       case 'endVisitations':
         // get this vs session's info
         return hook.service.get(hook.id, {})
-        // throw an error if anyone but the host is trying to perform this request
+        // throw an error if anyone but the host or the server is trying to perform this request
         .then(result => {
+          // we don't have to do this restriction if this is an internal server request, so in that
+          // case, just return the result and move on
+          if (hook.params.provider === undefined) { return result; }
+
           return restrictTo({ username: result.hostUsername })(hook)
           .then(() => result); // make sure to return the result; we'll need it again
         })
@@ -144,8 +148,6 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
           hook.data = {};
           hook.data.visitors = newVisitorsData;
           configureVsSessionEnding();
-
-          return hook;
         });
 
       // if the op isn't recognized, throw an error
@@ -156,6 +158,9 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
     function configureVsSessionEnding() {
       hook.data.endTime = currentTime;
       hook.data.ongoing = false;
+
+      // this IS automatically ended if it is an internal request ending the Vs, false otherwise
+      hook.data.automaticallyEnded = (hook.params.provider === undefined);
     }
   };
 };

@@ -131,6 +131,8 @@ A user who would like to visit another's room during visitations should send thi
 
 This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for the person specified in the request body as by `visitorUsername`.
 
+Note: if a visitations session has not been ended by 15 minutes after the latest time on a day when visitations are allowed, the session will automatically end.  If this happens, a field called `automaticallyEnded` on the [visitations object](#visitationsObject) will have the value `true`.
+
 ##### Request body (JSON):
 * `visitorUsername`: The username of the visitor initiating Vs.  Must be a student's username.
 * `hostUsername`: The username of the host the visitor is initiating Vs with.  Must be a boarding student's username.
@@ -799,7 +801,8 @@ This is an object containing information about a [visitations session](#visitati
 * `id`: A unique identifier for the [visitations session](#visitationSessionType).
 * `startTime`: The time when the Vs session started (ie. when the first visitor joined Vs) (in the form of milliseconds since Jan. 1, 1970)
 * `endTime`: The time when the Vs session ended (ie. when the last visitor left Vs) (in the form of milliseconds since Jan. 1, 1970) (If the Vs haven't ended, this will be null or not included).
-- `ongoing`: A boolean.  True if the Vs are currently occurring, false otherwise.
+* `ongoing`: A boolean.  True if the Vs are currently occurring, false otherwise.
+* `automaticallyEnded`: A boolean. Only included if the vs session has ended.  True if it was ended by the server automatically ending it at the end of the day, false if it was ended by user action (the host ending Vs, or all visitors leaving).
 * `host`: A [user object](#userObject) containing information about the host of the Vs session.  Note that the dorm and room number info for this object is the room and dorm in which the Vs are occurring.
 * `visitorDataRemoved`: A boolean, which may or may not be included. If this field is included and true, it means that information about other visitors who were part of the Vs session was removed before the data was sent to this user, since the user does not have authorization to view the information.  If false or not included, this did not happen.
 * `visitors`: An array of [user objects](#userObject), each containing information about a visitor in the Vs session.  The field `roomNumber` is not included for any user object in this array.  Each object in the array, however, has the following additional fields:

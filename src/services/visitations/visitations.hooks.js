@@ -9,10 +9,11 @@ const configureVisitationsPatch = require('../../hooks/configure-visitations-pat
 const ensureUserValidity = require('../../hooks/ensure-user-validity');
 const restrictTo = require('../../hooks/restrict-to');
 const changeFieldName = require('../../hooks/change-field-name');
+const configureAutomaticVisitationsEnding = require('../../hooks/configure-automatic-visitations-ending');
 
 module.exports = {
   before: {
-    all: [ authenticate('jwt') ],
+    all: [ iff(isProvider('external'), authenticate('jwt')) ],
     // format the query if this is an external request, but not if it's an internal one
     find: [ iff(isProvider('external'), formatViewVisitationsQuery()) ],
     get: [ disallow('external') ],
@@ -44,12 +45,15 @@ module.exports = {
     // if this is request is NOT coming from within the server, format the visitations objects as specified by the API
     find: [ iff(isProvider('external'), formatViewVisitations()) ],
     get: [],
-    // if the actionPerformed field hasn't already been set on the result, we created a vs
-    // session, so make 'visitations session created' its value
-    create: [ hook => {
-      hook.result.$actionPerformed = hook.result.$actionPerformed || 'visitations session created';
-      return hook;
-    } ],
+    create: [
+      // if the actionPerformed field hasn't already been set on the result, we created a vs
+      // session, so make 'visitations session created' its value
+      hook => {
+        hook.result.$actionPerformed = hook.result.$actionPerformed || 'visitations session created';
+        return hook;
+      },
+      configureAutomaticVisitationsEnding()
+    ],
     update: [],
     patch: [],
     remove: []

@@ -1,6 +1,6 @@
 /**
 * configure-visitations-request-expiration
-* Configures a timed event which was just created to automatically expire after 10 minutes.
+* Configures a timed event to automatically have the vs request expire after 10 minutes.
 */
 
 const initializeTimedEventPerformer = require('../lib/initialize-timed-event-performer');
