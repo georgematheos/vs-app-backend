@@ -7,13 +7,20 @@ const configureRemoveVisitationsRequest = require('../../hooks/configure-remove-
 const preventBlockedVsRequestCreation = require('../../hooks/prevent-blocked-vs-request-creation');
 const changeFieldName = require('../../hooks/change-field-name');
 
+
+const configureAfterCreateVisitationsRequest = require('../../hooks/configure-after-create-visitations-request');
+
+
 module.exports = {
   before: {
     all: [ authenticate('jwt') ],
     // run some checks and configuration before the request, if this is an external request
     find: [ iff(isProvider('external'), configureViewVisitationsRequestsQuery()) ],
     get: [ disallow('external') ],
-    create: [ disallow('external'), preventBlockedVsRequestCreation() ],
+    create: [
+      disallow('external'),
+      preventBlockedVsRequestCreation()
+    ],
     update: [ disallow() ],
     patch: [ disallow() ],
     remove: [ iff(isProvider('external'), configureRemoveVisitationsRequest()) ]
@@ -23,7 +30,7 @@ module.exports = {
     all: [ changeFieldName('_id', 'id') ],
     find: [ iff(isProvider('external'), formatViewVisitationsRequests()) ],
     get: [],
-    create: [],
+    create: [ configureAfterCreateVisitationsRequest() ],
     update: [],
     patch: [],
     // if the actionPerformed hasn't been set, it means all we did was delete the request,

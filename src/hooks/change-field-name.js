@@ -20,7 +20,7 @@ module.exports = function (oldFieldName, newFieldName, dataName = 'data') { // e
       // if the old field name is not set, don't overwrite the newFieldName to undefined, just
       // leave it as is; but make note, since this probably shouldn't be happening
       if (objs[i][oldFieldName] === undefined) {
-        console.log('The field `' + oldFieldName + '` could not be found on an object in the change-field-name hook.  No modification will be performed on this object.');
+        console.log('The field `' + oldFieldName + '` could not be found on an object in the change-field-name hook.  No modification will be performed on this object. Service: ' + hook.path + '; method: ' + hook.method + '.');
         continue;
       }
 

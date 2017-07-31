@@ -17,7 +17,7 @@ function initializeTimedEventPerformer(app, timedEvent) {
         console.log('Performing a timed event.  Timed event info:');
         console.log(timedEvent);
         // perform the method
-        return app.service(timedEvent.service)[method](parameters)
+        return app.service(timedEvent.service)[timedEvent.method](...timedEvent.parameters)
         .then(results => {
           console.log('Results of the timed event with id ' + timedEvent._id + ':');
           console.log(results);
@@ -39,8 +39,10 @@ function initializeTimedEventPerformer(app, timedEvent) {
       return;
   }
 
-  const currentTime = (new Data()).getTime();
+  const currentTime = (new Date()).getTime();
   const millisecondsUntilEvent = timedEvent.time - currentTime;
 
   setTimeout(functionToPerform, millisecondsUntilEvent);
 }
+
+module.exports = initializeTimedEventPerformer;
