@@ -732,7 +732,7 @@ This is an object containing information about a [visitations session](#visitati
 * `visitors`: An array of [user objects](#userObject), each containing information about a visitor in the Vs session.  The field `roomNumber` is not included for any user object in this array.  Each object in the array, however, has the following additional fields:
   * `timeJoinedVs`: An ISO date. The time when this visitor joined the Vs session.
   * `timeLeftVs`: An ISO date. The time when this visitor left the Vs session.  If the visitor hasn't left, this field will be null.
-  * `isApprovedVisitor`: A boolean.  Whether this student is an approved visitor of the host.
+  * `approvedVisitor`: A boolean.  Whether this student is an approved visitor of the host.
 
 ## <a name="termDefinitions"></a>Term definitions
 This section contains definitions of a few terms used in the API.
