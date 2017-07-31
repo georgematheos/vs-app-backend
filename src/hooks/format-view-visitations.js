@@ -62,7 +62,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
 
           visitor.timeJoinedVs = visitorData.timeJoinedVs;
           visitor.timeLeftVs = visitorData.timeLeftVs;
-          visitor.isApprovedVisitor = visitorData.isApprovedVisitor;
+          visitor.approvedVisitor = visitorData.approvedVisitor;
 
           visitors.push(visitor);
         }));

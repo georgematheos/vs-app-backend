@@ -18,7 +18,7 @@ function createVisitorObject(visitorUsername, hostUsername, time, hook) {
       timeJoinedVs: time,
       timeLeftVs: null,
       // if results were found for the above query, the visitor IS an approved visitor
-      isApprovedVisitor: results.total > 0
+      approvedVisitor: results.total > 0
     };
   });
 }
