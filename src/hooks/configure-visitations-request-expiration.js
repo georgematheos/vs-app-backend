@@ -1,7 +1,6 @@
 /**
-* configure-after-create-visitations-request
-* Configures everything necessary after a create visitations request.  Currently, this
-* is just setting up timed events for deleting the request after it expires.
+* configure-visitations-request-expiration
+* Configures a timed event which was just created to automatically expire after 10 minutes.
 */
 
 const initializeTimedEventPerformer = require('../lib/initialize-timed-event-performer');

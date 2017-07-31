@@ -2,13 +2,16 @@ const { authenticate } = require('feathers-authentication').hooks;
 const { disallow, iff, isProvider } = require('feathers-hooks-common');
 
 const configureViewVisitationsRequestsQuery = require('../../hooks/configure-view-visitations-requests-query');
+
 const formatViewVisitationsRequests = require('../../hooks/format-view-visitations-requests');
+
 const configureRemoveVisitationsRequest = require('../../hooks/configure-remove-visitations-request');
+
 const preventBlockedVsRequestCreation = require('../../hooks/prevent-blocked-vs-request-creation');
+
 const changeFieldName = require('../../hooks/change-field-name');
 
-
-const configureAfterCreateVisitationsRequest = require('../../hooks/configure-after-create-visitations-request');
+const configureVisitationsRequestExpiration = require('../../hooks/configure-visitations-request-expiration');
 
 
 module.exports = {
@@ -30,7 +33,7 @@ module.exports = {
     all: [ changeFieldName('_id', 'id') ],
     find: [ iff(isProvider('external'), formatViewVisitationsRequests()) ],
     get: [],
-    create: [ configureAfterCreateVisitationsRequest() ],
+    create: [ configureVisitationsRequestExpiration() ],
     update: [],
     patch: [],
     // if the actionPerformed hasn't been set, it means all we did was delete the request,

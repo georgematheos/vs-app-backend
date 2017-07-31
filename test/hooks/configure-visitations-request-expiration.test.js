@@ -1,12 +1,12 @@
 const assert = require('assert');
-const configureAfterCreateVisitationsRequest = require('../../src/hooks/configure-after-create-visitations-request');
+const configureVisitationsRequestExpiration = require('../../src/hooks/configure-visitations-request-expiration');
 
-describe('\'configure-after-create-visitations-request\' hook', () => {
+describe('\'configure-visitations-request-expiration\' hook', () => {
   it('runs the hook', () => {
     // A mock hook object
     const mock = {};
     // Initialize our hook with no options
-    const hook = configureAfterCreateVisitationsRequest();
+    const hook = configureVisitationsRequestExpiration();
 
     // Run the hook function (which returns a promise)
     // and compare the resulting hook object
