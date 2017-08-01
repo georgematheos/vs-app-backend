@@ -5,17 +5,32 @@
 
 console.log('Hello, world');
 const socket = io(location.origin);
-const feathersClient = feathers().configure(feathers.socketio(socket));
+const feathersClient = feathers()
+.configure(feathers.socketio(socket))
+.configure(feathers.hooks())
+.configure(feathers.authentication({
+  header: 'x-auth-token',
+  service: '/api/authentication',
+  storage: window.localStorage
+}));
 
 function getService(name) {
   return feathersClient.service('/api/' + name);
 }
 
-getService('authentication').create({
+feathersClient.authenticate({
   strategy: 'local',
   username: 'swoman',
   password: 'password'
 })
-.then(results => {
-  console.log(results);
-})
+.then(response => {
+  getService('visitations').create({
+    visitorUsername: "swoman",
+    hostUsername: "mlisa"
+  });
+});
+
+getService('visitations').on('created', message => {
+  console.log('created');
+  console.log(message);
+});
