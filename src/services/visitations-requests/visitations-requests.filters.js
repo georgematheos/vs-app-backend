@@ -1,5 +1,14 @@
 /* eslint no-console: 1 */
 
-module.exports = function (data, connection, hook) { // eslint-disable-line no-unused-vars
-  return false;
-};
+module.exports = {
+  created: (data, connection, hook) => {
+    if (connection.user && connection.user.username === data.host.username) {
+      return data;
+    }
+    return false;
+  }
+  ,
+  updated: () => false,
+  patched: () => false,
+  removed: () => false
+}

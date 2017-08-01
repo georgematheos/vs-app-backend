@@ -20,17 +20,13 @@ function getService(name) {
 
 feathersClient.authenticate({
   strategy: 'local',
-  username: 'swoman',
+  username: 'cnorris',
   password: 'password'
 })
 .then(response => {
-  getService('visitations').create({
-    visitorUsername: "swoman",
-    hostUsername: "mlisa"
+  console.log('authenticated');
+  getService('visitations-requests').on('created', message => {
+    console.log('visitations request created');
+    console.log(message);
   });
-});
-
-getService('visitations').on('created', message => {
-  console.log('created');
-  console.log(message);
 });

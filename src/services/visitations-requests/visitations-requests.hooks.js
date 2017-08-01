@@ -33,7 +33,9 @@ module.exports = {
     all: [ changeFieldName('_id', 'id') ],
     find: [ iff(isProvider('external'), formatViewVisitationsRequests()) ],
     get: [],
-    create: [ configureVisitationsRequestExpiration() ],
+    // also format the visitations request data on a create request, so that when events
+    // are sent, everything is formatted properly
+    create: [ configureVisitationsRequestExpiration(), formatViewVisitationsRequests() ],
     update: [],
     patch: [],
     // if the actionPerformed hasn't been set, it means all we did was delete the request,

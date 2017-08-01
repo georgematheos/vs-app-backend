@@ -40,6 +40,7 @@ It is fairly final at this point, but still subject to change if the developers 
 * [Object Type Definitions](#objectTypeDefinitions)
   * [User Object](#userObject)
   * [Visitations Object](#visitationsObject)
+  * [Visitations Request Object](#visitationsRequestObject)
 * [Term Definitions](#termDefinitions)
   * [Standard pagination interface](#standardPaginationInterfaceTerm)
   * [Visitations Session](#visitationsSessionTerm)
@@ -293,11 +294,7 @@ feathersRestClient.service('visitations-requests').find({ query: {
 ##### Successful response status code: `200`
 
 ##### Response body (JSON):
-* `visitationsRequests`: An array of visitations requests objects, each of which contains the following fields:
-  * `id`: A unique identifier for the visitations request.
-  * `timeRequestIssued`: The date and time (ISO) when the request was issued by the visitor.
-  * `host`: A [user object](#userObject) containing information about the user to whom this Vs request was sent.
-  * `visitor`: A [user object](#userObject) containing information about the user who issued the Vs request.  Does not contain the field `roomNumber.`
+* `visitationsRequests`: An array of [visitations requests objects](#visitationsRequestObjects) that match the query (from the request parameters).
 
 ---
 
@@ -707,38 +704,52 @@ NOTE that this section is less final than the REST section, and is relatively li
 
 Websockets is another technique for having the server and client communicate.  While REST only allows the client to initiate communication, making requests for the server to respond to, Websockets allows either the client or server to initiate communication.  Thus, it is useful for notifications, so the server can send information to the client when a notification occurs, without the client first making a request.
 
-As with REST, feathers provides a client-side framework for Websockets.  Its configuration is quite simple and described in the “Changing the HTML for Feathers client WebSocket calls“ section of the following webpage: https://docs.feathersjs.com/guides/step-by-step/basic-feathers/socket-client.html.  As noted at the beginning of the REST API, there is a more modular way of including feathers files that is a better design paradigm.
+As with REST, feathers provides a client-side framework for Websockets.  Its configuration is described in the “Changing the HTML for Feathers client WebSocket calls“ section of the following webpage: https://docs.feathersjs.com/guides/step-by-step/basic-feathers/socket-client.html.  As noted at the beginning of the REST API, there is a more modular way of including feathers files that is a better design paradigm.
+Make sure to include the socket.io client properly; I found that the [socket.io website](https://socket.io) has better documentation for this than the feathers webpage.
 The feathers command examples below assume that the following commands have already been run, with the files above included:
 
 ```javascript
-const socket = io(location.origin + '/api');
-const feathersSocketClient = feathers().configure(feathers.socketio(socket));
-
-// All notifications are sent with the service called 'notifications'
-const feathersNotificationReciever = feathersSocketClient.service('notifications');
+const socket = io(location.origin);
+const feathersSocketClient = feathers()
+.configure(feathers.socketio(socket))
+.configure(feathers.hooks())
+.configure(feathers.authentication({
+  header: 'x-auth-token',
+  service: '/api/authentication',
+  storage: window.localStorage
+}));
 ```
 
-Note that this `feathersSocketClient` can be used instead of the `feathersRestClient` in the examples in the REST API section without any syntax errors.  In fact, the server will most likely be designed so that this replacement will work just fine.  However, that is not a guarantee, and so I would recommend using the REST client for the REST commands.
+Note that this `feathersSocketClient` can be used instead of the `feathersRestClient` in the examples in the REST API section.  The only thing to note is that with socket.io, we cannot initialize the connection to be directly to the `api/` route, so each time a service is called, we must put the `api/` before it.  For example, the visitations service would be accessed using `app.service('/api/visitations')`, not `app.service('/visitations')`.
 
-The use of the websockets client is for receiving information from the server, so the API that will be described is the format of information the server will send the client, and how to set up the client to receive this information.  Use the REST API to send information to the server.
+After this configuration is run, this client should make sure to authenticated:
+
+```javascript
+feathersSocketClient.authenticate({
+  strategy: 'local',
+  username: ':username', // fill in real username and password
+  password: ':password'
+})
+.then(result => {
+  // run all further feathers commands from here, so the user is authenticated
+});
+```
+
+The use of the websockets client is for receiving information from the server, so the API that will be described is the format of information the server will send the client, and how to set up the client to receive this information.  Use the REST API to send information to the server (even if it is done over a websockets connection, the api for it is described above).
 
 ---
 
 #### <a name="notificationForVsRequest"></a>Notification for Vs request
-##### Event: `vs-request`
+When a user is sent the visitations request, the event `created` will be sent to them on the `visitations-request` service.
 
-Sent to a host when a visitor has issued a request to get Vs with the host.  Note that the body is the same as the visitations request object described in the REST API under the `GET /api/visitations-requests/:hostUsername` request description.
-
-##### Body:
-– `timeRequestIssued`: The date and time (ISO) when the request was issued by the visitor.
-– `visitor`: A [user object](#userObject) containing information about the visitor.  Does not include the field `roomNumber`.
-
-##### Feathers client command:
+Here is the feathers command to handle this request:
 ```javascript
-feathersNotificationReciever.on('vs-request', body => {
-    // do something with the information received (called 'body')
+feathersSocketClient.service('/api/visitations-requests').on('created', data => {
+  // do something
 });
 ```
+
+The data sent will be a [visitations request object](#visitationsRequestObject).
 
 ---
 
@@ -794,6 +805,7 @@ This is an object containing user information.
 * `roomNumber`: The student's (or faculty, if the faculty lives in a dorm) room number (field null or not included for day students or faculty who do not live in a dorm).  Field may not be included.
 * `currentlyOnvisitationsRestrictions`: A boolean. True if the user is on vs restrictions when the user object is sent, false if the user is not on vs restrictions at that time.  This will be null if the user is not a student.
 
+---
 
 #### <a name="visitationsObject"></a>Visitations Object
 This is an object containing information about a [visitations session](#visitationSessionType).
@@ -810,6 +822,19 @@ This is an object containing information about a [visitations session](#visitati
   * `timeJoinedVs`: A date and time expressed as milliseconds since Jan. 1, 1970. The time when this visitor joined the Vs session.
   * `timeLeftVs`: A date and time expressed as milliseconds since Jan. 1, 1970. The time when this visitor left the Vs session.  If the visitor hasn't left, this field will be null.
   * `approvedVisitor`: A boolean.  Whether this student is an approved visitor of the host.
+
+---
+
+#### <a name="visitationsRequestObject"></a>Visitations Request Object
+This is an object containing information about a visitations request.
+
+##### Fields:
+* `id`: A unique identifier for the visitations request.
+* `timeRequestIssued`: The date and time (ISO) when the request was issued by the visitor.
+* `host`: A [user object](#userObject) containing information about the user to whom this Vs request was sent.
+* `visitor`: A [user object](#userObject) containing information about the user who issued the Vs request.  Does not contain the field `roomNumber.`
+
+---
 
 ## <a name="termDefinitions"></a>Term definitions
 This section contains definitions of a few terms used in the API.

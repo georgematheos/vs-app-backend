@@ -9,14 +9,13 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {
     const users = hook.app.service('/users');
 
-    // rename `data` field to `visitationsRequests`
-    hook.result.visitationsRequests = hook.result.data;
-    delete hook.result.data;
+    // the requests are either in the hook.result.data array, or the hook.result is just one request
+    let requests = hook.result.data || [ hook.result ];
 
     let promises = [];
 
     // for each vs request
-    for (let request of hook.result.visitationsRequests) {
+    for (let request of requests) {
 
       // replace hostUsername with host user object
       promises.push(users.find({ query: { username: request.hostUsername } })
@@ -49,6 +48,19 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
     }
 
     return Promise.all(promises)
-    .then(() => hook);
+    .then(() => {
+      // if a data field is included, it means we are returning a whole array, so change this name
+      // and send the array
+      if (hook.result.data) {
+        delete hook.result.data;
+        hook.result.visitationsRequests = requests;
+      }
+      // if data field is not included, then return just the one request
+      else {
+        hook.result = requests[0];
+      }
+
+      return hook;
+    });
   };
 };
