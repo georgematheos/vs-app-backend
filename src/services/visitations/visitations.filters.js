@@ -2,11 +2,12 @@
 
 module.exports = {
   created: (data, connection, hook) => {
-    // only send this if user is authenticated, and is either a faculty member in the dormitory
-    // where vs are starting, or is a dean
-    if (connection.user && (
-      (!connection.user.isStudent && connection.user.dormitory === data.host.dormitory) || connection.user.isDean
-    )) {
+    // only send this if user is authenticated, and is a faculty member, and is either a dean
+    // or in the dorm where vs are occurring
+    if (!connection.user) return false;
+    if (connection.user.isStudent) return false;
+
+    if (connection.user.isDean || connection.user.dormitory === data.host.dormitory) {
       return data;
     }
 

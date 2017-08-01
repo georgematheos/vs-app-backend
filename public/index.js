@@ -20,7 +20,7 @@ function getService(name) {
 
 feathersClient.authenticate({
   strategy: 'local',
-  username: 'mlisa',
+  username: 'bbalduchy',
   password: 'password'
 })
 .then(response => {
