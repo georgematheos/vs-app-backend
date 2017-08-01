@@ -37,8 +37,9 @@ const VALID_STRATEGY_VALUES = [
 const errors = require('feathers-errors');
 
 function getValueFromHook(hook, specifier) {
-  // if the specifier is not an object, assume it is instead the correct value to return
-  if (typeof specifier !== 'object') {
+  // if the specifier is not an object, or it is null or undefined, assume that the specifier itself is
+  // the correct value to return
+  if (typeof specifier !== 'object' || specifier === undefined || specifier === null) {
     return Promise.resolve(specifier);
   }
 

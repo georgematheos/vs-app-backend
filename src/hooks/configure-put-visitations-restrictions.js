@@ -6,10 +6,12 @@
 const errors = require('feathers-errors');
 const restrictTo = require('./restrict-to');
 const ensureUserValidity = require('./ensure-user-validity');
+const initializeTimedEventPerformer = require('../lib/initialize-timed-event-performer');
 
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {
     const username = hook.id; // the username of the user to restrict from vs
+    const restrictionsEndTime = hook.data.endTime;
 
     // get the user's user object to check whether they exist, and to find their dorm
     return hook.app.service('/users').find({ query: { username } })
@@ -28,7 +30,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
         { strategy: 'included', value: results.data[0] },
         { isStudent: true }
       )(hook)
-      // also make sure the person making the request is a dean of fac in user's dorm
+      // also make sure the person making the request is a dean or fac in user's dorm
       .then(restrictTo(
         { isDean: true }, // dean
         { isStudent: false, dormitory } // faculty member in user's dorm
@@ -44,8 +46,26 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
       return hook.service.create(hook.data)
       .then(results => {
         hook.result = results;
-        return hook;
       });
+    })
+    // finally, if the request included a time for the restrictions to end, make a timed event to do
+    // this
+    .then(() => {
+      if (restrictionsEndTime) {
+        hook.app.service('/timed-events')
+        .create({
+          type: 1,
+          time: restrictionsEndTime,
+          service: 'visitations-restrictions',
+          method: 'remove',
+          parameters: [ hook.id ]
+        })
+        .then(result => {
+          initializeTimedEventPerformer(hook.app, result);
+        });
+      }
+
+      return hook;
     });
   };
 };

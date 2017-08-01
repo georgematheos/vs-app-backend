@@ -19,13 +19,13 @@ module.exports = {
     // avoid querying the user database twice
     update: [ configurePutVisitationsRestrictions() ],
     patch: [ disallow() ],
-    remove: [ restrictTo( // only deans or faculty in the dorm may delete a vs restriction
+    remove: [ iff(isProvider('external'), restrictTo( // only deans or faculty in the dorm may delete a vs restriction
       { isDean: true },
       {
         isStudent: false,
         dormitory: { strategy: 'user', username: { strategy: 'id' }, fieldName: 'dormitory' }
       }
-    ) ]
+    )) ]
   },
 
   after: {

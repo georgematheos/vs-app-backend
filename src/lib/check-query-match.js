@@ -27,7 +27,6 @@ function checkQueryMatch(hook, obj, ...queries) {
     // for this query, check each property included
     fieldLoop: for (let fieldName in query) {
       if (query.hasOwnProperty(fieldName)) { // make sure field isn't on prototype
-
         fieldLoopPromises.push(getValueFromHook(hook, query[fieldName])
         .then(value => {
           // if obj[fieldName] doesn't have the value of the query object, the query doesn't match
