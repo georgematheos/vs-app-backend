@@ -60,7 +60,24 @@ function initializeTimedEventPerformer(app, timedEvent) {
     millisecondsUntilEvent = 0;
   };
 
-  setTimeout(functionToPerform, millisecondsUntilEvent);
+  // if there was previously a timer for this timed event, cancel it
+  if (timedEvent.timerId) {
+    let timeoutIdObj = app.get('timerIdConverter').getTimerIdObject(timedEvent.timerId);
+    if (timeoutIdObj) {
+      clearTimeout(timeoutIdObj);
+    }
+  }
+
+  // set a timer for performing this event
+  let timeoutIdObj = setTimeout(functionToPerform, millisecondsUntilEvent);
+  let timerId = app.get('timerIdConverter').storeTimerIdObject(timeoutIdObj);
+
+  // put the new timer on the timed event service
+  app.service('/timed-events').patch(timedEvent._id, { timerId })
+  .then(result => {
+    console.log('Successfully set timer for a timed event, and added a timerId to the stored version of it. Timed event:');
+    console.log(result);
+  });
 }
 
 module.exports = initializeTimedEventPerformer;

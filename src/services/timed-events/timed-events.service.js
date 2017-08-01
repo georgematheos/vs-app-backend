@@ -4,6 +4,7 @@ const hooks = require('./timed-events.hooks');
 const filters = require('./timed-events.filters');
 
 const initializeAllTimedEventPerformers = require('../../lib/initialize-all-timed-event-performers');
+const timerIdConverter = require('../../lib/timer-id-converter');
 
 module.exports = function () {
   const app = this;
@@ -22,7 +23,9 @@ module.exports = function () {
     mongoClient.then(db => {
       service.Model = db.collection('timed-events');
     }),
-    service.hooks(hooks)
+    service.hooks(hooks),
+    // store the timer id converter on the app so it can be accessed
+    app.set('timerIdConverter', timerIdConverter)
   ];
 
   if (service.filter) {

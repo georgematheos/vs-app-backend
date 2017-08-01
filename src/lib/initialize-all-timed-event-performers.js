@@ -22,7 +22,12 @@ function initializeAllTimedEventPerformers(app) {
   function initializePageOfEvents(results) {
     // set each timedEvent to be performed at the right time
     for (let timedEvent of results.data) {
-      initializeTimedEventPerformer(app, timedEvent);
+      // make sure the timerId is set to a value that is a valid timerId (which is numerical)
+      // to make sure that the timerId is reset, and to make sure it isn't a timerId for some other
+      // timer (which can happen after server restarts), since if it is for another timer, that timer
+      // would be canceled
+      timedEvent.timerId = '$INVALID$';
+      initializeTimedEventPerformer(app, timedEvent, true);
     }
 
     // if there are more pages to get, run this function again with the next set of functions

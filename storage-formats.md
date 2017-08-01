@@ -69,6 +69,7 @@ be completed at a specific time, such as automatically deleting a visitations re
 Each timed event information object is stored in a MongoDB as a document with the following fields:
 * `type`: integer. This is a number that specifies the type of action to perform.  It has a limited number of valid values.
 * `time`: milliseconds since Jan. 1, 1970 (the time the event should occur)
+* `timerId`: A numerical timer id that can be used in the timer-id-converter (`src/lib/timer-id-converter`) to retrieve a timeoutID (this is the timer which has been set using setTimeout) for the action of performing this timed event. If no timer exists, this property may be unset.  Also note that if the server is turned off, this timerId's value will be meaningless, and should be removed immediatly once the server is turned back on. 
 * `_id`
 
 All valid values for `type` are listed below, along with a description of what type of action
