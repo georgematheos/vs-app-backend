@@ -1,6 +1,6 @@
 /**
 * format-view-visitations
-* This hook formats the data properly for a find request to the visitations service.
+* This hook formats the data properly for viewing visitations information.
 */
 
 const errors = require('feathers-errors');
@@ -10,8 +10,9 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
     const users = hook.app.service('/users');
     const approvedVisitors = hook.app.service('/approved-visitors');
 
-    let visitationsSessions = hook.result.data;
-    delete hook.result.data;
+    // either the hook.result.data contains vs sessions, or the hook.result is a vs session
+    let visitationsSessions = hook.result.data || [ hook.result ];
+
     let updatedVisitationsSessions = []; // as we reformat vs sessions, we'll put them in this array
     let sessionPromises = []; // promises from loop over Vs sessions
 
@@ -87,9 +88,15 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
 
     return Promise.all(sessionPromises)
     .then(() => {
-
-      // put the sessions as a field on the result
-      hook.result.visitations = updatedVisitationsSessions;
+      // if the data field was included, we should return an array
+      if (hook.result.data) {
+        delete hook.result.data;
+        hook.result.visitations = updatedVisitationsSessions;
+      }
+      // if no data field included, the whole result is the vs session
+      else {
+        hook.result = updatedVisitationsSessions[0];
+      }
 
       return hook;
     });

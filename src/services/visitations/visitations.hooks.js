@@ -52,7 +52,8 @@ module.exports = {
         hook.result.$actionPerformed = hook.result.$actionPerformed || 'visitations session created';
         return hook;
       },
-      configureAutomaticVisitationsEnding()
+      configureAutomaticVisitationsEnding(),
+      formatViewVisitations()
     ],
     update: [],
     patch: [],

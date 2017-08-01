@@ -742,7 +742,7 @@ The use of the websockets client is for receiving information from the server, s
 #### <a name="notificationForVsRequest"></a>Notification for Vs request
 When a user is sent the visitations request, the event `created` will be sent to them on the `visitations-request` service.
 
-Here is the feathers command to handle this request:
+##### Feathers client command to handle event:
 ```javascript
 feathersSocketClient.service('/api/visitations-requests').on('created', data => {
   // do something
@@ -754,19 +754,18 @@ The data sent will be a [visitations request object](#visitationsRequestObject).
 ---
 
 #### <a name="notificationForVsBeginningInDorm"></a> Notification for Vs beginning in dorm
-##### Event: `vs-began-in-dorm`
+When a visitations session begins in the dorm, all faculty members affiliated with that dorm, and 
+all deans, will be sent a `created` event on the `visitations` service.
 
-Sent to a dorm faculty member when a student in the dorm begins getting Vs.
-
-##### Body:
-A [visitations object](#visitationsObject).
-
-##### Feathers client command:
+##### Feathers client command to handle event:
 ```javascript
-feathersNotificationReciever.on('vs-began-in-dorm', body => {
-    // do something with the information received (called 'body')
+feathersSocketClient.service('/api/visitations').on('created', data => {
+    // do something
 });
 ```
+
+The data sent will be a [visitations object](#visitationsObject) for the vs session which
+has started.
 
 ---
 
