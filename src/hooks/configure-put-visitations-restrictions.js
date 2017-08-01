@@ -10,6 +10,9 @@ const initializeTimedEventPerformer = require('../lib/initialize-timed-event-per
 
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {
+    const timedEvents = hook.app.service('/timed-events');
+    let createTimedEvent = false; // whether we have to create a new timed event; start assuming no
+
     const username = hook.id; // the username of the user to restrict from vs
     const restrictionsEndTime = hook.data.endTime;
 
@@ -36,24 +39,50 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
         { isStudent: false, dormitory } // faculty member in user's dorm
       )(hook));
     })
-    // if a document doesn't exist at this url, switch this to a create request
-    .then(() => hook.service.get(username, { $limit: 0 }))
-    .then(results => hook)
-    // if there is a not found error, swap to create request
-    .catch(err => {
-      if (err.code !== 404) { throw err; } // if the error isn't a not found error, throw the error
+    // if a document doesn't exist restricting this user, switch this to a create request
+    .then(() => hook.service.find({ query: { username, $limit: 0 } }))
+    .then(results => {
+      // if a document exists, this should be a normal PUT request
+      if (results.total > 0) {
+        // if restrictions are set to end at a time, make sure the timed event is for that time
+        if (restrictionsEndTime) {
+          // see if a timed event to remove this request already exists
+          return timedEvents.find({
+            type: 1, service: 'visitations-restrictions', method: 'remove', parameters: [ hook.id ]
+          })
+          .then(results => {
+            // if there is currently no timed event set, get out of this .then, but we will have to
+            // create a timed event later
+            if (results.total === 0) {
+              createTimedEvent = true;
+              return;
+            }
+            // if there is currently a timed event, update it with the new endTime
+            else {
+              timedEvents.patch(results.data[0]._id, {
+                time: restrictionsEndTime
+              })
+              .then(result => {
+                initializeTimedEventPerformer(hook.app, result);
+              });
+            }
+          });
+        }
+      }
 
+      // if we get here, no document exists, so convert this to a create request
       return hook.service.create(hook.data)
       .then(results => {
         hook.result = results;
+
+        // if there is an end time specified, we will have to create a timed event
+        if (restrictionsEndTime) { createTimedEvent = true; }
       });
     })
-    // finally, if the request included a time for the restrictions to end, make a timed event to do
-    // this
     .then(() => {
-      if (restrictionsEndTime) {
-        hook.app.service('/timed-events')
-        .create({
+      // if we're supposed to create a timed event, do so
+      if (createTimedEvent) {
+        timedEvents.create({
           type: 1,
           time: restrictionsEndTime,
           service: 'visitations-restrictions',
@@ -65,6 +94,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
         });
       }
 
+      // return the hook
       return hook;
     });
   };
