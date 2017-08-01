@@ -771,17 +771,18 @@ has started.
 
 #### <a name="notificationForVsInDormChanging"></a>Notification for Vs in dorm changing
 ##### Event: `vs-in-dorm-changed`
-Sent to a dorm faculty when there is a change in a Vs session currently occurring in the dorm.  This includes someone joining or leaving the Vs, or the Vs session ending.
+When a visitations session in a dorm changes in some way, all faculty members affiliated with that 
+dorm, and all deans, will be sent a `patched` event on the `visitations` service.
 
-##### Body:
-A [visitations object](#visitationsObject) with current information about the [visitations session](#visitationsSessionTerm).
-
-##### Feathers client command:
+##### Feathers client command to handle event:
 ```javascript
-feathersNotificationReciever.on('vs-in-dorm-changed', body => {
-    // do something with the information received (called 'body')
+feathersSocketClient.service('/api/visitations').on('patched', data => {
+    // do something
 });
 ```
+
+The data sent will be an up-to-date [visitations object](#visitationsObject) for the vs session 
+which has modified.
 
 ## <a name="objectTypeDefinitions"></a>Object Type Definitions
 This section contains the definitions of some standard object types that are transmitted using this API.

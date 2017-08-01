@@ -56,7 +56,7 @@ module.exports = {
       formatViewVisitations()
     ],
     update: [],
-    patch: [],
+    patch: [ formatViewVisitations() ],
     remove: []
   },
 
