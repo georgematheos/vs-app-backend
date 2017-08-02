@@ -23,7 +23,7 @@ const millisecondsInWeek = millisecondsInDay * 7;
 const SCHEDULES = {
   weekday: {
       start: (10 * millisecondsInHour) + (45 * millisecondsInMinute), // 10:45 AM
-      end: (23 * millisecondsInHour) + (50 * millisecondsInMinute) + 59000 // 8:00 PM (20:00 military time)
+      end: (20 * millisecondsInHour) // 8:00 PM (20:00 military time)
   },
   friday: {
       start: (10 * millisecondsInHour) + (45 * millisecondsInMinute), // 10:45 AM
