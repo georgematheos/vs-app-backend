@@ -1,6 +1,6 @@
 /**
-* format-view-visitations-query
-* This hook formats the query before a request to view visitations objects.
+* visitations/hooks/configure-find
+* This hook formats the query before a find request to the visitations service.
 */
 
 const errors = require('feathers-errors');

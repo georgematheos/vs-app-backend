@@ -1,11 +1,11 @@
 /**
-* configure-create-visitations
+* visitations/hooks/configure-create
 * This hook parses a create request to the visitations route, and depending on the context
 * the request is made in, executes the proper method.
 */
 
 const errors = require('feathers-errors');
-const { visitationsCurrentlyAllowed } = require('../lib/visitations-scheduling');
+const { visitationsCurrentlyAllowed } = require('../../../lib/visitations-scheduling');
 
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {

@@ -1,5 +1,5 @@
 /**
-* format-view-visitations-requests
+* visitations-results/hooks/format-results
 * This hook formats the visitations request data for the client.
 */
 

@@ -1,5 +1,5 @@
 /**
-* format-view-visitations-restrictions
+* visitations-restrictions/hooks/format-results
 * Formats the results of a find visitations-restrictions request.
 */
 

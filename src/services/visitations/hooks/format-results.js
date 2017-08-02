@@ -1,6 +1,6 @@
 /**
-* format-view-visitations
-* This hook formats the data properly for viewing visitations information.
+* visitations/hooks/format-results
+* This hook formats the results of a request to the visitations service.
 */
 
 const errors = require('feathers-errors');

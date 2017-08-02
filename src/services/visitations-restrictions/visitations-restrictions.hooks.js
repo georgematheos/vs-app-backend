@@ -1,23 +1,21 @@
 const { authenticate } = require('feathers-authentication').hooks;
 const { disallow, discard, iff, isProvider } = require('feathers-hooks-common');
 
-const configurePutVisitationsRestrictions = require('../../hooks/configure-put-visitations-restrictions');
-
-const formatViewVisitationsRestrictions = require('../../hooks/format-view-visitations-restrictions');
-
-const configureViewVisitationsRestrictionsQuery = require('../../hooks/configure-view-visitations-restrictions-query');
-
 const restrictTo = require('../../hooks/restrict-to');
+
+const configureFind = require('./hooks/configure-find');
+const configureUpdate = require('./hooks/configure-update');
+const formatResults = require('./hooks/format-results');
 
 module.exports = {
     before: {
     all: [ authenticate('jwt') ],
-    find: [ iff(isProvider('external'), configureViewVisitationsRestrictionsQuery()) ],
+    find: [ iff(isProvider('external'), configureFind()) ],
     get: [ disallow('external') ],
     create: [ disallow('external') ],
     // for update method, restrictTo and ensureUserValidity hooks are within configure hook to
     // avoid querying the user database twice
-    update: [ configurePutVisitationsRestrictions() ],
+    update: [ configureUpdate() ],
     patch: [ disallow() ],
     remove: [ iff(isProvider('external'), restrictTo( // only deans or faculty in the dorm may delete a vs restriction
       { isDean: true },
@@ -30,7 +28,7 @@ module.exports = {
 
   after: {
     all: [ discard('_id') ],
-    find: [ formatViewVisitationsRestrictions() ],
+    find: [ formatResults() ],
     get: [],
     create: [],
     update: [],

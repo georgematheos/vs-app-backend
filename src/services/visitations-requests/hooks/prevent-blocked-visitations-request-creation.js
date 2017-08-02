@@ -1,5 +1,5 @@
 /**
-* prevent-blocked-vs-request-creation
+* visitations-requests/hooks/prevent-blocked-visitations-request-creation
 * This throws an error if the Vs request which is about to be created is not allowed due
 * to a vs request block.
 */

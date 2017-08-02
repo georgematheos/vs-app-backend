@@ -1,12 +1,12 @@
 /**
-* configure-put-visitations-restrictions
+* visitations-restrictions/hooks/configure-update
 * Configures a PUT request to the vs restrictions service.
 */
 
 const errors = require('feathers-errors');
-const restrictTo = require('./restrict-to');
-const ensureUserValidity = require('./ensure-user-validity');
-const initializeTimedEventPerformer = require('../lib/initialize-timed-event-performer');
+const restrictTo = require('../../../hooks/restrict-to');
+const ensureUserValidity = require('../../../hooks/ensure-user-validity');
+const initializeTimedEventPerformer = require('../../../lib/initialize-timed-event-performer');
 
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {

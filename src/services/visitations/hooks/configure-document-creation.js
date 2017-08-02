@@ -1,13 +1,13 @@
 /**
-* format-visitations-doc-creation
-* This hook formats the data in a visitations request in the way visitations objects
+* visitations/hooks/configure-document-creation
+* This hook formats the data in a request to the visitations service in the way visitations objects
 * are stored in the database.
 * By the time this hook is called, it should already be certain that a new visitations object
 * must be created, in which there is currently only one visitor.
 */
 
 const errors = require('feathers-errors');
-const createVisitorObject = require('../lib/create-visitor-object');
+const createVisitorObject = require('../../../lib/create-visitor-object');
 
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {

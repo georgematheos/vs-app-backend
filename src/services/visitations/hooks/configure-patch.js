@@ -1,11 +1,11 @@
 /**
-* configure-visitations-patch
+* visitations/hooks/configure-patch
 * Configure patch requests to the visitations field so they can be successful.
 */
 
 const errors = require('feathers-errors');
-const createVisitorObject = require('../lib/create-visitor-object');
-const restrictTo = require('./restrict-to');
+const createVisitorObject = require('../../../lib/create-visitor-object');
+const restrictTo = require('../../../hooks/restrict-to');
 
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {

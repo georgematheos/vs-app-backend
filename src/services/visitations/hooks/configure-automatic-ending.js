@@ -1,10 +1,10 @@
 /**
-* configure-automatic-visitation-ending
+* visitations/hooks/configure-automatic-ending
 * Configures a timed event to automatically have the visitations session end at the end of the day.
 */
 
-const { getTodaysVisitationsEnd } = require('../lib/visitations-scheduling');
-const initializeTimedEventPerformer = require('../lib/initialize-timed-event-performer');
+const { getTodaysVisitationsEnd } = require('../../../lib/visitations-scheduling');
+const initializeTimedEventPerformer = require('../../../lib/initialize-timed-event-performer');
 
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {

@@ -1,5 +1,5 @@
 /**
-* configure-remove-visitations-request
+* visitations-requests/hooks/configure-remove
 * This configures the removal of the visitations request, including accepting or denying the request,
 * if that is what should be done.
 */

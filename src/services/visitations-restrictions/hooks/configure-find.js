@@ -1,5 +1,5 @@
 /**
-* configure-view-visitations-restrictions-query
+* visitations-restrictions/hooks/configure-find
 * Configures the query properly for a find visitations-restrictions request.
 */
 

@@ -1,10 +1,10 @@
 /**
-* configure-view-visitations-requests-query
+* visitations-requests/hooks/configure-find
 * Configures the query for a view visitations requests request.
 */
 
 const errors = require('feathers-errors');
-const restrictTo = require('./restrict-to');
+const restrictTo = require('../../../hooks/restrict-to');
 
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {

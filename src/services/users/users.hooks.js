@@ -11,7 +11,7 @@ const restrict = [
   })
 ];
 
-const formatViewUsers = require('../../hooks/format-view-users');
+const formatResults = require('./hooks/format-results');
 
 module.exports = {
   before: {
@@ -31,8 +31,8 @@ module.exports = {
         commonHooks.discard('password')
       )
     ],
-    find: [formatViewUsers()],
-    get: [formatViewUsers()],
+    find: [ formatResults() ],
+    get: [ formatResults() ],
     create: [],
     update: [],
     patch: [],

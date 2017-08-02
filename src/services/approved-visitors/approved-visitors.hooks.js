@@ -8,7 +8,7 @@ const usernameToUser = require('../../hooks/username-to-user');
 const createDocIfNeeded = require('../../hooks/create-doc-if-needed');
 const checkQueryMatch = require('../../lib/check-query-match');
 
-const preventBlockedApprovedVisitorAddition = require('../../hooks/prevent-blocked-approved-visitor-addition');
+const preventBlockedApprovedVisitorAddition = require('./hooks/prevent-blocked-approved-visitor-addition');
 
 module.exports = {
   before: {

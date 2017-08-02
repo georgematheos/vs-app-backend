@@ -1,9 +1,9 @@
 /**
-* configure-visitations-request-expiration
+* visitations-requests/hooks/configure-expiration
 * Configures a timed event to automatically have the vs request expire after 10 minutes.
 */
 
-const initializeTimedEventPerformer = require('../lib/initialize-timed-event-performer');
+const initializeTimedEventPerformer = require('../../../lib/initialize-timed-event-performer');
 
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {

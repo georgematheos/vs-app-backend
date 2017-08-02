@@ -1,6 +1,6 @@
 /**
-* format-view-users
-* Formats users objects after a get or find request.
+* users/hooks/format-results
+* Formats the results of a request to the users service.
 * Currently, all this hook does is add the field currentlyOnvisitationsRestrictions to the result.
 */
 

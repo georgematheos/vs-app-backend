@@ -1,5 +1,5 @@
 /**
-* send-patch-visitations-events
+* visitations/hooks/emit-patch-events
 * After a patch event, checks what the performed op was, and if needed, emits an event or events.
 */
 
