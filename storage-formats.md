@@ -45,6 +45,7 @@ Visitations objects are stored in a MongoDB as documents with the following fiel
 * `ongoing`: boolean (true if the Vs session has not ended, false if it has)
 * `dormitory`: string
 * `_id`
+* `automaticEndTimedEventId`: id. This field may not be included.  If included, it is the id of a timed event that has been set to end visitations at the end of the day if the user does not end vs.
 
 ### visitations-requests
 Visitation request objects are stored in a MongoDB as documents with the following fields:
