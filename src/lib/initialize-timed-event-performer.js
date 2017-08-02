@@ -64,21 +64,13 @@ function initializeTimedEventPerformer(app, timedEvent) {
     millisecondsUntilEvent = 0;
   };
 
-  // if there was previously a timer for this timed event, cancel it
-  if (oldTimerId) {
-    let timeoutIdObj = app.get('timerIdConverter').getTimerIdObject(oldTimerId);
-    if (timeoutIdObj) {
-      clearTimeout(timeoutIdObj);
-    }
-  }
-
   // set a timer for performing this event
   let timeoutIdObj = setTimeout(functionToPerform, millisecondsUntilEvent);
 
   // if the timed event is occurring within the next tenth of a second, there's no need to store the timer, since it
   // will run out almost immedieatly
   // errors are caused if it
-  if (millisecondsUntilEvent < 100) { return; }
+  //if (millisecondsUntilEvent < 100) { return; }
 
   let timerId = app.get('timerIdConverter').storeTimerIdObject(timeoutIdObj);
 

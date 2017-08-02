@@ -38,7 +38,7 @@ module.exports = {
       configureDocumentCreation()
     ],
     update: [ disallow() ],
-    patch: [ configurePatch() ],
+    patch: [ iff(isProvider('external'), configurePatch()) ],
     remove: [ disallow() ]
   },
 

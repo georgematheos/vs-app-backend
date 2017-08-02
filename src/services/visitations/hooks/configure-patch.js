@@ -92,7 +92,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
 
           // if we are removing the last visitor, end the Vs session
           if (removingLastVisitor) {
-            configureVsSessionEnding();
+            configureVsSessionEnding(result.automaticEndTimedEventId);
           }
 
           return hook;
@@ -111,6 +111,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
         // get the Vs info so we can get the current visitors
         return hook.service.get(hook.id, {})
         .then(result => {
+
           // make sure this Vs session isn't over yet
           if (!result.ongoing) {
             throw new errors.Forbidden('This visitations session has already ended, and a visitor may not be added to a completed Vs session.');
@@ -172,7 +173,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
           // format everything as needed for patch
           hook.data = {};
           hook.data.visitors = newVisitorsData;
-          configureVsSessionEnding();
+          configureVsSessionEnding(result.automaticEndTimedEventId);
 
           // save this array to the hook params
           hook.params.visitorsToRemoveUsernames = visitorsToRemoveUsernames;
@@ -185,12 +186,20 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
         throw new errors.Unprocessable('the provided operation (op: `' + hook.data.op + '`) was not recognized');
     }
 
-    function configureVsSessionEnding() {
+    function configureVsSessionEnding(automaticEndTimedEventId) {
       hook.data.endTime = currentTime;
       hook.data.ongoing = false;
 
       // this IS automatically ended if it is an internal request ending the Vs, false otherwise
       hook.data.automaticallyEnded = (hook.params.provider === undefined);
+
+      if (automaticEndTimedEventId !== undefined) {
+        hook.app.service('/timed-events').remove(automaticEndTimedEventId)
+        .then(result => {
+          console.log('Timed event to end a visitations session was deleted because the visitations session is currently being ended.  Timed event info:');
+          console.log(result);
+        });
+      }
     }
   };
 };

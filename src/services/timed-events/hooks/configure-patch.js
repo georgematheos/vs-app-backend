@@ -6,7 +6,7 @@ const errors = require('feathers-errors');
 
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {
-    hook.params.setTimer = true; // assume that we will want to set a timer after this modification
+    hook.params.setTimer = true; // assume that we will want to update the timer after this modification
 
     // the only field allowed to be changed by a patch request is the 'time' field
     // (or the `timer` field, which will be changed in an after hook when the new timer is set for the new time)
