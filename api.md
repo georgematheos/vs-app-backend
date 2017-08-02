@@ -37,6 +37,7 @@ It is fairly final at this point, but still subject to change if the developers 
   * [Notification for Vs request](#notificationForVsRequest)
   * [Notification for Vs beginning in dorm](#notificationForVsBeginningInDorm)
   * [Notification for Vs in dorm changing](#notificationForVsInDormChanging)
+  * [Notification for visitor removal from Vs](#notificationForVisitorRemovalFromVs)
 * [Object Type Definitions](#objectTypeDefinitions)
   * [User Object](#userObject)
   * [Visitations Object](#visitationsObject)
@@ -185,7 +186,7 @@ All fields are optional.
 
 ##### Feathers command:
 ```javascript
-feathersRestClient.service('current-vs').find({ query: {
+feathersRestClient.service('visitations').find({ query: {
   dormitory: 'Webster' // or any other dormitory name
   onlyShowCurrent: true // or false
   // optionally include more fields or exclude fields shown
@@ -770,7 +771,6 @@ has started.
 ---
 
 #### <a name="notificationForVsInDormChanging"></a>Notification for Vs in dorm changing
-##### Event: `vs-in-dorm-changed`
 When a visitations session in a dorm changes in some way, all faculty members affiliated with that 
 dorm, and all deans, will be sent a `patched` event on the `visitations` service.
 
@@ -783,6 +783,26 @@ feathersSocketClient.service('/api/visitations').on('patched', data => {
 
 The data sent will be an up-to-date [visitations object](#visitationsObject) for the vs session 
 which has modified.
+
+---
+
+#### <a name="notificationForVisitorRemovalFromVs"></a>Notification for visitor removal from Vs
+When a visitor is removed from a Vs session (either because the vs session ended, or
+because the host removed them or they removed themselves from the session), the removed
+visitor will be sent a `visitorRemoved` event on the `visitations` service.
+
+##### Feathers client command to handle event:
+```javascript
+feathersSocketClient.service('/api/visitations').on('visitorRemoved', data => {
+    // do something
+});
+```
+
+The data sent will be an object with the following fields:
+* `removedVisitorUsername`: the username of the visitor who was removed from the Vs session; this should be the username of the user receiving this event
+* `visitationsId`: the ID for the vs session the visitor is being removed from
+
+---
 
 ## <a name="objectTypeDefinitions"></a>Object Type Definitions
 This section contains the definitions of some standard object types that are transmitted using this API.

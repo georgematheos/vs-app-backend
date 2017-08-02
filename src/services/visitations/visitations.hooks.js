@@ -11,6 +11,8 @@ const restrictTo = require('../../hooks/restrict-to');
 const changeFieldName = require('../../hooks/change-field-name');
 const configureAutomaticVisitationsEnding = require('../../hooks/configure-automatic-visitations-ending');
 
+const sendPatchVisitationsEvents = require('../../hooks/send-patch-visitations-events');
+
 module.exports = {
   before: {
     all: [ iff(isProvider('external'), authenticate('jwt')) ],
@@ -61,7 +63,7 @@ module.exports = {
       formatViewVisitations())
     ],
     update: [],
-    patch: [ formatViewVisitations() ],
+    patch: [formatViewVisitations(), sendPatchVisitationsEvents()],
     remove: []
   },
 

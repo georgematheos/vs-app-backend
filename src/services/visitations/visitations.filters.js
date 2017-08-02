@@ -23,5 +23,18 @@ module.exports = {
   },
   updated: () => false,
   patched: deansAndDormFac,
-  removed: () => false
+  removed: () => false,
+  visitorRemoved: (data, connection, hook) => {
+    // if a user is authenticated, and it is either the host or the user who was just removed from vs
+    // send the result to them
+    console.log('removed visitor username:');
+    console.log(data.removedVisitorUsername);
+    if (connection.user &&
+      connection.user.username === data.removedVisitorUsername
+    ) {
+      // return the username of the visitor who was removed
+        return data;
+    }
+    return false;
+  }
 }

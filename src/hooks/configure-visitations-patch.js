@@ -15,12 +15,20 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
       throw new errors.BadRequest('The field `op` must be included in a PATCH request.');
     }
 
+    // store the operation that was performed on the hook params so after hooks can view this
+    hook.params.op = hook.data.op;
+
     switch (hook.data.op) {
       case 'removeVisitor':
         // make sure the username of the visitor to remove was included
         if (!hook.data.visitorUsername) {
           throw new errors.BadRequest('A remove visitors request must have the field `visitorUsername` included in the request body.');
         }
+
+        const visitorToRemoveUsername = hook.data.visitorUsername;
+
+        // so we can access this in after hooks, put it on hook.params
+        hook.params.removedVisitorUsername = visitorToRemoveUsername;
 
         let removingLastVisitor = true; // assume we're removing the last visitor in Vs, change if this is false
         let visitorToRemoveFound = false; // assume we won't find the user to remove until we do
@@ -32,7 +40,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
         // quickly check to make sure either the visitor or host is trying to remove the visitor, otherwise throw an error
         .then(result => {
           return restrictTo(
-            { username: hook.data.visitorUsername },
+            { username: visitorToRemoveUsername },
             { username: result.hostUsername }
           )(hook)
           .then(() => result); // make sure to return the result we found earlier; we still need it
@@ -42,7 +50,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
           let newVisitorsData = []; // we'll recollect the visitors data to format it as needed for the PATCH
           for (let oldVisitorData of result.visitors) {
             // if this isn't the visitor to remove
-            if (oldVisitorData.username !== hook.data.visitorUsername) {
+            if (oldVisitorData.username !== visitorToRemoveUsername) {
               // if this visitor hasn't left yet, we ARE NOT removing the last visitor
               if (!oldVisitorData.timeLeftVs) {
                 removingLastVisitor = false;
@@ -70,12 +78,12 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
 
           // handle a couple of error cases
           if (!visitorToRemoveFound) {
-            throw new errors.NotFound('The user with the username `' + hook.data.visitorUsername + '` was and is not a visitor in this Vs session, and thus cannot be removed as a visitor.');
+            throw new errors.NotFound('The user with the username `' + visitorToRemoveUsername + '` was and is not a visitor in this Vs session, and thus cannot be removed as a visitor.');
           }
           // if the following is true, the previous if was true also, so this second check must
           // come second, since otherwise the first one would never be reached
           if (!visitorCurrentlyInVs) {
-            throw new errors.Unprocessable('This user with the username `' + hook.data.visitorUsername + '` has already left the Vs session, and has not returned, so they cannot be removed.');
+            throw new errors.Unprocessable('This user with the username `' + visitorToRemoveUsername + '` has already left the Vs session, and has not returned, so they cannot be removed.');
           }
 
           // now format the hook data as is necessary for the patch request
@@ -118,15 +126,26 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
             // format patch request properly
             hook.data = {};
             hook.data.visitors = visitorsList;
+
+            return hook;
           });
         });
 
       case 'endVisitations':
+        // store the usernames of all the visitors we have to remove in here,
+        // to put on the hook.params, so after hooks know which visitors were removed
+        let visitorsToRemoveUsernames = [];
+
         // get this vs session's info
         return hook.service.get(hook.id, {})
-        // throw an error if anyone but the host or the server is trying to perform this request
         .then(result => {
-          // we don't have to do this restriction if this is an internal server request, so in that
+          // if this visitations session has already ended, throw error
+          if (!result.ongoing) {
+            throw new errors.Forbidden('This visitations session has already ended; it may not be ended again');
+          }
+
+          // we will throw an error if anyone but the host or the server is trying to perform this request
+          // but we don't have to do this restriction if this is an internal server request, so in that
           // case, just return the result and move on
           if (hook.params.provider === undefined) { return result; }
 
@@ -138,8 +157,14 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
           let newVisitorsData = [];
           // for each visitor, if they haven't left, note that they are leaving now
           for (let oldVisitorData of result.visitors) {
-            if (!oldVisitorData.endTime) {
+            // if visitor hasn't left yet
+            if (!oldVisitorData.timeLeftVs) {
+              // they are leaving now
               oldVisitorData.timeLeftVs = currentTime;
+
+              // add this user's username to the list of visitors being removed from Vs,
+              // since they are being removed here
+              visitorsToRemoveUsernames.push(oldVisitorData.username);
             }
             newVisitorsData.push(oldVisitorData);
           }
@@ -148,6 +173,11 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
           hook.data = {};
           hook.data.visitors = newVisitorsData;
           configureVsSessionEnding();
+
+          // save this array to the hook params
+          hook.params.visitorsToRemoveUsernames = visitorsToRemoveUsernames;
+
+          return hook;
         });
 
       // if the op isn't recognized, throw an error
