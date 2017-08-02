@@ -62,6 +62,7 @@ Vs restrictions objects are stored in a MongoDB as documents with the following 
 * `username`: string (the username of a user who is on Vs restrictions)
 * `dormitory`: string (the dorm of the user who is on Vs restrictions [null if day student])
 * `_id`
+* `automaticEndTimedEventId`: id. This field may not be included.  If included, it is the id of a timed event that has been set to end vs restrictions at the specified if a user does not do so beforehand.
 
 ### timed-events
 This service is only for use by the server.  It is used to store data about events that have to

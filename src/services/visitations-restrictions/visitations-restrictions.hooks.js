@@ -5,6 +5,7 @@ const restrictTo = require('../../hooks/restrict-to');
 
 const configureFind = require('./hooks/configure-find');
 const configureUpdate = require('./hooks/configure-update');
+const deleteAutoEndTimedEvent = require('./hooks/delete-auto-end-timed-event');
 const formatResults = require('./hooks/format-results');
 
 module.exports = {
@@ -16,7 +17,7 @@ module.exports = {
     // for update method, restrictTo and ensureUserValidity hooks are within configure hook to
     // avoid querying the user database twice
     update: [ configureUpdate() ],
-    patch: [ disallow() ],
+    patch: [ disallow('external') ],
     remove: [ iff(isProvider('external'), restrictTo( // only deans or faculty in the dorm may delete a vs restriction
       { isDean: true },
       {
@@ -33,7 +34,7 @@ module.exports = {
     create: [],
     update: [],
     patch: [],
-    remove: []
+    remove: [ deleteAutoEndTimedEvent() ]
   },
 
   error: {

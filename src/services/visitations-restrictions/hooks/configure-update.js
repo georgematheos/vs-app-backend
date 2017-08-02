@@ -85,6 +85,11 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
           service: 'visitations-restrictions',
           method: 'remove',
           parameters: [ hook.id ]
+        })
+        .then(result => {
+          return hook.service.patch(username, {
+            automaticEndTimedEventId: result._id
+          });
         });
       }
 

@@ -28,23 +28,10 @@ function initializeTimedEventPerformer(app, timedEvent) {
         .then(results => {
           console.log('Results of the timed event with id ' + timedEvent._id + ':');
           console.log(results);
-        })
-        // if a 404 error is thrown, it means the document to modify in some way was not found
-        // this is probably okay, and probably just means the document was deleted since this
-        // timed event was created
-        // send a message about it, but don't throw the error
-        .catch(err => {
-          if (err.code !== 404) { throw err }; // if this isn't a 404, it's unexpected, so throw error
-          console.log('A not found error occurred while attempting to perform the following timed event:');
-          console.log(timedEvent);
-          console.log('It will be assumed that this is just because the resource to be modified has been deleted since this timed event was created, and that this is an expected behavior.');
-        })
-        // delete the timed event info object
-        .then(() => app.service('/timed-events').remove(timedEvent._id, {}))
-        .then(results => {
-          console.log('Results of deleting the timed event information object with id ' + timedEvent._id + ':');
-          console.log(results);
         });
+        // don't delete the timed event here; whatever service performed a request from the timed event
+        // should be in charge of deleting the timed event itself, as it will have to delete it if the user
+        // performs the action before the server can, anyway
       }
       break;
 

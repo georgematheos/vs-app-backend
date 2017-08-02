@@ -80,7 +80,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
         session.visitors = visitors;
 
         // delete a couple of fields
-        delete session.hostUsernamel
+        delete session.hostUsername;
         delete session.automaticEndTimedEventId;
 
         // add this session to the list
