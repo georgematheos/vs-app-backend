@@ -1,12 +1,12 @@
 const assert = require('assert');
-const configurePutvisitationsRestrictions = require('../../src/hooks/configure-put-visitations-restrictions');
+const configureAutomaticEnding = require('../../src/services/visitations/hooks/configure-automatic-ending');
 
-describe('\'configure-put-visitations-restrictions\' hook', () => {
+describe('\'configure-automatic-ending\' hook', () => {
   it('runs the hook', () => {
     // A mock hook object
     const mock = {};
     // Initialize our hook with no options
-    const hook = configurePutvisitationsRestrictions();
+    const hook = configureAutomaticEnding();
 
     // Run the hook function (which returns a promise)
     // and compare the resulting hook object

@@ -1,12 +1,12 @@
 const assert = require('assert');
-const configureAutomaticVisitationsEnding = require('../../src/hooks/consigure-automatic-visitations-ending');
+const configureFind = require('../../src/services/visitations-restrictions/hooks/configure-find');
 
-describe('\'configure-automatic-visitation-ending\' hook', () => {
+describe('\'configure-find\' hook', () => {
   it('runs the hook', () => {
     // A mock hook object
     const mock = {};
     // Initialize our hook with no options
-    const hook = configureAutomaticVisitationsEnding();
+    const hook = configureFind();
 
     // Run the hook function (which returns a promise)
     // and compare the resulting hook object

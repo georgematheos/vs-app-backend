@@ -1,12 +1,12 @@
 const assert = require('assert');
-const configureCreateVisitations = require('../../src/hooks/configure-create-visitations');
+const configureRemove = require('../../src/services/visitations-requests/hooks/configure-remove');
 
-describe('\'configure-create-visitations\' hook', () => {
+describe('\'configure-remove\' hook', () => {
   it('runs the hook', () => {
     // A mock hook object
     const mock = {};
     // Initialize our hook with no options
-    const hook = configureCreateVisitations();
+    const hook = configureRemove();
 
     // Run the hook function (which returns a promise)
     // and compare the resulting hook object

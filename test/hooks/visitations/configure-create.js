@@ -1,12 +1,12 @@
 const assert = require('assert');
-const configureViewVisitationsRequestsQuery = require('../../src/hooks/configure-view-visitations-requests-query');
+const configureCreate = require('../../src/services/visitations/hooks/configure-create');
 
-describe('\'configure-view-visitations-requests-query\' hook', () => {
+describe('\'configure-create\' hook', () => {
   it('runs the hook', () => {
     // A mock hook object
     const mock = {};
     // Initialize our hook with no options
-    const hook = configureViewVisitationsRequestsQuery();
+    const hook = configureCreate();
 
     // Run the hook function (which returns a promise)
     // and compare the resulting hook object

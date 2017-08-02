@@ -1,12 +1,12 @@
 const assert = require('assert');
-const formatViewvisitationsRestrictions = require('../../src/hooks/format-view-visitations-restrictions');
+const formatResults = require('../../src/services/visitations-restrictions/hooks/format-results');
 
-describe('\'format-view-visitations-restrictions\' hook', () => {
+describe('\'format-results\' hook', () => {
   it('runs the hook', () => {
     // A mock hook object
     const mock = {};
     // Initialize our hook with no options
-    const hook = formatViewvisitationsRestrictions();
+    const hook = formatResults();
 
     // Run the hook function (which returns a promise)
     // and compare the resulting hook object

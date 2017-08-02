@@ -1,12 +1,12 @@
 const assert = require('assert');
-const preventBlockedApprovedVisitorAddition = require('../../src/hooks/prevent-blocked-approved-visitor-addition');
+const formatResults = require('../../src/services/visitations/hooks/format-results');
 
-describe('\'prevent-blocked-approved-visitor-addition\' hook', () => {
+describe('\'format-results\' hook', () => {
   it('runs the hook', () => {
     // A mock hook object
     const mock = {};
     // Initialize our hook with no options
-    const hook = preventBlockedApprovedVisitorAddition();
+    const hook = formatResults();
 
     // Run the hook function (which returns a promise)
     // and compare the resulting hook object

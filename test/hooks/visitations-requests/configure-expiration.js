@@ -1,12 +1,12 @@
 const assert = require('assert');
-const formatVisitationsDocCreation = require('../../src/hooks/format-visitations-doc-creation');
+const configureExpiration = require('../../src/services/visitations-requests/hooks/configure-expiration');
 
-describe('\'format-visitations-doc-creation\' hook', () => {
+describe('\'configure-expiration\' hook', () => {
   it('runs the hook', () => {
     // A mock hook object
     const mock = {};
     // Initialize our hook with no options
-    const hook = formatVisitationsDocCreation();
+    const hook = configureExpiration();
 
     // Run the hook function (which returns a promise)
     // and compare the resulting hook object

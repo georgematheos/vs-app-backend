@@ -1,12 +1,12 @@
 const assert = require('assert');
-const formatViewVisitations = require('../../src/hooks/format-view-visitations');
+const configureDocumentCreation = require('../../src/services/visitations/hooks/configure-document-creation');
 
-describe('\'format-view-visitations\' hook', () => {
+describe('\'configure-document-creation\' hook', () => {
   it('runs the hook', () => {
     // A mock hook object
     const mock = {};
     // Initialize our hook with no options
-    const hook = formatViewVisitations();
+    const hook = configureDocumentCreation();
 
     // Run the hook function (which returns a promise)
     // and compare the resulting hook object

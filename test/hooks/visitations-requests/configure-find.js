@@ -1,12 +1,12 @@
 const assert = require('assert');
-const preventBlockedVsRequestCreation = require('../../src/hooks/prevent-blocked-vs-request-creation');
+const configureFind = require('../../src/services/visitations-requests/hooks/configure-find');
 
-describe('\'prevent-blocked-vs-request-creation\' hook', () => {
+describe('\'configure-find\' hook', () => {
   it('runs the hook', () => {
     // A mock hook object
     const mock = {};
     // Initialize our hook with no options
-    const hook = preventBlockedVsRequestCreation();
+    const hook = configureFind();
 
     // Run the hook function (which returns a promise)
     // and compare the resulting hook object

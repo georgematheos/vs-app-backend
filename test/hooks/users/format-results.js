@@ -1,12 +1,12 @@
 const assert = require('assert');
-const configureRemoveVisitationsRequest = require('../../src/hooks/configure-remove-visitations-request');
+const formatResults = require('../../src/services/users/hooks/format-results');
 
-describe('\'configure-remove-visitations-request\' hook', () => {
+describe('\'format-results\' hook', () => {
   it('runs the hook', () => {
     // A mock hook object
     const mock = {};
     // Initialize our hook with no options
-    const hook = configureRemoveVisitationsRequest();
+    const hook = formatResults();
 
     // Run the hook function (which returns a promise)
     // and compare the resulting hook object

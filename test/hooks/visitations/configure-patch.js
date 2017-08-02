@@ -1,12 +1,12 @@
 const assert = require('assert');
-const sendPatchVisitationsEvents = require('../../src/hooks/send-patch-visitations-events');
+const configurePatch = require('../../src/services/visitations/hooks/configure-patch');
 
-describe('\'send-patch-visitations-events\' hook', () => {
+describe('\'configure-patch\' hook', () => {
   it('runs the hook', () => {
     // A mock hook object
     const mock = {};
     // Initialize our hook with no options
-    const hook = sendPatchVisitationsEvents();
+    const hook = configurePatch();
 
     // Run the hook function (which returns a promise)
     // and compare the resulting hook object

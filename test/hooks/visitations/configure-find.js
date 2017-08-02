@@ -1,12 +1,12 @@
 const assert = require('assert');
-const formatViewUsers = require('../../src/hooks/format-view-users');
+const configureFind = require('../../src/services/visitations/hooks/configure-find');
 
-describe('\'format-view-users\' hook', () => {
+describe('\'configure-find\' hook', () => {
   it('runs the hook', () => {
     // A mock hook object
     const mock = {};
     // Initialize our hook with no options
-    const hook = formatViewUsers();
+    const hook = configureFind();
 
     // Run the hook function (which returns a promise)
     // and compare the resulting hook object
