@@ -10,6 +10,12 @@
 
 function initializeTimedEventPerformer(app, timedEvent) {
   let functionToPerform;
+
+  // when we log info about timed events, we could end up with different ones having different numbers for the timerId,
+  // which is confusing, so just pull that off the timedEvent object at this point
+  let oldTimerId = timedEvent.timerId;
+  delete timedEvent.timerId;
+
   switch (timedEvent.type) {
     // perform a REST service method
     case 1:
@@ -59,8 +65,8 @@ function initializeTimedEventPerformer(app, timedEvent) {
   };
 
   // if there was previously a timer for this timed event, cancel it
-  if (timedEvent.timerId) {
-    let timeoutIdObj = app.get('timerIdConverter').getTimerIdObject(timedEvent.timerId);
+  if (oldTimerId) {
+    let timeoutIdObj = app.get('timerIdConverter').getTimerIdObject(oldTimerId);
     if (timeoutIdObj) {
       clearTimeout(timeoutIdObj);
     }
@@ -68,6 +74,12 @@ function initializeTimedEventPerformer(app, timedEvent) {
 
   // set a timer for performing this event
   let timeoutIdObj = setTimeout(functionToPerform, millisecondsUntilEvent);
+
+  // if the timed event is occurring within the next tenth of a second, there's no need to store the timer, since it
+  // will run out almost immedieatly
+  // errors are caused if it
+  if (millisecondsUntilEvent < 100) { return; }
+
   let timerId = app.get('timerIdConverter').storeTimerIdObject(timeoutIdObj);
 
   // put the new timer on the timed event service

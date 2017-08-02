@@ -13,7 +13,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
 
     const eventTime = currentTime + tenMinutes; // the event should occur in 10 minutes
 
-    // save info object for deleting Vs request after fixed amount of time
+    // create timed event for deleting visitations request after a fixed amount of time
     hook.app.service('/timed-events') // don't return this; it doesn't have to happen synchronously
     .create({
       type: 1,
@@ -21,10 +21,6 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
       service: 'visitations-requests',
       method: 'remove',
       parameters: [ hook.result.id ] // delete the request with the id of the one just created
-    })
-    // initialize this event to be performed at the right time
-    .then(result => {
-      initializeTimedEventPerformer(hook.app, result);
     });
 
     return hook;

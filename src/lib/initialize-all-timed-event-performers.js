@@ -22,11 +22,11 @@ function initializeAllTimedEventPerformers(app) {
   function initializePageOfEvents(results) {
     // set each timedEvent to be performed at the right time
     for (let timedEvent of results.data) {
-      // make sure the timerId is set to a value that is a valid timerId (which is numerical)
+      // make sure the timerId is set to a value that is a not a valid timerId (such as `undefined`)
       // to make sure that the timerId is reset, and to make sure it isn't a timerId for some other
       // timer (which can happen after server restarts), since if it is for another timer, that timer
       // would be canceled
-      timedEvent.timerId = '$INVALID$';
+      timedEvent.timerId = undefined;
       initializeTimedEventPerformer(app, timedEvent, true);
     }
 
@@ -36,9 +36,7 @@ function initializeAllTimedEventPerformers(app) {
         $skip: results.skip + results.limit,
         $limit: 100
       } })
-      .then(initializePageOfEvents)
-      .catch(err => {
-      });
+      .then(initializePageOfEvents);
     }
   }
 }

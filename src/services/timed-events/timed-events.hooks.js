@@ -1,4 +1,7 @@
-const { disallow } = require('feathers-hooks-common');
+const { disallow, iff } = require('feathers-hooks-common');
+
+const configurePatch = require('./hooks/configure-patch');
+const setEventTimer = require('./hooks/set-event-timer');
 
 module.exports = {
   before: {
@@ -7,8 +10,8 @@ module.exports = {
     find: [],
     get: [],
     create: [],
-    update: [],
-    patch: [],
+    update: [ disallow() ], // to modify time, use patch; to modify anything else, create a new timed event
+    patch: [ configurePatch() ],
     remove: []
   },
 
@@ -16,9 +19,10 @@ module.exports = {
     all: [],
     find: [],
     get: [],
-    create: [],
+    create: [ setEventTimer() ],
     update: [],
-    patch: [],
+    // set a timer if we are supposed to, but not otherwise
+    patch: [ iff(hook => hook.params.setTimer, setEventTimer()) ],
     remove: []
   },
 

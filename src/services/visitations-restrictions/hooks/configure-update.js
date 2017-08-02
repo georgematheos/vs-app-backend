@@ -47,9 +47,9 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
         // if restrictions are set to end at a time, make sure the timed event is for that time
         if (restrictionsEndTime) {
           // see if a timed event to remove this request already exists
-          return timedEvents.find({
+          return timedEvents.find({ query: {
             type: 1, service: 'visitations-restrictions', method: 'remove', parameters: [ hook.id ]
-          })
+          }})
           .then(results => {
             // if there is currently no timed event set, get out of this .then, but we will have to
             // create a timed event later
@@ -61,9 +61,6 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
             else {
               timedEvents.patch(results.data[0]._id, {
                 time: restrictionsEndTime
-              })
-              .then(result => {
-                initializeTimedEventPerformer(hook.app, result);
               });
             }
           });
@@ -88,9 +85,6 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
           service: 'visitations-restrictions',
           method: 'remove',
           parameters: [ hook.id ]
-        })
-        .then(result => {
-          initializeTimedEventPerformer(hook.app, result);
         });
       }
 

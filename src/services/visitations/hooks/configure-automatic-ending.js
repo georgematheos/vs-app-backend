@@ -13,6 +13,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
     // event will occur 15 minutes after visitations sessions are done for the day
     const eventTime = getTodaysVisitationsEnd() + (15 * millisecondsInMinute);
 
+    // create the timed event
     hook.app.service('/timed-events')
     .create({
       type: 1,
@@ -22,9 +23,6 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
       parameters: [ hook.result.id, {
         'op': 'endVisitations'
       }]
-    })
-    .then(result => {
-      initializeTimedEventPerformer(hook.app, result);
     });
 
     return hook;
