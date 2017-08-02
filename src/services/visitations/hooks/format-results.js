@@ -79,8 +79,9 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
         // which contains user objects
         session.visitors = visitors;
 
-        // delete the host username field
-        delete session.hostUsername;
+        // delete a couple of fields
+        delete session.hostUsernamel
+        delete session.automaticEndTimedEventId;
 
         // add this session to the list
         updatedVisitationsSessions.push(session);
