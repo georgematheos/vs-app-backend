@@ -52,8 +52,13 @@ module.exports = {
         hook.result.$actionPerformed = hook.result.$actionPerformed || 'visitations session created';
         return hook;
       },
+
+      // if this was the creation of a Vs session,
+      // configure the Vs session to end at the proper time.
+      // Also, we will be sending an event about its creation, so format it nicely
+      iff( hook => hook.result.$actionPerformed === 'visitations session created',
       configureAutomaticVisitationsEnding(),
-      formatViewVisitations()
+      formatViewVisitations())
     ],
     update: [],
     patch: [ formatViewVisitations() ],

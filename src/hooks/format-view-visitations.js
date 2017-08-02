@@ -7,11 +7,6 @@ const errors = require('feathers-errors');
 
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {
-    // it is possible that we entered this hook having already formatted everything
-    // perform a couple of quick checks to make sure this didn't happen:
-    // if a visitations or host field is present on the hook.result, we have already formatted it
-    // so return the hook object to get out of this hook
-    if (hook.result.visitations || hook.result.host) { return hook; }
 
     const users = hook.app.service('/users');
     const approvedVisitors = hook.app.service('/approved-visitors');

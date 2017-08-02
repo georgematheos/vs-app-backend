@@ -153,34 +153,36 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
             return hook;
           });
         }
+
+        // if we get here, we don't need to make a request,
+        // and we can just create a vs session, or add them to a session if one is ongoing
+        // check if the host is currently hosting a Vs session
+        return visitations.find({ query: {
+          ongoing: true,
+          hostUsername: hook.data.hostUsername
+        }})
+        .then(results => {
+          // if the host is currently hosting a Vs session
+          if (results.total > 0) {
+            return hook.service.patch(results.data[0].id, {
+              op: 'addVisitor',
+              visitorUsername: hook.data.visitorUsername
+            })
+            .then(result => {
+              hook.result = result; // set the result here; don't proceed with POST request
+              // the action performed in the end was that the visitor joined a vs session
+              hook.result.$actionPerformed = 'visitations session joined';
+              return hook;
+            });
+          }
+        });
+
+        // Since, if we get here, the visitor is an approved visitor of the host, and the
+        // host is not already hosting a Vs session, we can proceed to create a new Vs session.
+        // This will be accomplished after this hook's execution,
+        // so all we have to do is return the hook object.
+        return hook;
       });
     })
-    // if we get here, we don't need to make a request,
-    // and we can just create a vs session, or add them to a session if one is ongoing
-    // check if the host is currently hosting a Vs session
-    .then(() => visitations.find({ query: {
-      ongoing: true,
-      hostUsername: hook.data.hostUsername
-    }}))
-    .then(results => {
-      // if the host is currently hosting a Vs session
-      if (results.total > 0) {
-        return hook.service.patch(results.data[0].id, {
-          op: 'addVisitor',
-          visitorUsername: hook.data.visitorUsername
-        })
-        .then(result => {
-          hook.result = result; // set the result here; don't proceed with POST request
-          // the action performed in the end was that the visitor joined a vs session
-          hook.result.$actionPerformed = 'visitations session joined';
-          return hook;
-        });
-      }
-    })
-    // Since, if we get here, the visitor is an approved visitor of the host, and the
-    // host is not already hosting a Vs session, we can proceed to create a new Vs session.
-    // This will be accomplished after this hook's execution,
-    // so all we have to do is return the hook object.
-    .then(() => hook);
   };
 };

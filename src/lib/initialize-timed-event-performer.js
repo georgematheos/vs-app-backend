@@ -31,8 +31,6 @@ function initializeTimedEventPerformer(app, timedEvent) {
           if (err.code !== 404) { throw err }; // if this isn't a 404, it's unexpected, so throw error
           console.log('A not found error occurred while attempting to perform the following timed event:');
           console.log(timedEvent);
-          console.log('Here are the details of the error:');
-          console.log(err);
           console.log('It will be assumed that this is just because the resource to be modified has been deleted since this timed event was created, and that this is an expected behavior.');
         })
         // delete the timed event info object
