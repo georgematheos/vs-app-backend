@@ -21,6 +21,11 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
       service: 'visitations-requests',
       method: 'remove',
       parameters: [ hook.result.id ] // delete the request with the id of the one just created
+    })
+    .then(result => {
+      hook.service.patch(hook.result.id, {
+        expirationTimedEventId: result._id
+      });
     });
 
     return hook;

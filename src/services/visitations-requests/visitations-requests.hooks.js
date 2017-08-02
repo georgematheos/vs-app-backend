@@ -6,6 +6,7 @@ const changeFieldName = require('../../hooks/change-field-name');
 const configureExpiration = require('./hooks/configure-expiration');
 const configureFind = require('./hooks/configure-find');
 const configureRemove = require('./hooks/configure-remove');
+const deleteExpirationTimedEvent = require('./hooks/delete-expiration-timed-event');
 const formatResults = require('./hooks/format-results');
 const preventBlockedVisitationsRequestCreation = require('./hooks/prevent-blocked-visitations-request-creation');
 
@@ -20,7 +21,7 @@ module.exports = {
       preventBlockedVisitationsRequestCreation()
     ],
     update: [ disallow() ],
-    patch: [ disallow() ],
+    patch: [ disallow('external') ],
     remove: [ iff(isProvider('external'), configureRemove()) ]
   },
 
@@ -38,7 +39,7 @@ module.exports = {
     remove: [ hook => {
       hook.result.$actionPerformed = hook.result.$actionPerformed || 'visitations request deleted';
       return hook;
-    } ]
+    }, deleteExpirationTimedEvent() ]
   },
 
   error: {

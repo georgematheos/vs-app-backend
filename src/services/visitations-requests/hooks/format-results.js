@@ -16,6 +16,8 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
 
     // for each vs request
     for (let request of requests) {
+      // don't show users this property
+      delete request.expirationTimedEventId;
 
       // replace hostUsername with host user object
       promises.push(users.find({ query: { username: request.hostUsername } })

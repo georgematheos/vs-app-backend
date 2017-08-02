@@ -16,6 +16,9 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
         throw new errors.NotAuthenticated('The authenticated user may not perform this action.');
       }
 
+      // put this on the params object so we can access it in an after hook
+      hook.params.expirationTimedEventId = result.expirationTimedEventId;
+
       // whether the host is responding (alternatively, it could be the visitor deleting the request)
       const hostIsResponding = hook.params.user.username === result.hostUsername;
 
