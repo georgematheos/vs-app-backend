@@ -54,11 +54,6 @@ function initializeTimedEventPerformer(app, timedEvent) {
   // set a timer for performing this event
   let timeoutIdObj = setTimeout(functionToPerform, millisecondsUntilEvent);
 
-  // if the timed event is occurring within the next tenth of a second, there's no need to store the timer, since it
-  // will run out almost immedieatly
-  // errors are caused if it
-  //if (millisecondsUntilEvent < 100) { return; }
-
   let timerId = app.get('timerIdConverter').storeTimerIdObject(timeoutIdObj);
 
   // put the new timer on the timed event service
