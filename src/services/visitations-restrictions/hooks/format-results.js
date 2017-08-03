@@ -24,6 +24,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
         let user = results.data[0];
         delete user._id;
         delete user.password;
+        user.restrictionsEndTime = restrictionData.endTime; // put on the user when their visitations restrictions end
         hook.result.restrictedUsers.push(user);
       }));
     }

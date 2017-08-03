@@ -673,7 +673,9 @@ feathersRestClient.service('visitations-restrictions').find({}) // optionally pu
 ##### Successful response status code: `200`
 
 ##### Response body (JSON):
-* `restrictedUsers`: an array of [user objects](#userObject), one for each user on Vs restrictions who matched the query
+* `restrictedUsers`: an array of [user objects](#userObject), one for each user on Vs restrictions who matched the query.
+Each of these objects will have an additional field called `restrictionsEndTime` which will be set to the time when the 
+visitations restrictions are set to expire (in milliseconds past Jan. 1, 1970), or to `null`, if no expiration has been set.
 
 ---
 

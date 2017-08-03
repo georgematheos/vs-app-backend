@@ -14,7 +14,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
     let createTimedEvent = false; // whether we have to create a new timed event; start assuming no
 
     const username = hook.id; // the username of the user to restrict from vs
-    const restrictionsEndTime = hook.data.endTime;
+    const endTime = hook.data.endTime;
 
     // get the user's user object to check whether they exist, and to find their dorm
     return hook.app.service('/users').find({ query: { username } })
@@ -24,9 +24,9 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
         throw new errors.NotFound('A user with username `' + username + '` could not be found.');
       }
 
-      // add the dormitory to the hook data
+      // add the dormitory and end time to the hook data
       const { dormitory } = results.data[0];
-      hook.data = { username, dormitory };
+      hook.data = { username, dormitory, endTime };
 
       // now, make sure the user is a student
       return ensureUserValidity(
@@ -45,7 +45,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
       // if a document exists, this should be a normal PUT request
       if (results.total > 0) {
         // if restrictions are set to end at a time, make sure the timed event is for that time
-        if (restrictionsEndTime) {
+        if (endTime) {
           // see if a timed event to remove this request already exists
           return timedEvents.find({ query: {
             type: 1, service: 'visitations-restrictions', method: 'remove', parameters: [ hook.id ]
@@ -60,11 +60,12 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
             // if there is currently a timed event, update it with the new endTime
             else {
               timedEvents.patch(results.data[0]._id, {
-                time: restrictionsEndTime
+                time: endTime
               });
             }
           });
         }
+        return hook; // return the hook object and perform send a normal PUT operation
       }
 
       // if we get here, no document exists, so convert this to a create request
@@ -73,7 +74,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
         hook.result = results;
 
         // if there is an end time specified, we will have to create a timed event
-        if (restrictionsEndTime) { createTimedEvent = true; }
+        if (endTime) { createTimedEvent = true; }
       });
     })
     .then(() => {
@@ -81,7 +82,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
       if (createTimedEvent) {
         timedEvents.create({
           type: 1,
-          time: restrictionsEndTime,
+          time: endTime,
           service: 'visitations-restrictions',
           method: 'remove',
           parameters: [ hook.id ]
