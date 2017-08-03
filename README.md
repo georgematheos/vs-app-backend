@@ -14,3 +14,6 @@ The feathers app started by `src/index.js` is created in `src/root-app.js`.  Thi
 Scripts to perform utility operations for server admins can be found in the `utilities` directory.  For more information, see [`utilities/utilities.md`](utilities/utilities.md).
 
 For more info on the format in which data is stored server-side, see [`storage-formats.md`](storage-formats.md).
+
+For more information about the timed events system used on the server, see [`timed-events.md`](timed-events.md) 
+(understanding this system is important for anyone working on the server).

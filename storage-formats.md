@@ -52,6 +52,7 @@ Visitation request objects are stored in a MongoDB as documents with the followi
 * `timeRequestIssued`: milliseconds since Jan. 1, 1970 (the time the request was issued)
 * `visitorUsername`: string (the username of the visitor who issued the request)
 * `hostUsername`: string (the username of the host the visitor is requesting to get Vs with)
+* `expirationTimedEventId`: id. This field may not be included.  If included, it is the id of a timed event that has been set to delete the visitations request when it expires.
 * `_id`
 
 ### visitations-request-blocks
