@@ -25,7 +25,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
       .find({ query: { username: users[i].username, $limit: 0 } })
       .then(results => {
         // if on vs restrictions, make note
-        users[i].currentlyOnvisitationsRestrictions = results.total > 0;
+        users[i].currentlyOnVisitationsRestrictions = results.total > 0;
       }));
     }
 
