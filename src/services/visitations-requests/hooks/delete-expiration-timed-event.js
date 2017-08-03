@@ -6,6 +6,10 @@ const errors = require('feathers-errors');
 
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {
+    // there will be some delete requests that won't have this id on it, and that's fine, but
+    // this hook doesn't have to do anything in that case
+    if (!hook.params.expirationTimedEventId) { return hook; }
+
     hook.app.service('/timed-events')
     .remove(hook.params.expirationTimedEventId)
     .then(result => {

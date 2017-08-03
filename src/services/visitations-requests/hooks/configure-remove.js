@@ -37,8 +37,9 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
           hostUsername: result.hostUsername,
           visitorUsername: result.visitorUsername
         }).then(results => {
-           // don't continue with the delete request; instead just return the result of this
-           // visitor joining Vs
+          // don't continue with the delete request; it will be deleted when visitations are created
+          // by a hook on that service
+          // instead just return the result of this visitor joining Vs
           hook.result = results;
           return hook;
         });

@@ -28,7 +28,7 @@ module.exports = {
   },
 
   after: {
-    all: [ discard('_id') ],
+    all: [ iff(isProvider('external'), discard('_id')) ],
     find: [ formatResults() ],
     get: [],
     create: [],

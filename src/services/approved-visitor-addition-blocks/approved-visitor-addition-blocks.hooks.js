@@ -1,5 +1,5 @@
 const { authenticate } = require('feathers-authentication').hooks;
-const { disallow, discard } = require('feathers-hooks-common');
+const { disallow, discard, iff, isProvider } = require('feathers-hooks-common');
 
 const configureAddRemovePatch = require('../../hooks/configure-add-remove-patch');
 const restrictTo = require('../../hooks/restrict-to');
@@ -49,7 +49,7 @@ module.exports = {
   },
 
   after: {
-    all: [ discard('_id') ], // remove the id field
+    all: [ iff(isProvider('external'), discard('_id')) ], // remove the id field for external requests
     find: [],
     get:  [ usernameToUser( {
       fieldName: 'blockees',

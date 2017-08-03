@@ -29,17 +29,21 @@ module.exports = {
     all: [ changeFieldName('_id', 'id') ],
     find: [ iff(isProvider('external'), formatResults()) ],
     get: [],
-    // also format the visitations request data on a create request, so that when events
+    // also format the visitations request data on a create request, so that when `created` events
     // are sent, everything is formatted properly
     create: [ configureExpiration(), formatResults() ],
     update: [],
     patch: [],
-    // if the actionPerformed hasn't been set, it means all we did was delete the request,
-    // so communicate this using that field
-    remove: [ hook => {
-      hook.result.$actionPerformed = hook.result.$actionPerformed || 'visitations request deleted';
-      return hook;
-    }, deleteExpirationTimedEvent() ]
+    remove: [
+      hook => {
+        // if the actionPerformed hasn't been set, it means all we did was delete the request,
+        // so communicate this using that field
+        hook.result.$actionPerformed = hook.result.$actionPerformed || 'visitations request deleted';
+        return hook;
+      },
+      // make sure to delete the timed event that had been set to delete this visitations request if the user didn't
+      deleteExpirationTimedEvent()
+    ]
   },
 
   error: {

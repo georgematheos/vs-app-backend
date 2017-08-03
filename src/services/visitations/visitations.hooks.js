@@ -10,7 +10,7 @@ const configureCreate = require('./hooks/configure-create');
 const configureDocumentCreation = require('./hooks/configure-document-creation');
 const configureFind = require('./hooks/configure-find');
 const configurePatch = require('./hooks/configure-patch');
-const emitPatchEvents = require('./hooks/emit-patch-events');
+const emitVisitorRemovedEvents = require('./hooks/emit-visitor-removed-events');
 const formatResults = require('./hooks/format-results');
 
 module.exports = {
@@ -20,7 +20,7 @@ module.exports = {
     find: [ iff(isProvider('external'), configureFind()) ],
     get: [ disallow('external') ],
     create: [
-      // make sure the visitor is the one making this request
+      // make sure the visitor is the one making this request (if it is external; if server is making it, always allow it)
       iff(isProvider('external'), restrictTo(
         { username: { strategy: 'data', fieldName: 'visitorUsername' } }
       )),
@@ -38,7 +38,7 @@ module.exports = {
       configureDocumentCreation()
     ],
     update: [ disallow() ],
-    patch: [ iff(isProvider('external'), configurePatch()) ],
+    patch: [ configurePatch() ],
     remove: [ disallow() ]
   },
 
@@ -48,13 +48,12 @@ module.exports = {
     find: [ iff(isProvider('external'), formatResults()) ],
     get: [],
     create: [
-      // if the actionPerformed field hasn't already been set on the result, we created a vs
-      // session, so make 'visitations session created' its value
+      // if the $actionPerformed has not been set, it means we proceeded with creating a visitations session, so the action
+      // is that a visitations session was created
       hook => {
         hook.result.$actionPerformed = hook.result.$actionPerformed || 'visitations session created';
-        return hook; // TODO: do this in configure create hook
+        return hook;
       },
-
       // if this was the creation of a Vs session,
       // configure the Vs session to end at the proper time.
       // Also, we will be sending an event about its creation, so format it nicely
@@ -63,7 +62,9 @@ module.exports = {
       formatResults())
     ],
     update: [],
-    patch: [ formatResults(), emitPatchEvents() ],
+    // make sure results are nicely formatted for `patched` events
+    // and send any `visitorRemoved` events that should be emitted
+    patch: [ formatResults(), emitVisitorRemovedEvents() ],
     remove: []
   },
 

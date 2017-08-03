@@ -1,6 +1,6 @@
 /**
-* visitations/hooks/emit-patch-events
-* After a patch event, checks what the performed op was, and if needed, emits an event or events.
+* visitations/hooks/emit-visitor-removed-events
+* After a patch event, checks what the performed op was, and if needed, emits some number of `visitorRemoved` events.
 */
 
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars

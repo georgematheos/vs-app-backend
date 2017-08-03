@@ -115,7 +115,8 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
         }
         else {
           // if this request is for the same host, remove the request, and it will either be replaced
-          // with a new one, or if the visitor is now an approved visitor, Vs will just start
+          // with a new one, or if the visitor is now an approved visitor, or has been approved
+          // already via a visitations request, Vs will just start
           promises.push(visitationsRequests.remove(result.id, {}));
         }
       }
@@ -180,7 +181,8 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
         // Since, if we get here, the visitor is an approved visitor of the host, and the
         // host is not already hosting a Vs session, we can proceed to create a new Vs session.
         // This will be accomplished after this hook's execution,
-        // so all we have to do is return the hook object.
+        // so all we have to do is note the action performed and return the hook object.
+        hook.result.$actionPerformed = 'visitations session created';
         return hook;
       });
     })

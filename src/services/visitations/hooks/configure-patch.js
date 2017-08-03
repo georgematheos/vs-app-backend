@@ -12,6 +12,11 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
     const currentTime = (new Date()).getTime(); // the time this request is being processed
 
     if (!hook.data.op) {
+      // if the `op` isn't included, but this is an internal request, we should allow this modification, using standard
+      // patch format, so just exit from this hook
+      if (hook.params.provider === undefined) { return hook; }
+
+      // on the other hand, if an external request doesn't include `op`, we should throw an error
       throw new errors.BadRequest('The field `op` must be included in a PATCH request.');
     }
 
