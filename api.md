@@ -13,6 +13,7 @@ It is fairly final at this point, but still subject to change if the developers 
   * [Visitations](#visitations)
     * [Get/join visitations](#getJoinVisitations)
     * [View visitations data](#viewVisitationsData)
+    * [View information about a specific visitations session](#viewInformationAboutASpecificVisitationsSession)
     * [Remove visitor from visitations](#removeVisitorFromVisitations)
     * [End Vs session](#endVsSession)
   * [Visitations requests](#visitationsRequests)
@@ -20,6 +21,7 @@ It is fairly final at this point, but still subject to change if the developers 
     * [Respond to or delete visitations request](#respondToOrDeleteVisitationsRequest)
     * [Block Vs requests from a user](#blockVsRequestsFromAUser)
     * [Remove Vs request block](#removeVsRequestBlock)
+    * [View Vs request blocks you created](#viewvisitationsRequestBlocksYouCreated)
   * [Approved Visitors](#approvedVisitors)
     * [Add an approved visitor](#addAnApprovedVisitor)
     * [Remove an approved visitor](#removeAnApprovedVisitor)
@@ -27,18 +29,22 @@ It is fairly final at this point, but still subject to change if the developers 
     * [View users for whom one is an approved visitor](#viewUsersForWhomOneIsAnApprovedVisitor)
     * [Block approved visitor addition](#blockApprovedVisitorAddition)
     * [Remove a block on approved visitor addition](#removeABlockOnApprovedVisitorAddition)
-    * [View Vs addition blocks you created](#viewVsAdditionBlocksYouCreated)
-  * [Vs Restrictions](#vsRestrictions)
-    * [Put a user on Vs restrictions](#putAUserOnVsRestrictions)
-    * [Remove a user from Vs restrictions](#removeAUserFromVsRestrictions)
+    * [View approved visitor addition blocks you created](#viewApprovedVisitorAdditionBlocksYouCreated)
+  * [Vs Restrictions](#visitationsRestrictions)
+    * [Put a user on Vs restrictions](#putAUserOnvisitationsRestrictions)
+    * [View Users on Vs Restrictions](#viewUsersOnVsRescrictions)
+    * [Remove a user from Vs restrictions](#removeAUserFromvisitationsRestrictions)
 * [Websockets API](#websocketsApi)
   * [Notification for Vs request](#notificationForVsRequest)
   * [Notification for Vs beginning in dorm](#notificationForVsBeginningInDorm)
   * [Notification for Vs in dorm changing](#notificationForVsInDormChanging)
+  * [Notification for visitor removal from Vs](#notificationForVisitorRemovalFromVs)
 * [Object Type Definitions](#objectTypeDefinitions)
   * [User Object](#userObject)
   * [Visitations Object](#visitationsObject)
+  * [Visitations Request Object](#visitationsRequestObject)
 * [Term Definitions](#termDefinitions)
+  * [Standard pagination interface](#standardPaginationInterfaceTerm)
   * [Visitations Session](#visitationsSessionTerm)
 
 ---
@@ -103,6 +109,7 @@ feathersRestClient.authenticate({
     // feathers automatically configures hooks so the jwt is sent with further feathers requests
     // make sure the feathersRestClient.authenticate command has been run before making requests that require authentication
     // note that due to the asynchronous nature of this function, this will probably be more complicated than simply running commands at a lower down point in the code than the authentication
+    // one easy way to deal with this is to just run any authenticated requests within this then
     // also note that if a session continues after this token has expired, requests will be sent with the outdated token, so this function will have to be called again to get a new one
 
     // of course, you may do something with the response in this .then if it is successful
@@ -112,7 +119,7 @@ feathersRestClient.authenticate({
 });
 ```
 
-##### Successful response status code: `200`
+##### Successful response status code: `201`
 
 ##### Response body (JSON):
 * `accessToken`: A JWT valid for the user. The payload sent with it will include a field `exp` containing the time the token expires (as [Unix time](https://en.wikipedia.org/wiki/Unix_time)).
@@ -124,9 +131,11 @@ feathersRestClient.authenticate({
 
 #### <a name="getJoinVisitations"></a>Get/join visitations
     POST /api/visitations/
-A user who would like to visit another's room during visitations should send this request.  If the visitor is an approved visitor for the specified host, this command will create a [visitations session](#visitationSessionTerm) with the visitor being the only visitor, or, if visitations are already in progress in the host's room, will add the visitor to that [visitations session](#visitationSessionTerm).  If the visitor is not an approved visitor, this will send a request to the host asking for permission for that user to join Vs.  If the host grants permission, a [visitations session](#visitationSessionTerm) will be started if none is currently in progress, or the visitor will be added to the one currently in progress, if one exists.
+A user who would like to visit another's room during visitations should send this request.  If the visitor is an approved visitor for the specified host, this command will create a [visitations session](#visitationSessionTerm) with the visitor being the only visitor, or, if visitations are already in progress in the host's room, will add the visitor to that [visitations session](#visitationSessionTerm).  If the visitor is not an approved visitor, this will send a request to the host asking for permission for that user to join Vs (the visitor may not send a request if they have already sent a request to another host, and this request has not yet been deleted; also note that if the visitor sends a request to the host while another request exists which they have sent to the same host, the first request will be deleted and replaced with the second).  If the host grants permission, a [visitations session](#visitationSessionTerm) will be started if none is currently in progress, or the visitor will be added to the one currently in progress, if one exists.
 
 This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for the person specified in the request body as by `visitorUsername`.
+
+Note: if a visitations session has not been ended by 15 minutes after the latest time on a day when visitations are allowed, the session will automatically end.  If this happens, a field called `automaticallyEnded` on the [visitations object](#visitationsObject) will have the value `true`.
 
 ##### Request body (JSON):
 * `visitorUsername`: The username of the visitor initiating Vs.  Must be a student's username.
@@ -145,10 +154,12 @@ feathersRestClient.service('visitations').create({
 });
 ```
 
-##### Successful response status code:
-* `200` if the visitor is an approved visitor and is added to a Vs session which is currently in progress
-* `201` if the visitor is an approved visitor and a new Vs session starts with that person as visitor
-* `202` if the visitor is not an approved visitor, and a request has been sent to the host
+##### Successful response status code: `201`
+
+A successful response body will contain a field called `$actionPerformed`.  This field will have one of the following values:
+* `visitations session created` - a new visitations session has been created
+* `visitations session joined` - the visitor has been added to an ongoing visitations session
+* `visitations request created` - a visitations request has been sent to the specified host
 
 ---
 
@@ -163,6 +174,7 @@ The request will only return information about visitations that the user (determ
 * Faculty members may view all information about visitations which occurred in the dorm they are affiliated with.
 * Deans may view all information about all visitations.
 
+This request uses the [standard pagination interface](#standardPaginationInterfaceTerm).
 
 ##### Request parameters (inline URL query):
 All fields are optional.
@@ -170,14 +182,12 @@ All fields are optional.
 * `dormitory`: A string which is the name of a dormitory. If included, only Vs which occurred in this dormitory will be returned.
 * `hostUsername`: A string which is a student's username.  If included, only Vs whom the user specified by this username hosted will be returned.
 * `visitorUsername`: A string which is a student's username.  If included, only Vs in which the user specified by this username was a visitor will be returned.
-* `earliestStartTime`: An ISO date.  If this field is included, only Vs which began at or after this time will be retrieved.
-* `latestStartTime`: An ISO date.  If this field is included, only Vs which began at or before this time will be retrieved.
-* `maxResults`: An integer. The maximum number of results to return.  If not included, the server will return 50 results by default, in reverse chronological order by start time.  The cap for this value is 250 (in other words, if `maxResults` is greater than 250, the server will act as though it is 250).
-* `firstResultNumber`: The number of the first result which should be returned. If not included, the server will default to returning items starting with result 1.  (For example, if 50 results are returned per request, and you want to retrieve results 51-100, this field should have the value of 51.)
+* `earliestStartTime`: A date and time, expressed as milliseconds since Jan. 1, 1970.  If this field is included, only Vs which began at or after this time will be retrieved.
+* `latestStartTime`: A date and time, expressed as milliseconds since Jan. 1, 1970.  If this field is included, only Vs which began at or before this time will be retrieved.
 
 ##### Feathers command:
 ```javascript
-feathersRestClient.service('current-vs').find({ query: {
+feathersRestClient.service('visitations').find({ query: {
   dormitory: 'Webster' // or any other dormitory name
   onlyShowCurrent: true // or false
   // optionally include more fields or exclude fields shown
@@ -190,9 +200,34 @@ feathersRestClient.service('current-vs').find({ query: {
 });
 ```
 
+##### Successful response status code: `200`
+
 ##### Response body (JSON):
-* `resultsFound`: The number of results found which matched the search criteria (which may be more than the number of results returned in this request. For example, if there are 60 results that match criteria, but `maxResults` was set to 20 in the request, only 20 results will be sent by the server, but `resultsFound` will have a value of 60).
 * `visitations`: An array of [visitations objects](#visitationsObject), representing the [visitations sessions](#visitationsSessionTerm) which match the search criteria.
+
+---
+
+#### <a name="viewInformationAboutASpecificVisitationsSession"></a>View information about a specific visitations session
+    GET /api/visitations/:id
+This returns the information about the visitations session with the id specified by `:id` in the URL.
+
+This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for a dean, faculty member affiliated with the dorm this visitations session occurred in, or a student who participated in the visitations session.
+
+##### Feathers command:
+```javascript
+feathersRestClient.service('visitations').get(`:id`, {}) // fill in real id
+.then(results => {
+  // do something with the response if request is successful
+})
+.catch(err => {
+  // do something with error if request is unsuccessful
+});
+```
+
+##### Successful response status code: `200`
+
+##### Response body (JSON):
+A [visitations object](#visitationsObject) for the visitations session retrieved.
 
 ---
 
@@ -207,8 +242,6 @@ Removes the specified visitor from a [visitations session](#visitationSessionTyp
 
 This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for either the visitor who is being removed or for the host of the Vs session the visitor is being removed from.
 
-##### Successful response status code: `200`
-
 ##### Feathers command:
 ```javascript
 feathersRestClient.service('visitations').patch(':visitationsId', { // fill in real ID
@@ -222,6 +255,8 @@ feathersRestClient.service('visitations').patch(':visitationsId', { // fill in r
     // do something with error if request is unsuccessful
 });
 ```
+
+##### Successful response status code: `200`
 
 ---
 
@@ -262,6 +297,8 @@ Returns information about any Vs requests that have been sent to the user specif
 
 This must include a valid JWT in the header labeled `x-auth-token`.  This JWT must be valid for the user specified by `hostUsername` or `visitorUsername` in the request parameters.
 
+This request uses the [standard pagination interface](#standardPaginationInterfaceTerm).
+
 ##### Request parameters (inline URL query):
 EXACTLY ONE OF THE FOLLOWING FIELDS SHOULD BE INCLUDED (NOT BOTH):
 * `hostUsername`: The username of the host who would like to see Vs requests which have been sent to them.  Must be a boarding student.
@@ -283,10 +320,7 @@ feathersRestClient.service('visitations-requests').find({ query: {
 ##### Successful response status code: `200`
 
 ##### Response body (JSON):
-* `visitations-requests`: An array of visitations requests objects, each of which contains the following fields:
-  * `id`: A unique identifier for the visitations request.
-  * `timeRequestIssued`: The date and time (ISO) when the request was issued by the visitor.
-  * `visitor`: A [user object](#userObject) containing information about the user who issued the Vs request.  Does not contain the field `roomNumber.`
+* `visitationsRequests`: An array of [visitations requests objects](#visitationsRequestObjects) that match the query (from the request parameters).
 
 ---
 
@@ -313,14 +347,18 @@ feathersRestClient.service('visitations-requests').remove(':visitationsRequestID
 });
 ```
 
-##### Successful response status code:
-* If visitations request is accepted (and Vs begin): `200` (or `201`, if this is the first visitor in a Vs session, and so a Vs session is created).  Also, a visitations object will be sent with information about the Vs session.
-* If the visitations request is denied: `204`
+##### Successful response status code: `200`
+
+A successful response body will contain a field called `$actionPerformed`.  This field will have one of the following values:
+* `visitations session created` - the request was accepted and a visitations session was created with the host and the visitor in it
+* `visitations session joined` - the request was accepted and the visitor who had issued the request has joined the current vs session the host is in
+* `visitations request deleted` - the request was deleted and no visitations sessions have been created or changed
+
 
 ---
 
 #### <a name="blockVsRequestsFromAUser"></a>Block Vs requests from a user
-    PATCH /api/vs-request-blocks/:blockerUsername
+    PATCH /api/visitations-request-blocks/:blockerUsername
     
 ##### Request Body (JSON):
 * `op`: "addBlock",
@@ -348,7 +386,7 @@ feathersRestClient.service('vs-request-block').patch(':blockerUsername', {
 ---
 
 #### <a name="removeVsRequestBlock"></a>Remove Vs request block
-    PATCH /api/vs-request-blocks/:blockerUsername
+    PATCH /api/visitations-request-blocks/:blockerUsername
     
 ##### Request Body (JSON):
 * `op`: "removeBlock",
@@ -372,6 +410,34 @@ feathersRestClient.service('vs-request-block').patch(':blockerUsername', {
 ```
 
 ##### Successful response status code: `200`
+
+---
+
+#### <a name="viewvisitationsRequestBlocksYouCreated"></a>View Vs request blocks you created
+    GET /api/visitations-request-blocks/:blockerUsername
+
+Returns info on all the users the user specified by `:blockerUsername` in the URL has blocked from making Vs requests to them.
+
+This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for the user specified by `:blockerUsername` in the url, or for a dean.  Note that the user specified by `:blockerUsername` must be a student.
+
+#### Feathers command:
+```javascript
+feathersRestClient.service('visitations-request-blocks').get(':blockerUsername', {}) // fill in real username
+.then(results => {
+    // do something with the response if request is successful
+})
+.catch(err => {
+    // do something with error if request is unsuccessful
+});
+```
+
+##### Successful response status code: `200`
+
+##### Response body (JSON):
+* `blocker`: A [user object](#userObject) for the user who has blocked these users.
+* `blockees`: An array of [user objects](#userObject), one for each user who is blocked.
+
+---
 
 ### <a name="approvedVisitors"></a>Approved Visitors
 
@@ -400,7 +466,7 @@ feathersRestClient.service('approved-visitors').patch(':listOwnerUsername', { //
 });
 ```
 
-##### Successful response status code: `200`.
+##### Successful response status code: `200`
 
 ---
 
@@ -550,10 +616,10 @@ feathersRestClient.service('approved-visitor-addition-blocks').patch(':blockerUs
 ##### Successful response status code: `200`
 
 ---
-#### <a name="viewVsAdditionBlocksYouCreated"></a>View Vs addition blocks you created
+#### <a name="viewApprovedVisitorAdditionBlocksYouCreated"></a>View approved visitor addition blocks you created
     GET /api/approved-visitor-addition-blocks/:blockerUsername
 
-Returns info on all the users the user specified by `:blockerUsername` in the URL has added as an approved visitor.
+Returns info on all the users the user specified by `:blockerUsername` in the URL has blocked from adding themself as an approved visitor.
 
 This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for the user specified by `:blockerUsername` in the url, or for a dean.  Note that the user specified by `:blockerUsername` must be a student.
 
@@ -576,22 +642,22 @@ feathersRestClient.service('approved-visitor-addition-blocks').get(':blockerUser
 
 ---
 
-### <a name="vsRestrictions"></a>Vs Restrictions
+### <a name="visitationsRestrictions"></a>Vs Restrictions
 
-#### <a name="putAUserOnVsRestrictions"></a>Put a user on Vs restrictions
-	 PUT /api/vs-restrictions/:username
+#### <a name="putAUserOnvisitationsRestrictions"></a>Put a user on Vs restrictions
+	 PUT /api/visitations-restrictions/:username
 Applies Vs restrictions to the student specified by `:username` in the URL.
 
 This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for a faculty member affiliated with the dorm of the student to be put on Vs restrictions, or a dean.  Also note that the user specified by `:username` must be a student.
 
 ##### Request body (JSON):
 Optional.
-* `endTime`: An ISO date. The date and time when the Vs restrictions should end, and the user should be allowed to get Vs again.  If this value is not included, restrictions will remain until a faculty member or dean removes the restriction.
+* `endTime`: A date and time, expressed as milliseconds since Jan. 1, 1970. The date and time when the Vs restrictions should end, and the user should be allowed to get Vs again.  If this value is not included, restrictions will remain until a faculty member or dean removes the restriction.
 
 ##### Feathers command:
 ```javascript
-feathersRestClient.service('vs-restrictions').update(':usernameOfStudent', { // fill in real username
-  endTime: // an ISO date
+feathersRestClient.service('visitations-restrictions').update(':usernameOfStudent', { // fill in real username
+  endTime: // A date and time, expressed as milliseconds since Jan. 1, 1970.
 })
 .then(results => {
     // do something with the response if request is successful
@@ -601,19 +667,53 @@ feathersRestClient.service('vs-restrictions').update(':usernameOfStudent', { // 
 });
 ```
 
-##### Successful response status code: `201`
+##### Successful response status code: `200`
 
 ---
-#### <a name="removeAUserFromVsRestrictions"></a>Remove a user from Vs restrictions
 
-	 DELETE /api/vs-restrictions/:username
+#### <a name="viewUsersOnVsRescrictions"></a>View users on Vs restrictions
+    
+    GET /api/visitations-restrictions
+Returns info on users who are on Vs restrictions.
+
+This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for a student (in which case only vs restrictions for that student will be returned), a faculty member affiliated with a dorm (in which case only vs restrictions for students in that dorm will be returned), or a dean (in which case all vs restrictions may be returned).
+
+This request uses the [standard pagination interface](#standardPaginationInterfaceTerm).
+
+##### Request parameters (inline URL query) (optional):
+* `username`: If included, this will only return restrictions for the user with the username specified here. Will be ignored if a student is making the request.
+* `dormitory`: If included, this will only return restrictions on people in the specified dorm. Will be ignored if a non-dean faculty member is making the request.
+
+#### Feathers command:
+```javascript
+feathersRestClient.service('visitations-restrictions').find({}) // optionally put a query
+.then(results => {
+    // do something with the response if request is successful
+})
+.catch(err => {
+    // do something with error if request is unsuccessful
+});
+```
+
+##### Successful response status code: `200`
+
+##### Response body (JSON):
+* `restrictedUsers`: an array of [user objects](#userObject), one for each user on Vs restrictions who matched the query.
+Each of these objects will have an additional field called `restrictionsEndTime` which will be set to the time when the 
+visitations restrictions are set to expire (in milliseconds past Jan. 1, 1970), or to `null`, if no expiration has been set.
+
+---
+
+#### <a name="removeAUserFromvisitationsRestrictions"></a>Remove a user from Vs restrictions
+
+	 DELETE /api/visitations-restrictions/:username
 Removes Vs restrictions from the student specified by `:username` in the URL.  This user must currently be on Vs restrictions for this to have any effect.
 
 This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for a faculty member affiliated with the dorm of the student to be put on Vs restrictions, or a dean.
 
 #### Feathers command:
 ```javascript
-feathersRestClient.service('vs-restrictions').remove(':usernameOfStudent', {}) // fill in real username
+feathersRestClient.service('visitations-restrictions').remove(':usernameOfStudent', {}) // fill in real username
 .then(results => {
     // do something with the response if request is successful
 })
@@ -622,7 +722,7 @@ feathersRestClient.service('vs-restrictions').remove(':usernameOfStudent', {}) /
 });
 ```
 
-##### Successful response status code: `204`
+##### Successful response status code: `200`
 
 ---
 
@@ -632,71 +732,104 @@ NOTE that this section is less final than the REST section, and is relatively li
 
 Websockets is another technique for having the server and client communicate.  While REST only allows the client to initiate communication, making requests for the server to respond to, Websockets allows either the client or server to initiate communication.  Thus, it is useful for notifications, so the server can send information to the client when a notification occurs, without the client first making a request.
 
-As with REST, feathers provides a client-side framework for Websockets.  Its configuration is quite simple and described in the “Changing the HTML for Feathers client WebSocket calls“ section of the following webpage: https://docs.feathersjs.com/guides/step-by-step/basic-feathers/socket-client.html.  As noted at the beginning of the REST API, there is a more modular way of including feathers files that is a better design paradigm.
+As with REST, feathers provides a client-side framework for Websockets.  Its configuration is described in the “Changing the HTML for Feathers client WebSocket calls“ section of the following webpage: https://docs.feathersjs.com/guides/step-by-step/basic-feathers/socket-client.html.  As noted at the beginning of the REST API, there is a more modular way of including feathers files that is a better design paradigm.
+Make sure to include the socket.io client properly; I found that the [socket.io website](https://socket.io) has better documentation for this than the feathers webpage.
 The feathers command examples below assume that the following commands have already been run, with the files above included:
 
 ```javascript
-const socket = io(location.origin + '/api');
-const feathersSocketClient = feathers().configure(feathers.socketio(socket));
-
-// All notifications are sent with the service called 'notifications'
-const feathersNotificationReciever = feathersSocketClient.service('notifications');
+const socket = io(location.origin);
+const feathersSocketClient = feathers()
+.configure(feathers.socketio(socket))
+.configure(feathers.hooks())
+.configure(feathers.authentication({
+  header: 'x-auth-token',
+  service: '/api/authentication',
+  storage: window.localStorage
+}));
 ```
 
-Note that this `feathersSocketClient` can be used instead of the `feathersRestClient` in the examples in the REST API section without any syntax errors.  In fact, the server will most likely be designed so that this replacement will work just fine.  However, that is not a guarantee, and so I would recommend using the REST client for the REST commands.
+Note that this `feathersSocketClient` can be used instead of the `feathersRestClient` in the examples in the REST API section.  The only thing to note is that with socket.io, we cannot initialize the connection to be directly to the `api/` route, so each time a service is called, we must put the `api/` before it.  For example, the visitations service would be accessed using `app.service('/api/visitations')`, not `app.service('/visitations')`.
 
-The use of the websockets client is for receiving information from the server, so the API that will be described is the format of information the server will send the client, and how to set up the client to receive this information.  Use the REST API to send information to the server.
+After this configuration is run, this client should make sure to authenticated:
+
+```javascript
+feathersSocketClient.authenticate({
+  strategy: 'local',
+  username: ':username', // fill in real username and password
+  password: ':password'
+})
+.then(result => {
+  // run all further feathers commands from here, so the user is authenticated
+});
+```
+
+The use of the websockets client is for receiving information from the server, so the API that will be described is the format of information the server will send the client, and how to set up the client to receive this information.  Use the REST API to send information to the server (even if it is done over a websockets connection, the api for it is described above).
 
 ---
 
 #### <a name="notificationForVsRequest"></a>Notification for Vs request
-##### Event: `vs-request`
+When a user is sent the visitations request, the event `created` will be sent to them on the `visitations-request` service.
 
-Sent to a host when a visitor has issued a request to get Vs with the host.  Note that the body is the same as the visitations request object described in the REST API under the `GET /api/visitations-requests/:hostUsername` request description.
-
-##### Body:
-– `timeRequestIssued`: The date and time (ISO) when the request was issued by the visitor.
-– `visitor`: A [user object](#userObject) containing information about the visitor.  Does not include the field `roomNumber`.
-
-##### Feathers client command:
+##### Feathers client command to handle event:
 ```javascript
-feathersNotificationReciever.on('vs-request', body => {
-    // do something with the information received (called 'body')
+feathersSocketClient.service('/api/visitations-requests').on('created', data => {
+  // do something
 });
 ```
+
+The data sent will be a [visitations request object](#visitationsRequestObject).
 
 ---
 
 #### <a name="notificationForVsBeginningInDorm"></a> Notification for Vs beginning in dorm
-##### Event: `vs-began-in-dorm`
+When a visitations session begins in the dorm, all faculty members affiliated with that dorm, and 
+all deans, will be sent a `created` event on the `visitations` service.
 
-Sent to a dorm faculty member when a student in the dorm begins getting Vs.
-
-##### Body:
-A [visitations object](#visitationsObject).
-
-##### Feathers client command:
+##### Feathers client command to handle event:
 ```javascript
-feathersNotificationReciever.on('vs-began-in-dorm', body => {
-    // do something with the information received (called 'body')
+feathersSocketClient.service('/api/visitations').on('created', data => {
+    // do something
 });
 ```
+
+The data sent will be a [visitations object](#visitationsObject) for the vs session which
+has started.
 
 ---
 
 #### <a name="notificationForVsInDormChanging"></a>Notification for Vs in dorm changing
-##### Event: `vs-in-dorm-changed`
-Sent to a dorm faculty when there is a change in a Vs session currently occurring in the dorm.  This includes someone joining or leaving the Vs, or the Vs session ending.
+When a visitations session in a dorm changes in some way, all faculty members affiliated with that 
+dorm, and all deans, will be sent a `patched` event on the `visitations` service.
 
-##### Body:
-A [visitations object](#visitationsObject) with current information about the [visitations session](#visitationsSessionTerm).
-
-##### Feathers client command:
+##### Feathers client command to handle event:
 ```javascript
-feathersNotificationReciever.on('vs-in-dorm-changed', body => {
-    // do something with the information received (called 'body')
+feathersSocketClient.service('/api/visitations').on('patched', data => {
+    // do something
 });
 ```
+
+The data sent will be an up-to-date [visitations object](#visitationsObject) for the vs session 
+which has modified.
+
+---
+
+#### <a name="notificationForVisitorRemovalFromVs"></a>Notification for visitor removal from Vs
+When a visitor is removed from a Vs session (either because the vs session ended, or
+because the host removed them or they removed themselves from the session), the removed
+visitor will be sent a `visitorRemoved` event on the `visitations` service.
+
+##### Feathers client command to handle event:
+```javascript
+feathersSocketClient.service('/api/visitations').on('visitorRemoved', data => {
+    // do something
+});
+```
+
+The data sent will be an object with the following fields:
+* `removedVisitorUsername`: the username of the visitor who was removed from the Vs session; this should be the username of the user receiving this event
+* `visitationsId`: the ID for the vs session the visitor is being removed from
+
+---
 
 ## <a name="objectTypeDefinitions"></a>Object Type Definitions
 This section contains the definitions of some standard object types that are transmitted using this API.
@@ -716,26 +849,68 @@ This is an object containing user information.
 * `profileImageURL`: a url linking to an image of the user
 * `graduationYear`: The year the student is scheduled to graduate Exeter. (field null or not included for faculty)
 * `dormitory`: The dormitory a student or faculty member is affiliated with (field null or not included for users without dorm affiliation).
-Only
 * `roomNumber`: The student's (or faculty, if the faculty lives in a dorm) room number (field null or not included for day students or faculty who do not live in a dorm).  Field may not be included.
+* `currentlyOnvisitationsRestrictions`: A boolean. True if the user is on vs restrictions when the user object is sent, false if the user is not on vs restrictions at that time.  This will be null if the user is not a student.
 
+---
 
 #### <a name="visitationsObject"></a>Visitations Object
 This is an object containing information about a [visitations session](#visitationSessionType).
 
 ##### Fields:
 * `id`: A unique identifier for the [visitations session](#visitationSessionType).
-* `startTime`: The time when the Vs session started (ie. when the first visitor joined Vs) (in the form of an ISO date)
-* `endTime`: The time when the Vs session ended (ie. when the last visitor left Vs) (in the form of an ISO date) (If the Vs haven't ended, this will be null or not included).
-- `ongoing`: A boolean.  True if the Vs are currently occurring, false otherwise.
+* `startTime`: The time when the Vs session started (ie. when the first visitor joined Vs) (in the form of milliseconds since Jan. 1, 1970)
+* `endTime`: The time when the Vs session ended (ie. when the last visitor left Vs) (in the form of milliseconds since Jan. 1, 1970) (If the Vs haven't ended, this will be null or not included).
+* `ongoing`: A boolean.  True if the Vs are currently occurring, false otherwise.
+* `automaticallyEnded`: A boolean. Only included if the vs session has ended.  True if it was ended by the server automatically ending it at the end of the day, false if it was ended by user action (the host ending Vs, or all visitors leaving).
 * `host`: A [user object](#userObject) containing information about the host of the Vs session.  Note that the dorm and room number info for this object is the room and dorm in which the Vs are occurring.
+* `visitorDataRemoved`: A boolean, which may or may not be included. If this field is included and true, it means that information about other visitors who were part of the Vs session was removed before the data was sent to this user, since the user does not have authorization to view the information.  If false or not included, this did not happen.
 * `visitors`: An array of [user objects](#userObject), each containing information about a visitor in the Vs session.  The field `roomNumber` is not included for any user object in this array.  Each object in the array, however, has the following additional fields:
-  * `timeJoinedVs`: An ISO date. The time when this visitor joined the Vs session.
-  * `timeLeftVs`: An ISO date. The time when this visitor left the Vs session.  If the visitor hasn't left, this field will be null.
+  * `timeJoinedVs`: A date and time expressed as milliseconds since Jan. 1, 1970. The time when this visitor joined the Vs session.
+  * `timeLeftVs`: A date and time expressed as milliseconds since Jan. 1, 1970. The time when this visitor left the Vs session.  If the visitor hasn't left, this field will be null.
   * `approvedVisitor`: A boolean.  Whether this student is an approved visitor of the host.
+
+---
+
+#### <a name="visitationsRequestObject"></a>Visitations Request Object
+This is an object containing information about a visitations request.
+
+##### Fields:
+* `id`: A unique identifier for the visitations request.
+* `timeRequestIssued`: The date and time (ISO) when the request was issued by the visitor.
+* `host`: A [user object](#userObject) containing information about the user to whom this Vs request was sent.
+* `visitor`: A [user object](#userObject) containing information about the user who issued the Vs request.  Does not contain the field `roomNumber.`
+
+---
 
 ## <a name="termDefinitions"></a>Term definitions
 This section contains definitions of a few terms used in the API.
+
+#### <a name="standardPaginationInterfaceTerm"></a>Standard pagination interface
+Pagination refers to sending data to the client in "pages", rather than all at once.
+For example, if there are 200 database entries that could be returned, rather than sending 200
+entries, the server may send only 20 at each request the client makes, with the client
+having the ability to choose which entry to start at, so in 10 requests, the client could view
+all the data.
+
+The [standard pagination interface](#standardPaginationInterfaceTerm) is the standard syntax used 
+in this app for pagination.  Note that this is the pagination interface that feathers uses by
+default.  Each method that uses this pagination and this interface makes note of it in its section
+of this document.
+
+Here is how it works:
+
+On the URL query for this method (in addition to any other query parameters), the following
+fields may be included:
+* `$limit`: The maximum number of documents to be returned at once.  The default for this is 10.  The maximum value it may have is 100; if this is set to a greater number, it will default to 100.  (Pro tip: if you just want to see if a document exists, but don't care about its contents, use `$limit=0` to decrease the amount of data sent by the server.)
+* `$skip`: The number of documents to skip before the first returned result.  (For example, if this is set to 10, the first result returned will be the 11th one found.)  Defaults to 0.
+
+On the returned JSON file, the following fields will be included in addition to any others
+specified on the specific method:
+* `limit`: The value used as the limit of the number of documents to send to the client.
+* `skip`: The number of documents skipped before the first one sent to the client.
+* `total`: The total number of documents which matched the query.  If this is greater than `limit`, not all have been sent.
+* Another field will also be included with an array of documents of some sort.
 
 #### <a name="visitationsSessionTerm"></a>Visitations Session
 A visitations session is a continuous, uninterrupted period during which Vs are occurring in an individual's room.  The same visitor does not have to be getting Vs for the whole time, as long as (an)other visitor(s) joins the Vs before the first visitor leaves.  The Vs session ends once all visitors have left the room, and at that point, a new Vs session begins the next time a visitor begins to get Vs in the room.

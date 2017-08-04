@@ -1,5 +1,5 @@
 const { authenticate } = require('feathers-authentication').hooks;
-const { disallow, discard, iff } = require('feathers-hooks-common');
+const { disallow, discard, iff, isProvider } = require('feathers-hooks-common');
 
 const configureAddRemovePatch = require('../../hooks/configure-add-remove-patch');
 const ensureUserValidity = require('../../hooks/ensure-user-validity');
@@ -8,7 +8,7 @@ const usernameToUser = require('../../hooks/username-to-user');
 const createDocIfNeeded = require('../../hooks/create-doc-if-needed');
 const checkQueryMatch = require('../../lib/check-query-match');
 
-const preventBlockedApprovedVisitorAddition = require('../../hooks/prevent-blocked-approved-visitor-addition');
+const preventBlockedApprovedVisitorAddition = require('./hooks/prevent-blocked-approved-visitor-addition');
 
 module.exports = {
   before: {
@@ -56,7 +56,7 @@ module.exports = {
   },
 
   after: {
-    all: [ discard('_id') ], // remove the id field
+    all: [ iff(isProvider('external'), discard('_id')) ], // remove the id field if this is an external request
     find: [],
     get: [ usernameToUser( {
       fieldName: 'approvedVisitors',

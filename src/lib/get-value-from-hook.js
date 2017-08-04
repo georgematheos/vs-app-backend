@@ -37,20 +37,33 @@ const VALID_STRATEGY_VALUES = [
 const errors = require('feathers-errors');
 
 function getValueFromHook(hook, specifier) {
-  // if the specifier is not an object, assume it is instead the correct value to return
-  if (typeof specifier !== 'object') {
+  // if the specifier is not an object, or it is null or undefined, assume that the specifier itself is
+  // the correct value to return
+  if (typeof specifier !== 'object' || specifier === undefined || specifier === null) {
     return Promise.resolve(specifier);
   }
 
   let val;
   switch (specifier.strategy) {
     case 'id':
+      if (hook.id === undefined) {
+        throw new errors.BadRequest('An id must be included in the url.');
+      }
       return Promise.resolve(hook.id);
     case 'data':
+      if (hook.data[specifier.fieldName] === undefined) {
+        throw new errors.BadRequest('The field `' + specifier.fieldName + '` must be included in the request body.');
+      }
       return Promise.resolve(hook.data[specifier.fieldName]);
     case 'params':
+      if (hook.params[specifier.fieldName] === undefined) {
+        throw new errors.GeneralError('The field `' + specifier.fieldName + '` was not included on the hook parameters.');
+      }
       return Promise.resolve(hook.params[specifier.fieldName]);
     case 'authenticated user':
+      if (!hook.params.user) {
+        throw new errors.GeneralError('There is currently no authenticated user.');
+      }
       return Promise.resolve(hook.params.user);
     case 'user':
       // query into users object using the provided username
@@ -69,7 +82,7 @@ function getValueFromHook(hook, specifier) {
         }
 
         // if we get here, we are supposed to return a specific field, so do so
-        return getValueFromHook(hook, specifier.field)
+        return getValueFromHook(hook, specifier.fieldName)
         .then(fieldName => results.data[0][fieldName]);
       });
     case 'included':

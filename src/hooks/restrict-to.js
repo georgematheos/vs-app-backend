@@ -16,8 +16,11 @@ module.exports = function (...validQueries) { // eslint-disable-line no-unused-v
     // supply the authenticated user as the user to check
     return ensureUserValidity({ strategy: 'authenticated user' }, ...validQueries)(hook)
     .then(hook => hook)
-    // if an error is thrown, use our own more specific one instead
+    // if a Forbidden error is thrown, use our own more specific one instead
     .catch(err => {
+      // if this isn't a forbidden error, we shouldn't handle it this way, so just throw it normally
+      if (err.code !== 403) { throw err; }
+
       throw new errors.NotAuthenticated('The authenticated user may not perform this request.');
     });
   };
