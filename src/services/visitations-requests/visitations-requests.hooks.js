@@ -1,8 +1,6 @@
 const { authenticate } = require('feathers-authentication').hooks;
 const { disallow, iff, isProvider } = require('feathers-hooks-common');
 
-const changeFieldName = require('../../hooks/change-field-name');
-
 const configureExpiration = require('./hooks/configure-expiration');
 const configureFind = require('./hooks/configure-find');
 const configureRemove = require('./hooks/configure-remove');
@@ -26,7 +24,7 @@ module.exports = {
   },
 
   after: {
-    all: [ changeFieldName('_id', 'id') ],
+    all: [],
     find: [ iff(isProvider('external'), formatResults()) ],
     get: [],
     // also format the visitations request data on a create request, so that when `created` events

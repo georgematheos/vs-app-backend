@@ -5,6 +5,8 @@
 
 const errors = require('feathers-errors');
 
+const changeFieldName = require('../../../hooks/change-field-name');
+
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {
 
@@ -67,7 +69,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
           visitor.approvedVisitor = visitorData.approvedVisitor;
 
           visitors.push(visitor);
-        }));
+        }).then());
       }
 
       sessionPromises.push(Promise.all(userPromises)
@@ -100,7 +102,8 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
         hook.result = updatedVisitationsSessions[0];
       }
 
-      return hook;
-    });
+    })
+    // change the id's field name from _id to id
+    .then(() => changeFieldName('_id', 'id', 'visitations')(hook));
   };
 };

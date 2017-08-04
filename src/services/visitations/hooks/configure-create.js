@@ -117,7 +117,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
           // if this request is for the same host, remove the request, and it will either be replaced
           // with a new one, or if the visitor is now an approved visitor, or has been approved
           // already via a visitations request, Vs will just start
-          promises.push(visitationsRequests.remove(result.id, {}));
+          promises.push(visitationsRequests.remove(result._id, {}));
         }
       }
       return Promise.all(promises)
@@ -165,7 +165,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
         .then(results => {
           // if the host is currently hosting a Vs session
           if (results.total > 0) {
-            return hook.service.patch(results.data[0].id, {
+            return hook.service.patch(results.data[0]._id, {
               op: 'addVisitor',
               visitorUsername: hook.data.visitorUsername
             })

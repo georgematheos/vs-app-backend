@@ -20,13 +20,13 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
       time: eventTime,
       service: 'visitations',
       method: 'patch',
-      parameters: [ hook.result.id, {
+      parameters: [ hook.result._id, {
         'op': 'endVisitations'
       }]
     })
 
     // store the ID of the timed event created on the visitations object so it can be deleted if the user ends Vs
-    .then(result => hook.service.patch(hook.result.id, {
+    .then(result => hook.service.patch(hook.result._id, {
       automaticEndTimedEventId: result._id
     }));
 

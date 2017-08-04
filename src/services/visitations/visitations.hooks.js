@@ -3,7 +3,6 @@ const { disallow, iff, isProvider } = require('feathers-hooks-common');
 
 const ensureUserValidity = require('../../hooks/ensure-user-validity');
 const restrictTo = require('../../hooks/restrict-to');
-const changeFieldName = require('../../hooks/change-field-name');
 
 const configureAutomaticEnding = require('./hooks/configure-automatic-ending');
 const configureCreate = require('./hooks/configure-create');
@@ -44,7 +43,7 @@ module.exports = {
   },
 
   after: {
-    all: [ changeFieldName('_id', 'id') ],
+    all: [],
     // if this is request is NOT coming from within the server, format the visitations objects as specified by the API
     find: [ iff(isProvider('external'), formatResults()) ],
     get: [ iff(isProvider('external'), restrictAfterGet(), formatResults())],

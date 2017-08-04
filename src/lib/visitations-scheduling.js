@@ -60,7 +60,7 @@ function getCurrentTimeInfo() {
 function getTodaysSchedule() {
   let { currentDay } = getCurrentTimeInfo();
 
-  if (1 <= currentDay <= 4) {
+  if (1 <= currentDay && currentDay <= 4) {
     return SCHEDULES.weekday;
   }
   // friday

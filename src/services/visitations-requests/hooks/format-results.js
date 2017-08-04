@@ -5,6 +5,8 @@
 
 const errors = require('feathers-errors');
 
+const changeFieldName = require('../../../hooks/change-field-name');
+
 module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
   return function (hook) {
     const users = hook.app.service('/users');
@@ -61,8 +63,7 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
       else {
         hook.result = requests[0];
       }
-
-      return hook;
-    });
+    })
+    .then(() => changeFieldName('_id', 'id', 'visitationsRequests')(hook));
   };
 };
