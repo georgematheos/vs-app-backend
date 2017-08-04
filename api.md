@@ -13,6 +13,7 @@ It is fairly final at this point, but still subject to change if the developers 
   * [Visitations](#visitations)
     * [Get/join visitations](#getJoinVisitations)
     * [View visitations data](#viewVisitationsData)
+    * [View information about a specific visitations session](#viewInformationAboutASpecificVisitationsSession)
     * [Remove visitor from visitations](#removeVisitorFromVisitations)
     * [End Vs session](#endVsSession)
   * [Visitations requests](#visitationsRequests)
@@ -203,6 +204,30 @@ feathersRestClient.service('visitations').find({ query: {
 
 ##### Response body (JSON):
 * `visitations`: An array of [visitations objects](#visitationsObject), representing the [visitations sessions](#visitationsSessionTerm) which match the search criteria.
+
+---
+
+#### <a name="viewInformationAboutASpecificVisitationsSession"></a>View information about a specific visitations session
+    GET /api/visitations/:id
+This returns the information about the visitations session with the id specified by `:id` in the URL.
+
+This must include a valid JWT (javascript web token) in the header labeled `x-auth-token`.  This JWT must be valid for a dean, faculty member affiliated with the dorm this visitations session occurred in, or a student who participated in the visitations session.
+
+##### Feathers command:
+```javascript
+feathersRestClient.service('visitations').get(`:id`, {}) // fill in real id
+.then(results => {
+  // do something with the response if request is successful
+})
+.catch(err => {
+  // do something with error if request is unsuccessful
+});
+```
+
+##### Successful response status code: `200`
+
+##### Response body (JSON):
+A [visitations object](#visitationsObject) for the visitations session retrieved.
 
 ---
 

@@ -12,13 +12,14 @@ const configureFind = require('./hooks/configure-find');
 const configurePatch = require('./hooks/configure-patch');
 const emitVisitorRemovedEvents = require('./hooks/emit-visitor-removed-events');
 const formatResults = require('./hooks/format-results');
+const restrictAfterGet = require('./hooks/restrict-after-get');
 
 module.exports = {
   before: {
     all: [ iff(isProvider('external'), authenticate('jwt')) ],
     // format the query if this is an external request, but not if it's an internal one
     find: [ iff(isProvider('external'), configureFind()) ],
-    get: [ disallow('external') ],
+    get: [],
     create: [
       // make sure the visitor is the one making this request (if it is external; if server is making it, always allow it)
       iff(isProvider('external'), restrictTo(
@@ -46,7 +47,7 @@ module.exports = {
     all: [ changeFieldName('_id', 'id') ],
     // if this is request is NOT coming from within the server, format the visitations objects as specified by the API
     find: [ iff(isProvider('external'), formatResults()) ],
-    get: [],
+    get: [ iff(isProvider('external'), restrictAfterGet(), formatResults())],
     create: [
       // if the $actionPerformed has not been set, it means we proceeded with creating a visitations session, so the action
       // is that a visitations session was created
