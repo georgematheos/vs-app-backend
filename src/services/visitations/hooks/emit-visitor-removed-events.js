@@ -17,7 +17,6 @@ module.exports = function (options = {}) { // eslint-disable-line no-unused-vars
         break;
 
       case 'endVisitations':
-        console.log(hook.params.visitorsToRemoveUsernames);
         for (let visitorUsername of hook.params.visitorsToRemoveUsernames) {
           hook.service.emit('visitorRemoved', {
             removedVisitorUsername: visitorUsername,
